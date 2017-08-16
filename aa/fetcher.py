@@ -1,5 +1,9 @@
-import urllib2
-import urllib
+try:
+    from urllib.parse import quote
+    from urllib.request import urlopen
+except ImportError:
+    from urllib import quote
+    from urllib2 import urlopen
 
 from datetime import tzinfo, timedelta, datetime
 
@@ -16,16 +20,16 @@ class AaFetcher(object):
         return datetime.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def _construct_url(self, pv, start, end):
-        encoded_pv = urllib.quote(pv)
-        encoded_start = urllib.quote(self._format_date(start))
-        encoded_end = urllib.quote(self._format_date(end))
+        encoded_pv = quote(pv)
+        encoded_start = quote(self._format_date(start))
+        encoded_end = quote(self._format_date(end))
         suffix = '?pv={}&from={}&to={}'.format(encoded_pv, 
                 encoded_start, encoded_end)
         return '{}{}'.format(self._url, suffix)
 
     def _fetch_data(self, pv, start, end):
         url = self._construct_url(pv, start, end)
-        urlinfo = urllib2.urlopen(url)
+        urlinfo = urlopen(url)
         return urlinfo.read()
 
     def get_value_at(self, pv, start):
@@ -33,7 +37,7 @@ class AaFetcher(object):
 
     def get_values(self, pv, start, end=None, count=None):
         if end is None:
-            end = datetime.datetime.now()
+            end = datetime.now()
         return self._get_values(pv, start, end, count)
 
     def _get_values(self, pv, start, end, count):
