@@ -1,0 +1,10 @@
+
+# Compiled Python
+*.pyc
+.cache
+
+# Virtualenv
+venv
+
+# Vim
+*.swp
