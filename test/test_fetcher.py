@@ -1,10 +1,12 @@
-from aa import jfetcher, fetcher
+from aa import jfetcher, fetcher, pbfetcher
 from datetime import datetime
 import pytest
 import mock
 
 
 DUMMY_PV = 'a-b:c'
+EARLY_DATE = datetime(2001, 1, 1, 1, 1)
+LATE_DATE = datetime(2010, 2, 3, 4, 5)
 
 @pytest.fixture
 def aa_fetcher():
@@ -16,16 +18,13 @@ def test_AaFetcher_constructs_endpoint_correctly(aa_fetcher):
 
 
 def test_AaFetcher_format_date(aa_fetcher):
-    date = datetime(2001, 1, 1, 1, 1)
     expected = '2001-01-01T01:01:00Z'
-    assert aa_fetcher._format_date(date) == expected
+    assert aa_fetcher._format_date(EARLY_DATE) == expected
 
 
 def test_AaFetcher_constructs_url_correctly(aa_fetcher):
-    start_date = datetime(2001, 1, 1, 1, 1)
-    end_date = datetime(2010, 2, 3, 4, 5)
     aa_fetcher._url = 'dummy-url'
-    constructed = aa_fetcher._construct_url(DUMMY_PV, start_date, end_date)
+    constructed = aa_fetcher._construct_url(DUMMY_PV, EARLY_DATE, LATE_DATE)
     expected = 'dummy-url?pv=a-b%3Ac&from=2001-01-01T01%3A01%3A00Z&to=2010-02-03T04%3A05%3A00Z'
     assert constructed == expected
 

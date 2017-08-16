@@ -1,6 +1,4 @@
 from aa import fetcher
-
-import datetime
 import json
 
 
