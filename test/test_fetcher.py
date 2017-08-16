@@ -31,7 +31,7 @@ def test_AaFetcher_constructs_url_correctly(aa_fetcher):
 
 
 def test_AaFetcher_creates_default_for_end_if_not_provided(aa_fetcher):
-    dummy_datetime = datetime(2017, 01, 01)
+    dummy_datetime = datetime(2017, 1, 1)
     dummy_get_values = mock.MagicMock()
     aa_fetcher._get_values = dummy_get_values
     aa_fetcher.get_values(DUMMY_PV, dummy_datetime, end=None)
