@@ -33,7 +33,7 @@ class AaFetcher(object):
 
     def get_values(self, pv, start, end=None, count=None):
         if end is None:
-            end = datetime.datetime.now()
+            end = datetime.now()
         return self._get_values(pv, start, end, count)
 
     def _get_values(self, pv, start, end, count):

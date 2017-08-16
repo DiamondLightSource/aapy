@@ -1,7 +1,10 @@
 from aa import jfetcher, fetcher
 from datetime import datetime
 import pytest
+import mock
 
+
+DUMMY_PV = 'a-b:c'
 
 @pytest.fixture
 def aa_fetcher():
@@ -19,13 +22,23 @@ def test_AaFetcher_format_date(aa_fetcher):
 
 
 def test_AaFetcher_constructs_url_correctly(aa_fetcher):
-    pv = 'a-b:c'
     start_date = datetime(2001, 1, 1, 1, 1)
     end_date = datetime(2010, 2, 3, 4, 5)
     aa_fetcher._url = 'dummy-url'
-    constructed = aa_fetcher._construct_url(pv, start_date, end_date)
+    constructed = aa_fetcher._construct_url(DUMMY_PV, start_date, end_date)
     expected = 'dummy-url?pv=a-b%3Ac&from=2001-01-01T01%3A01%3A00Z&to=2010-02-03T04%3A05%3A00Z'
     assert constructed == expected
+
+
+def test_AaFetcher_creates_default_for_end_if_not_provided(aa_fetcher):
+    dummy_datetime = datetime(2017, 01, 01)
+    dummy_get_values = mock.MagicMock()
+    aa_fetcher._get_values = dummy_get_values
+    aa_fetcher.get_values(DUMMY_PV, dummy_datetime, end=None)
+    args, _ = dummy_get_values.call_args
+    assert args[0] == DUMMY_PV
+    assert args[1] == dummy_datetime
+    assert isinstance(args[2], datetime)
 
 
 def test_JsonFetcher_constructs_url_correctly():
