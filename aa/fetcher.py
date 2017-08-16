@@ -1,7 +1,7 @@
 try:
     from urllib.parse import quote
     from urllib.request import urlopen
-except ImportError:
+except ImportError:  # Python 2 compatibility.
     from urllib import quote
     from urllib2 import urlopen
 
@@ -32,14 +32,13 @@ class AaFetcher(object):
         urlinfo = urlopen(url)
         return urlinfo.read()
 
-    def get_value_at(self, pv, start):
-        return self.get_values(pv, start, start, 1)
-
     def get_values(self, pv, start, end=None, count=None):
         if end is None:
             end = datetime.now()
         return self._get_values(pv, start, end, count)
 
+    def get_value_at(self, pv, start):
+        raise NotImplementedError('This feature is planned but not implemented.')
+
     def _get_values(self, pv, start, end, count):
         raise NotImplementedError()
-
