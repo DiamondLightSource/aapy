@@ -38,7 +38,7 @@ class AaFetcher(object):
         return self._get_values(pv, start, end, count)
 
     def get_value_at(self, pv, start):
-        raise NotImplementedError('This feature is planned but not implemented.')
+        return self._get_values(pv, start, start, 1)
 
     def _get_values(self, pv, start, end, count):
         raise NotImplementedError()
