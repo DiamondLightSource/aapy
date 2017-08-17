@@ -1,4 +1,4 @@
-from aa import jfetcher, fetcher, pbfetcher
+from aa import js, fetcher, pb
 from datetime import datetime
 import pytest
 import mock
@@ -58,12 +58,12 @@ def test_AaFetcher_creates_default_for_end_if_not_provided(aa_fetcher):
 
 
 def test_JsonFetcher_constructs_url_correctly():
-    j = jfetcher.JsonFetcher('localhost', 5000)
+    j = js.JsonFetcher('localhost', 5000)
     assert j._url == 'http://localhost:5000/retrieval/data/getData.json'
 
 
 def test_JsonFetcher_decodes_json_correctly():
-    j = jfetcher.JsonFetcher('localhost', 5000)
+    j = js.JsonFetcher('localhost', 5000)
     j._fetch_data = mock.MagicMock(return_value=JSON_DEMO)
     aa_data = j.get_values(DUMMY_PV, EARLY_DATE, LATE_DATE)
     assert aa_data.pv == DUMMY_PV

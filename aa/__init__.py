@@ -1,4 +1,4 @@
-from . import jfetcher
+from . import js
 import collections
 
 
@@ -10,10 +10,10 @@ ArchiveData = collections.namedtuple('ArchiveData', ('pv', 'values', 'timestamps
 
 
 def get_value_at(pv, date):
-    jf = jfetcher.JsonFetcher(URL, PORT)
-    return jf.get_value_at(pv, date)
+    fetcher = js.JsonFetcher(URL, PORT)
+    return fetcher.get_value_at(pv, date)
 
 
 def get_values(pv, start_date, end_date=None, count=None):
-    jf = jfetcher.JsonFetcher(URL, PORT)
-    return jf.get_values(pv, start_date, end_date, count)
+    fetcher = js.JsonFetcher(URL, PORT)
+    return fetcher.get_values(pv, start_date, end_date, count)
