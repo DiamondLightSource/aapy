@@ -1,10 +1,7 @@
+import aa
 from aa import fetcher
 import json
-import collections
 import numpy
-
-
-AaData = collections.namedtuple('AaData', ('pv', 'values', 'timestamps', 'severities'))
 
 
 class JsonFetcher(fetcher.AaFetcher):
@@ -32,4 +29,4 @@ class JsonFetcher(fetcher.AaFetcher):
             timestamps = numpy.array((0,))
             severities = numpy.array((0,))
 
-        return AaData(pv, values, timestamps, severities)
+        return aa.AaData(pv, values, timestamps, severities)
