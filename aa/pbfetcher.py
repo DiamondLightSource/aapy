@@ -63,25 +63,16 @@ class PbFetcher(fetcher.AaFetcher):
 
     def _get_values(self, pv, start, end, count):
         pb_string = self._fetch_data(pv, start, end)
-        lines = [line.strip() for line in pb_string.split('\n')]
+        chunks = [chunk.strip() for chunk in pb_string.split('\n\n')]
         epics_data = []
-        current_type = None
-        year_timestamp = None
-        for line in lines:
-            if not line:
-                current_type = None
-                year_timestamp = None
-                continue
-            # Additional escaping: see https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html
-            unescaped_line = unescape_line2(line)
-            if current_type is None:  # parse the header
-                pi = eepb.PayloadInfo()
-                pi.ParseFromString(unescaped_line)
-                current_type = pi.type
-                year_timestamp = (datetime(pi.year, 1, 1) - datetime(1970, 1, 1)).total_seconds()
-            else:  # parse an event
-                event = TYPE_MAPPINGS[current_type]()
-                event.ParseFromString(unescaped_line)
+        for chunk in chunks:
+            lines = [unescape_line2(line) for line in chunk.split('\n')]
+            pi = eepb.PayloadInfo()
+            pi.ParseFromString(lines[0])
+            year_timestamp = (datetime(pi.year, 1, 1) - datetime(1970, 1, 1)).total_seconds()
+            for line in lines[1:]:
+                event = TYPE_MAPPINGS[pi.type]()
+                event.ParseFromString(line)
                 epics_data.append({'val': event.val,
                     'secs':event.secondsintoyear+year_timestamp,
                     'nanos': event.nano,
