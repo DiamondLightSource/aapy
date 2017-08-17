@@ -16,7 +16,7 @@ class JsonFetcher(fetcher.AaFetcher):
         json_data = json.loads(json_string)
         if json_data:
             events = json_data[0]['data']
-            array_size = max(count, len(events))
+            array_size = min(count, len(events)) if count is not None else len(events)
             values = numpy.zeros((array_size,))
             timestamps = numpy.zeros((array_size,))
             severities = numpy.zeros((array_size,))
