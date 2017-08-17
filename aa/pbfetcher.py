@@ -85,4 +85,4 @@ class PbFetcher(fetcher.AaFetcher):
         for i, event in zip(range(array_size), (events)):
             values[i], timestamps[i], severities[i] = event
 
-        return aa.AaData(pv, values, timestamps, severities)
+        return aa.ArchiveData(pv, values, timestamps, severities)

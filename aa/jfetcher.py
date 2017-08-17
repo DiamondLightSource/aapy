@@ -27,4 +27,4 @@ class JsonFetcher(fetcher.AaFetcher):
             timestamps = numpy.array((0,))
             severities = numpy.array((0,))
 
-        return aa.AaData(pv, values, timestamps, severities)
+        return aa.ArchiveData(pv, values, timestamps, severities)

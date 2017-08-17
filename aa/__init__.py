@@ -6,7 +6,7 @@ URL = 'cs03r-cs-serv-54.cs.diamond.ac.uk'
 PORT = 8080
 
 
-AaData = collections.namedtuple('AaData', ('pv', 'values', 'timestamps', 'severities'))
+ArchiveData = collections.namedtuple('ArchiveData', ('pv', 'values', 'timestamps', 'severities'))
 
 
 def get_value_at(pv, date):
