@@ -5,6 +5,10 @@
 
 # Virtualenv
 venv
+venv3
 
 # Vim
 *.swp
+
+# Coverage data
+.coverage
