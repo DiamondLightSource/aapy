@@ -1,7 +1,9 @@
+import aa
 from aa import fetcher
 from aa import epics_event_pb2 as eepb
 from datetime import datetime, timedelta
 import curses.ascii as ascii
+import numpy
 
 
 # It is not clear to me why I can't extract this from the compiled protobuf file.
@@ -61,10 +63,9 @@ class PbFetcher(fetcher.AaFetcher):
         super(PbFetcher, self).__init__(hostname, port)
         self._url = '{}/retrieval/data/getData.raw'.format(self._endpoint)
 
-    def _get_values(self, pv, start, end, count):
-        pb_string = self._fetch_data(pv, start, end)
-        chunks = [chunk.strip() for chunk in pb_string.split('\n\n')]
-        epics_data = []
+    def _parse_raw_data(self, raw_data, pv, count):
+        chunks = [chunk.strip() for chunk in raw_data.split('\n\n')]
+        events = []
         for chunk in chunks:
             lines = [unescape_line2(line) for line in chunk.split('\n')]
             pi = eepb.PayloadInfo()
@@ -73,8 +74,15 @@ class PbFetcher(fetcher.AaFetcher):
             for line in lines[1:]:
                 event = TYPE_MAPPINGS[pi.type]()
                 event.ParseFromString(line)
-                epics_data.append({'val': event.val,
-                    'secs':event.secondsintoyear+year_timestamp,
-                    'nanos': event.nano,
-                    'severity': event.severity})
-        return epics_data
+                events.append((event.val,
+                    year_timestamp + event.secondsintoyear + 1e-9 * event.nano,
+                    event.severity))
+
+        array_size = min(count, len(events)) if count is not None else len(events)
+        values = numpy.zeros((array_size,))
+        timestamps = numpy.zeros((array_size,))
+        severities = numpy.zeros((array_size,))
+        for i, event in zip(range(array_size), (events)):
+            values[i], timestamps[i], severities[i] = event
+
+        return aa.AaData(pv, values, timestamps, severities)

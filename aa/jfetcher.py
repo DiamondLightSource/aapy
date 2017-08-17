@@ -10,11 +10,9 @@ class JsonFetcher(fetcher.AaFetcher):
         super(JsonFetcher, self).__init__(hostname, port)
         self._url = '{}/retrieval/data/getData.json'.format(self._endpoint)
 
-    def _get_values(self, pv, start, end, count):
-        json_string = self._fetch_data(pv, start, end)
-        #print(json_string)
-        json_data = json.loads(json_string)
-        if json_data:
+    def _parse_raw_data(self, raw_data, pv, count):
+        json_data = json.loads(raw_data)
+        if raw_data:
             events = json_data[0]['data']
             array_size = min(count, len(events)) if count is not None else len(events)
             values = numpy.zeros((array_size,))
