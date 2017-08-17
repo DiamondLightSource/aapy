@@ -24,7 +24,7 @@ TYPE_MAPPINGS = {
         }
 
 
-ESCAPE_TO = [str(unichr(ascii.ESC)), str(unichr(ascii.NL)), str(unichr(ascii.CR))]
+ESCAPE_TO = [str(ascii.ESC), str(ascii.NL), str(ascii.CR)]
 
 
 def unescape_line1(line):
