@@ -1,5 +1,7 @@
+import aa
 from aa import fetcher
 import json
+import numpy
 
 
 class JsonFetcher(fetcher.AaFetcher):
@@ -10,12 +12,21 @@ class JsonFetcher(fetcher.AaFetcher):
 
     def _get_values(self, pv, start, end, count):
         json_string = self._fetch_data(pv, start, end)
+        #print(json_string)
         json_data = json.loads(json_string)
         if json_data:
-            epics_data = json_data[0]['data']
-            # potentially a performance problem here
-            if count is not None:
-                epics_data = epics_data[:count]
+            events = json_data[0]['data']
+            array_size = min(count, len(events)) if count is not None else len(events)
+            values = numpy.zeros((array_size,))
+            timestamps = numpy.zeros((array_size,))
+            severities = numpy.zeros((array_size,))
+            for i, event in zip(range(array_size), events):
+                values[i] = event['val']
+                timestamps[i] = event['secs'] + 1e-9 * event['nanos']
+                severities[i] = event['severity']
         else:  # no values returned
-            epics_data = []
-        return epics_data
+            values = numpy.array((0,))
+            timestamps = numpy.array((0,))
+            severities = numpy.array((0,))
+
+        return aa.AaData(pv, values, timestamps, severities)

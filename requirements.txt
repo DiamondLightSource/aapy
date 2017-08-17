@@ -3,3 +3,4 @@ mock
 pytest-cov
 protobuf
 python-coveralls
+numpy

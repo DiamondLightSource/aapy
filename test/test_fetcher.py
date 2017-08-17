@@ -8,6 +8,23 @@ DUMMY_PV = 'a-b:c'
 EARLY_DATE = datetime(2001, 1, 1, 1, 1)
 LATE_DATE = datetime(2010, 2, 3, 4, 5)
 
+
+JSON_DEMO = """
+[{
+  "meta": {},
+  "data":
+  [
+    {
+      "secs": 1502963093,
+      "nanos": 123,
+      "val": 1.23,
+      "severity": 1
+    }
+  ]
+}]
+"""
+
+
 @pytest.fixture
 def aa_fetcher():
     return fetcher.AaFetcher('localhost', '3003')
@@ -43,3 +60,13 @@ def test_AaFetcher_creates_default_for_end_if_not_provided(aa_fetcher):
 def test_JsonFetcher_constructs_url_correctly():
     j = jfetcher.JsonFetcher('localhost', 5000)
     assert j._url == 'http://localhost:5000/retrieval/data/getData.json'
+
+
+def test_JsonFetcher_decodes_json_correctly():
+    j = jfetcher.JsonFetcher('localhost', 5000)
+    j._fetch_data = mock.MagicMock(return_value=JSON_DEMO)
+    aa_data = j.get_values(DUMMY_PV, EARLY_DATE, LATE_DATE)
+    assert aa_data.pv == DUMMY_PV
+    assert aa_data.values[0] == 1.23
+    assert aa_data.timestamps[0] == 1502963093.000000123
+    assert aa_data.severities[0] == 1
