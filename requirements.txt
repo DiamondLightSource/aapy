@@ -2,3 +2,4 @@ pytest
 mock
 pytest-cov
 python-coveralls
+numpy
