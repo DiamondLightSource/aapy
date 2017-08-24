@@ -8,7 +8,16 @@ except ImportError:  # Python 2 compatibility.
 from datetime import tzinfo, timedelta, datetime
 
 
-class AaFetcher(object):
+class Fetcher(object):
+
+    def get_values(self, pv, start, end=None, count=None):
+        raise NotImplementedError()
+
+    def get_value_at(self, instant):
+        raise NotImplementedError()
+
+
+class AaFetcher(Fetcher):
 
     def __init__(self, hostname, port):
         self._host = hostname
@@ -37,12 +46,12 @@ class AaFetcher(object):
             end = datetime.now()
         return self._get_values(pv, start, end, count)
 
-    def get_value_at(self, pv, start):
-        return self._get_values(pv, start, start, 1)
+    def get_value_at(self, pv, instant):
+        return self._get_values(pv, instant, instant, 1)
 
     def _get_values(self, pv, start, end, count):
         raw_data = self._fetch_data(pv, start, end)
         return self._parse_raw_data(raw_data, pv, count)
 
     def _parse_raw_data(self, raw_data):
-        raise NotImplementedException()
+        raise NotImplementedError()
