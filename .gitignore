@@ -10,5 +10,8 @@ venv3
 # Vim
 *.swp
 
+# Pycharm
+.idea
+
 # Coverage data
 .coverage
