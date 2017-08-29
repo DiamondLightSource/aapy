@@ -1,7 +1,7 @@
 import numpy
 import aa
+from aa import utils
 from aa.fetcher import Fetcher
-from datetime import datetime
 try:
     from xmlrpc.client import ServerProxy
 except ImportError:  # Python 2 compatibility
@@ -10,47 +10,42 @@ except ImportError:  # Python 2 compatibility
 
 class CaFetcher(Fetcher):
 
-    EPOCH = datetime(1970, 1, 1)
-
     def __init__(self, url):
         self._url = url
         self._proxy = ServerProxy(url)
 
-    def _datetime_to_epoch(self, dt):
-        return int((dt - CaFetcher.EPOCH).total_seconds())
-
     def get_values(self, pv, start, end=None, count=None):
         count = 10000 if count is None else count
-        start_secs = self._datetime_to_epoch(start)
-        end_secs = self._datetime_to_epoch(end)
-        data = self._proxy.archiver.values(1, [PV], start_secs, 0, end_secs, 0, count, 0)
-        array_size = len(data[0]['values'])
-        vals = numpy.zeros((array_size,))
-        timestamps = numpy.zeros((array_size,))
-        sevs = numpy.zeros((array_size,))
-        for i, val in enumerate(data[0]['values']):
-            timestamp = val['secs'] + 1e-9 * val['nano']
-            timestamps[i] = timestamp
-            vals[i] = val['value'][0]
-            sevs[i] = val['sevr']
+        start_secs = utils.datetime_to_epoch(start)
+        end_secs = utils.datetime_to_epoch(end)
+        data = self._proxy.archiver.values(1, [pv], start_secs, 0, end_secs, 0, count, 0)
+        event_count = len(data[0]['values'])
+        wf_length = len(data[0]['values'][0]['value'])
+        values = numpy.zeros((event_count, wf_length))
+        timestamps = numpy.zeros((event_count,))
+        sevs = numpy.zeros((event_count,))
+        count = 0
+        previous_val = {}
+        for val in data[0]['values']:
+            if val == previous_val:
+                print('continuing on duplicate {}'.format(val))
+                continue
+            previous_val = val
 
-        return aa.ArchiveData(pv, vals, timestamps, sevs)
+            timestamp = val['secs'] + 1e-9 * val['nano']
+            if timestamp < start_secs:
+                continue
+            if val['sevr'] > 3:
+                print('discarding {} {}'.format(utils.epoch_to_datetime(timestamp), val))
+                continue
+            timestamps[count] = timestamp
+            values[count] = val['value']
+            sevs[count] = val['sevr']
+            count += 1
+
+        return aa.ArchiveData(pv, numpy.squeeze(values[:count]),
+                              timestamps[:count], sevs[:count])
+
 
     def get_value_at(self, pv, instant):
-        return self._get_values(pv, start, start, 1)
-
-
-if __name__ == '__main__':
-    PV = 'SR-DI-DCCT-01:SIGNAL'
-    PRIMARY_ARCHIVER = 'http://archiver.pri.diamond.ac.uk/archive/cgi/ArchiveDataServer.cgi'
-    fetcher = CaFetcher(PRIMARY_ARCHIVER)
-
-    start = datetime(2016, 1, 2)
-    end = datetime(2017, 1, 1)
-
-    data = fetcher.get_values(PV, start, end)
-
-    print(len(data.values))
-    print(datetime.fromtimestamp(data.timestamps[0]))
-    print(datetime.fromtimestamp(data.timestamps[-1]))
-
+        return self._get_values(pv, instant, instant, 1)
