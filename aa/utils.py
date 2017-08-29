@@ -1,9 +1,10 @@
 import collections
 import numpy
 from datetime import datetime
+import pytz
 
 
-EPOCH = datetime(1970, 1, 1)
+EPOCH = pytz.UTC.localize(datetime(1970, 1, 1))
 ArchiveData = collections.namedtuple('ArchiveData', ('pv', 'values', 'timestamps', 'severities'))
 
 
@@ -22,4 +23,4 @@ def datetime_to_epoch(dt):
 
 
 def epoch_to_datetime(secs):
-    return datetime.fromtimestamp(secs)
+    return datetime.fromtimestamp(secs, tz=pytz.UTC)
