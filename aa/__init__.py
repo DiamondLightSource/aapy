@@ -1,5 +1,11 @@
 from . import js
 from .utils import ArchiveData
+import logging
+
+
+LOG_FORMAT = '%(levelname)s:  %(message)s'
+LOG_LEVEL = logging.INFO
+logging.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
 
 URL = 'cs03r-cs-serv-54.cs.diamond.ac.uk'

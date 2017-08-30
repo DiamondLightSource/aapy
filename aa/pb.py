@@ -98,7 +98,6 @@ class PbFileFetcher(fetcher.Fetcher):
         data = self._read_pb_file(filepath, pv, count)
         start_secs = utils.datetime_to_epoch(start)
         end_secs = utils.datetime_to_epoch(end)
-        print(utils.epoch_to_datetime(data.timestamps[0]))
         for i, ts in enumerate(data.timestamps):
             if ts > start_secs:
                 start_index = i

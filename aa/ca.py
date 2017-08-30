@@ -1,4 +1,5 @@
 import numpy
+import logging as log
 import aa
 from aa import utils
 from aa.fetcher import Fetcher
@@ -28,7 +29,7 @@ class CaFetcher(Fetcher):
         previous_val = {}
         for val in data[0]['values']:
             if val == previous_val:
-                print('continuing on duplicate {}'.format(val))
+                log.debug('Continuing on duplicate event %s', val)
                 continue
             previous_val = val
 
@@ -36,7 +37,8 @@ class CaFetcher(Fetcher):
             if timestamp < start_secs:
                 continue
             if val['sevr'] > 3:
-                print('discarding {} {}'.format(utils.epoch_to_datetime(timestamp), val))
+                log.debug('Discarding error event %s %s',
+                          utils.epoch_to_datetime(timestamp), val)
                 continue
             timestamps[count] = timestamp
             values[count] = val['value']
