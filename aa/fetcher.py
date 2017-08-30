@@ -5,7 +5,7 @@ except ImportError:  # Python 2 compatibility.
     from urllib import quote
     from urllib2 import urlopen
 
-from datetime import tzinfo, timedelta, datetime
+from datetime import datetime
 
 
 class Fetcher(object):
@@ -25,13 +25,13 @@ class AaFetcher(Fetcher):
         self._endpoint = 'http://{}:{}'.format(self._host, self._port)
         self._url = None
 
-    def _format_date(self, datetime):
-        return datetime.strftime('%Y-%m-%dT%H:%M:%SZ')
+    def _format_datetime(self, dt):
+        return dt.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def _construct_url(self, pv, start, end):
         encoded_pv = quote(pv)
-        encoded_start = quote(self._format_date(start))
-        encoded_end = quote(self._format_date(end))
+        encoded_start = quote(self._format_datetime(start))
+        encoded_end = quote(self._format_datetime(end))
         suffix = '?pv={}&from={}&to={}'.format(encoded_pv,
                 encoded_start, encoded_end)
         return '{}{}'.format(self._url, suffix)

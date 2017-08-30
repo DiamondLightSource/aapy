@@ -18,9 +18,9 @@ def test_AaFetcher_constructs_endpoint_correctly(aa_fetcher):
     assert aa_fetcher._endpoint == 'http://localhost:3003'
 
 
-def test_AaFetcher_format_date(aa_fetcher):
+def test_AaFetcher_format_datetime(aa_fetcher):
     expected = '2001-01-01T01:01:00Z'
-    assert aa_fetcher._format_date(EARLY_DATE) == expected
+    assert aa_fetcher._format_datetime(EARLY_DATE) == expected
 
 
 def test_AaFetcher_constructs_url_correctly(aa_fetcher):
