@@ -38,7 +38,9 @@ class CaFetcher(Fetcher):
             timestamps[count] = timestamp
             values[count] = val['value']
             sevs[count] = val['sevr']
-        return aa.ArchiveData(pv, numpy.squeeze(values), timestamps, sevs)
+        if values.shape[1] == 1:
+            values = numpy.squeeze(values, axis=1)
+        return aa.ArchiveData(pv, values, timestamps, sevs)
 
     def get_values(self, pv, start, end=None, count=None):
         # Make count a large number if not specified to ensure we get all
