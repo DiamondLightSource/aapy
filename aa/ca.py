@@ -9,19 +9,31 @@ except ImportError:  # Python 2 compatibility
     from xmlrpclib import ServerProxy
 
 
+class CaClient(object):
+
+    def __init__(self, url):
+        self._proxy = ServerProxy(url)
+
+    def get(self, pv, start, end, count):
+        start_secs = utils.datetime_to_epoch(start)
+        end_secs = utils.datetime_to_epoch(end)
+        response = self._proxy.archiver.values(1, [pv], start_secs, 0,
+                                               end_secs, 0, count, 0)
+        return response[0]['values']
+
+
 class CaFetcher(Fetcher):
 
     def __init__(self, url):
-        self._url = url
-        self._proxy = ServerProxy(url)
+        self._client = CaClient(url)
 
-    def _process_raw_data(self, data, pv):
-        event_count = len(data)
-        wf_length = len(data[0]['value'])
+    def _process_raw_data(self, events, pv):
+        event_count = len(events)
+        wf_length = len(events[0]['value'])
         values = numpy.zeros((event_count, wf_length))
         timestamps = numpy.zeros((event_count,))
         sevs = numpy.zeros((event_count,))
-        for count, val in enumerate(data):
+        for count, val in enumerate(events):
             timestamp = val['secs'] + 1e-9 * val['nano']
             timestamps[count] = timestamp
             values[count] = val['value']
@@ -33,12 +45,11 @@ class CaFetcher(Fetcher):
         # data.
         count = 2**31 if count is None else count
         requested = 10000 if count > 10000 else count
-        start_secs = utils.datetime_to_epoch(start)
-        end_secs = utils.datetime_to_epoch(end)
-        response = self._proxy.archiver.values(1, [pv], start_secs, 0,
-                                               end_secs, 0, requested, 0)
-        done = len(response[0]['values']) < requested
-        data = self._process_raw_data(response[0]['values'], pv)
+        events = self._client.get(pv, start, end, requested)
+        # Fewer samples than requested means that that was all there were,
+        # and so we are done.
+        done = len(events) < requested
+        data = self._process_raw_data(events, pv)
         while done is not True and len(data.values) < count:
             log.warn('{} samples requested; {} fetched so far.'.format(count,
                                                                        len(data.values)))
@@ -46,15 +57,11 @@ class CaFetcher(Fetcher):
             # and the one before that.
             requested = count - len(data.values) + 2
             log.warn('Making additional request for {} samples.'.format(requested))
-            start_secs = int(data.timestamps[-1])
-            start_nanos = int(1e9 * (data.timestamps[-1] % 1))
-            response = self._proxy.archiver.values(1, [pv],
-                                                   start_secs, start_nanos,
-                                                   end_secs, 0,
-                                                   requested, 0)
-            done = len(response) < requested
+            start = utils.epoch_to_datetime(data.timestamps[-1])
+            events = self._client.get(pv, start, end, requested)
+            done = len(events) < requested
             # Discard the two samples we already have.
-            new_data = self._process_raw_data(response[0]['values'][2:], pv)
+            new_data = self._process_raw_data(events[2:], pv)
             data = utils.concatenate((data, new_data))
         return data
 
