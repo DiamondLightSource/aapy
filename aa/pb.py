@@ -56,7 +56,10 @@ def parse_pb_data(raw_data, pv, count=None):
                            event.severity))
 
     event_count = min(count, len(events)) if count is not None else len(events)
-    wf_length = len(events[0][0])
+    try:
+        wf_length = len(events[0][0])
+    except TypeError:
+        wf_length = 1
     values = numpy.zeros((event_count, wf_length))
     timestamps = numpy.zeros((event_count,))
     severities = numpy.zeros((event_count,))
