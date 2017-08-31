@@ -13,7 +13,7 @@ class Fetcher(object):
     def get_values(self, pv, start, end=None, count=None):
         raise NotImplementedError()
 
-    def get_value_at(self, instant):
+    def get_value_at(self, pv, instant):
         raise NotImplementedError()
 
 
