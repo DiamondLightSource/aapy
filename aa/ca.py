@@ -46,7 +46,7 @@ class CaFetcher(Fetcher):
         # Make count a large number if not specified to ensure we get all
         # data.
         count = 2**31 if count is None else count
-        requested = 10000 if count > 10000 else count
+        requested = min(count, 10000)
         events = self._client.get(pv, start, end, requested)
         # Fewer samples than requested means that that was all there were,
         # and so we are done.
@@ -57,13 +57,29 @@ class CaFetcher(Fetcher):
                                                                        len(data.values)))
             # The first two samples will be the last from the previous request
             # and the one before that.
-            requested = count - len(data.values) + 2
+            requested = min(count - len(data.values) + 2, 10000)
             log.warn('Making additional request for {} samples.'.format(requested))
             start = utils.epoch_to_datetime(data.timestamps[-1])
+            print('Start of request {}'.format(start))
+            print('End of request {}'.format(end))
             events = self._client.get(pv, start, end, requested)
+            print('number of events {}'.format(len(events)))
             done = len(events) < requested
-            # Discard the two samples we already have.
-            new_data = self._process_raw_data(events[2:], pv)
+            skip = 0
+            for event in events:
+                ts =  event['secs'] + 1e-9 * event['nano']
+                if ts <= data.timestamps[-1]:
+                    print('skipping {}'.format(utils.epoch_to_datetime(ts)))
+                    skip += 1
+                else:
+                    break
+            print('skipping {}'.format(skip))
+            """
+            for i in range(3):
+                d = utils.epoch_to_datetime(events[i]['secs'] + 1e-9 * events[i]['nano'])
+                print('event {} dt {}'.format(i, d))
+            """
+            new_data = self._process_raw_data(events[skip:], pv)
             data = utils.concatenate((data, new_data))
         return data
 

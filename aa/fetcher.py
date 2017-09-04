@@ -51,7 +51,7 @@ class AaFetcher(Fetcher):
 
     def _get_values(self, pv, start, end, count):
         raw_data = self._fetch_data(pv, start, end)
-        return self._parse_raw_data(raw_data, pv, count)
+        return self._parse_raw_data(raw_data, pv, start, end, count)
 
-    def _parse_raw_data(self, raw_data):
+    def _parse_raw_data(self, raw_data, pv, start, end, count):
         raise NotImplementedError()

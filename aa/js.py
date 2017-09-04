@@ -10,7 +10,7 @@ class JsonFetcher(fetcher.AaFetcher):
         super(JsonFetcher, self).__init__(hostname, port)
         self._url = '{}/retrieval/data/getData.json'.format(self._endpoint)
 
-    def _parse_raw_data(self, raw_data, pv, count):
+    def _parse_raw_data(self, raw_data, pv, start, end, count):
         json_data = json.loads(raw_data)
         if json_data:
             events = json_data[0]['data']
