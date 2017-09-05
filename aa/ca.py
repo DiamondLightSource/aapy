@@ -48,6 +48,8 @@ class CaFetcher(Fetcher):
         count = 2**31 if count is None else count
         requested = min(count, 10000)
         events = self._client.get(pv, start, end, requested)
+        if len(events) == 0:
+            raise ValueError('No events returned by Channel Archiver')
         # Fewer samples than requested means that that was all there were,
         # and so we are done.
         done = len(events) < requested
@@ -67,7 +69,7 @@ class CaFetcher(Fetcher):
             done = len(events) < requested
             skip = 0
             for event in events:
-                ts =  event['secs'] + 1e-9 * event['nano']
+                ts = event['secs'] + 1e-9 * event['nano']
                 if ts <= data.timestamps[-1]:
                     print('skipping {}'.format(utils.epoch_to_datetime(ts)))
                     skip += 1
