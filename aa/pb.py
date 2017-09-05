@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import curses.ascii as ascii
 import numpy
 import os
+import re
 import logging as log
 
 
@@ -159,9 +160,10 @@ class PbFileFetcher(fetcher.Fetcher):
         self._root = root
 
     def _get_pb_file(self, pv, year):
-        prefix, suffix = pv.split(':')
-        prefix_parts = prefix.split('-')
-        directory = os.path.join(self._root, os.path.sep.join(prefix_parts))
+        # Split PV on either dash or colon
+        parts = re.split('[-:]', pv)
+        suffix = parts.pop()
+        directory = os.path.join(self._root, os.path.sep.join(parts))
         filename = '{}:{}.pb'.format(suffix, year)
         return os.path.join(directory, filename)
 
