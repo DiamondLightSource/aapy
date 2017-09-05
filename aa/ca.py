@@ -74,13 +74,8 @@ class CaFetcher(Fetcher):
                 else:
                     break
             print('skipping {}'.format(skip))
-            """
-            for i in range(3):
-                d = utils.epoch_to_datetime(events[i]['secs'] + 1e-9 * events[i]['nano'])
-                print('event {} dt {}'.format(i, d))
-            """
             new_data = self._process_raw_data(events[skip:], pv)
-            data = utils.concatenate((data, new_data))
+            data.append(new_data)
         return data
 
     def get_value_at(self, pv, instant):

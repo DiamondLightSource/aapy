@@ -29,14 +29,11 @@ class ArchiveDataDiff(object):
     def summarise(self):
         for side in (self.LEFT, self.RIGHT):
             for event in self._extra[side]:
-                log.warn('Extra event on {}: {}'.format(side,
-                    utils.event_str(event)))
+                log.warn('Extra event on {}: {}'.format(side, event))
             for event in self._duplicates[side]:
-                log.info('Duplicate event on {}: {}'.format(side,
-                    utils.event_str(event)))
+                log.info('Duplicate event on {}: {}'.format(side, event))
             for event in self._invalid[side]:
-                log.info('High severity event on {}: {}'.format(side,
-                    utils.event_str(event)))
+                log.info('High severity event on {}: {}'.format(side, event))
 
 
 def compare_archive_data(data_left, data_right):
@@ -49,7 +46,7 @@ def compare_archive_data(data_left, data_right):
     while not (count_left >= len(data_left.values) and
                        count_right >= len(data_right.values)):
         if not count_right >= len(data_right.values):
-            right_event = utils.get_event(data_right, count_right)
+            right_event = data_right.get_event(count_right)
             if right_event == previous_right_event:
                 diff.add_duplicate(ArchiveDataDiff.RIGHT, right_event)
                 count_right += 1
@@ -63,7 +60,7 @@ def compare_archive_data(data_left, data_right):
                 count_right += 1
                 continue
         if not count_left >= len(data_left.values):
-            left_event = utils.get_event(data_left, count_left)
+            left_event = data_left.get_event(count_left)
             if left_event == previous_left_event:
                 diff.add_duplicate(ArchiveDataDiff.LEFT, left_event)
                 count_left += 1
@@ -78,8 +75,8 @@ def compare_archive_data(data_left, data_right):
                 continue
 
         log.debug('count_left {} count_right {}'.format(count_left, count_right))
-        log.debug('left event {}'.format(utils.event_str(left_event)))
-        log.debug('right event {}'.format(utils.event_str(right_event)))
+        log.debug('left event {}'.format(left_event))
+        log.debug('right event {}'.format(right_event))
 
         if left_event.timestamp > right_event.timestamp:
             diff.add_extra(ArchiveDataDiff.RIGHT, right_event)

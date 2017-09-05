@@ -29,6 +29,7 @@ DATA_2D = ArchiveData(DUMMY_PV,
                       numpy.array((10.21,)),
                       numpy.array((1,)))
 
+
 @pytest.fixture
 def ca_fetcher():
     fetcher = ca.CaFetcher('http://url')
@@ -37,7 +38,8 @@ def ca_fetcher():
 
 
 def test_CaFetcher_process_raw_data_handles_1d_event(ca_fetcher):
-    assert ca_fetcher._process_raw_data([EVENT_1D], DUMMY_PV) == DATA_1D
+    result = ca_fetcher._process_raw_data([EVENT_1D], DUMMY_PV)
+    assert result == DATA_1D
 
 
 def test_CaFetcher_process_raw_data_handles_2d_event(ca_fetcher):
