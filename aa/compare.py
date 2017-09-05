@@ -82,17 +82,16 @@ def compare_archive_data(data_left, data_right):
             diff.add_extra(ArchiveDataDiff.RIGHT, right_event)
             count_right += 1
             previous_right_event = right_event
-        elif right_event.timestamp < left_event.timestamp:
+        elif right_event.timestamp > left_event.timestamp:
             diff.add_extra(ArchiveDataDiff.LEFT, left_event)
             count_left += 1
             previous_left_event = left_event
         else:
-            utils.assert_event_similar(data_left, count_left, data_right, count_right)
+            assert left_event == right_event
             count_left += 1
             count_right += 1
             previous_left_event = left_event
             previous_right_event = right_event
-
 
     return diff
 
