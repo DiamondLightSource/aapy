@@ -82,7 +82,7 @@ def binary_search(seq, f, target):
     upper = len(seq)
     lower = -1
     while (upper - lower) > 1:
-        current = (upper + lower) / 2
+        current = (upper + lower) // 2
         next_input = seq[current]
         val = f(next_input)
         if val > target:

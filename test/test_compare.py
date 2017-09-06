@@ -3,25 +3,25 @@ import numpy
 
 
 ONE_EVENT_DATA = data.ArchiveData('dummy',
-                                   numpy.array((1,)),
-                                   numpy.array((2,)),
-                                   numpy.array((1,)))
-HIGH_SEV_DATA = data.ArchiveData('dummy',
                                   numpy.array((1,)),
                                   numpy.array((2,)),
-                                  numpy.array((4,)))
+                                  numpy.array((1,)))
+HIGH_SEV_DATA = data.ArchiveData('dummy',
+                                 numpy.array((1,)),
+                                 numpy.array((2,)),
+                                 numpy.array((4,)))
 TWO_EVENT_DATA = data.ArchiveData('dummy',
-                                   numpy.array((1,2)),
-                                   numpy.array((2,3)),
-                                   numpy.array((1,0)))
+                                  numpy.array((1,2)),
+                                  numpy.array((2,3)),
+                                  numpy.array((1,0)))
 DUPLICATE_DATA = data.ArchiveData('dummy',
-                                   numpy.array((1,1)),
-                                   numpy.array((2,2)),
-                                   numpy.array((1,1)))
+                                  numpy.array((1,1)),
+                                  numpy.array((2,2)),
+                                  numpy.array((1,1)))
 TWO_EVENT_WITH_DUPLICATE_DATA = data.ArchiveData('dummy',
-                                                  numpy.array((1,1,2)),
-                                                  numpy.array((2,2,3)),
-                                                  numpy.array((1,1,0)))
+                                                 numpy.array((1,1,2)),
+                                                 numpy.array((2,2,3)),
+                                                 numpy.array((1,1,0)))
 EMPTY_DIFF = compare.ArchiveDataDiff()
 
 
