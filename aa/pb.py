@@ -2,7 +2,7 @@ import aa
 from aa import fetcher, utils
 from aa import epics_event_pb2 as eepb
 from datetime import datetime, timedelta
-import curses.ascii as ascii
+from curses import ascii
 import numpy
 import os
 import re
@@ -48,6 +48,8 @@ def year_timestamp(year):
 
 def event_timestamp(year, event):
     year_start = year_timestamp(year)
+    # This will lose information (the last few decimal places) since
+    # a double cannot store 18 significant figures.
     return year_start + event.secondsintoyear + 1e-9 * event.nano
 
 
@@ -118,13 +120,12 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
         s = start_line if year == start.year else 0
         e = end_line if year == end.year else None
         info, lines = year_chunks[year]
-        year_start = (datetime(info.year, 1, 1) - datetime(1970, 1, 1)).total_seconds()
         for line in lines[s:e]:
             unescaped = unescape_line(line)
             event = TYPE_MAPPINGS[info.type]()
             event.ParseFromString(unescaped)
             events.append((event.val,
-                           year_start + event.secondsintoyear + 1e-9 * event.nano,
+                           event_timestamp(year, event),
                            event.severity))
 
     event_count = min(count, len(events)) if count is not None else len(events)

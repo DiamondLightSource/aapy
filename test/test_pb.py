@@ -1,6 +1,44 @@
 from aa import pb
 import pytest
+import mock
 import os
+from curses import ascii
+
+
+TIMESTAMP_2001 = 978307200
+TIMESTAMP_INACCURACY = 1e-6
+
+
+def test_unescape_line_does_not_change_regular_string():
+    test_string = "hello:-1|bye"
+    assert pb.unescape_line(test_string) == test_string
+
+
+def test_unescape_line_handles_example_escaped_string():
+    test_string = 'hello' + chr(ascii.ESC) + chr(2) + 'bye'
+    assert pb.unescape_line(test_string) == 'hello' + chr(ascii.NL) + 'bye'
+
+
+@pytest.mark.parametrize('year,timestamp', ((1970, 0), (2001, TIMESTAMP_2001)))
+def test_year_timestamp_gives_correct_answer(year, timestamp):
+    assert pb.year_timestamp(year) == timestamp
+
+
+def test_event_timestamp_gives_correct_answer_1970():
+    event = mock.MagicMock()
+    event.secondsintoyear = 10
+    event.nano = 1e7
+    assert pb.event_timestamp(1970, event) == 10.01
+
+
+def test_event_timestamp_gives_correct_answer_2001():
+    seconds = 1000
+    nanos = 12345
+    expected = TIMESTAMP_2001 + seconds + 1e9 * nanos
+    event = mock.MagicMock()
+    event.secondsintoyear = seconds
+    event.nano = nanos
+    assert pb.event_timestamp(2001, event) - expected < TIMESTAMP_INACCURACY
 
 
 def test_binary_search_raises_IndexError_for_empty_seq():
