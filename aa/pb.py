@@ -1,15 +1,15 @@
 import aa
 from aa import fetcher, utils
 from aa import epics_event_pb2 as eepb
-from datetime import datetime, timedelta
-from curses import ascii
+from datetime import datetime
 import numpy
 import os
 import re
 import logging as log
 
 
-# It is not clear to me why I can't extract this from the compiled protobuf file.
+# It is not clear to me why I can't extract this information
+# from the compiled protobuf file.
 TYPE_MAPPINGS = {
         0: eepb.ScalarString,
         1: eepb.ScalarShort,
@@ -29,17 +29,25 @@ TYPE_MAPPINGS = {
         }
 
 
-REPLACEMENTS = {
-        chr(ascii.ESC) + chr(1): chr(ascii.ESC),
-        chr(ascii.ESC) + chr(2): chr(ascii.NL),
-        chr(ascii.ESC) + chr(3): chr(ascii.CR)
-        }
+ESC_BYTE = b'\x1B'
+NL_BYTE = b'\x0A'
+CR_BYTE = b'\x0D'
 
 
-def unescape_line(line):
+def unescape_bytes(byte_seq):
+    """Replace specific sub-sequences in a bytes sequence.
+
+    This escaping is defined as part of the Archiver Appliance raw file
+    format: https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html
+    """
+    REPLACEMENTS = {
+        ESC_BYTE + b'\x01': ESC_BYTE,
+        ESC_BYTE + b'\x02': NL_BYTE,
+        ESC_BYTE + b'\x03': CR_BYTE
+    }
     for r in REPLACEMENTS:
-        line = line.replace(r, REPLACEMENTS[r])
-    return line
+        byte_seq = byte_seq.replace(r, REPLACEMENTS[r])
+    return byte_seq
 
 
 def year_timestamp(year):
@@ -56,7 +64,7 @@ def event_timestamp(year, event):
 def get_timestamp_from_line_function(chunk_info):
     def timestamp_from_line(line):
         event = TYPE_MAPPINGS[chunk_info.type]()
-        event.ParseFromString(unescape_line(line))
+        event.ParseFromString(unescape_bytes(line))
         event_time = event_timestamp(chunk_info.year, event)
         return event_time
     return timestamp_from_line
@@ -101,15 +109,15 @@ def search_events(dt, chunk_info, lines):
 
 
 def parse_pb_data(raw_data, pv, start, end, count=None):
-    chunks = [chunk.strip() for chunk in raw_data.split('\n\n')]
+    chunks = [chunk.strip() for chunk in raw_data.split(b'\n\n')]
     log.info('{} chunks in pb file'.format(len(chunks)))
     events = []
     year_chunks = {}
     for chunk in chunks:
-        lines = chunk.split('\n')
+        lines = chunk.split(b'\n')
         log.info('{} lines in chunk'.format(len(lines)))
         chunk_info = eepb.PayloadInfo()
-        chunk_info.ParseFromString(unescape_line(lines[0]))
+        chunk_info.ParseFromString(unescape_bytes(lines[0]))
         year_chunks[chunk_info.year] = chunk_info, lines[1:]
 
     chunk_info, lines = year_chunks[start.year]
@@ -121,7 +129,7 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
         e = end_line if year == end.year else None
         info, lines = year_chunks[year]
         for line in lines[s:e]:
-            unescaped = unescape_line(line)
+            unescaped = unescape_bytes(line)
             event = TYPE_MAPPINGS[info.type]()
             event.ParseFromString(unescaped)
             events.append((event.val,
@@ -169,11 +177,13 @@ class PbFileFetcher(fetcher.Fetcher):
         return os.path.join(directory, filename)
 
     def _read_pb_files(self, files, pv, start, end, count):
-        data = ''
+        data = bytearray()
         for filepath in files:
-            with open(filepath) as f:
-                data += '\n' + f.read()
-        return parse_pb_data(data, pv, start, end, count)
+            with open(filepath, 'rb') as f:
+                # Ascii code for new line character.
+                data.append(10)
+                data.extend(f.read())
+        return parse_pb_data(bytes(data), pv, start, end, count)
 
     def get_values(self, pv, start, end=None, count=None):
         end = datetime.now() if end is None else end
