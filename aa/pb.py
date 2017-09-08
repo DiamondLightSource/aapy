@@ -192,6 +192,3 @@ class PbFileFetcher(fetcher.Fetcher):
             pb_files.append(self._get_pb_file(pv, year))
         log.info('Parsing pb files {}'.format(pb_files))
         return self._read_pb_files(pb_files, pv, start, end, count)
-
-    def get_value_at(self, instant):
-        raise NotImplementedError()

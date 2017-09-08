@@ -14,7 +14,7 @@ PORT = 8080
 
 def get_value_at(pv, date):
     fetcher = js.JsonFetcher(URL, PORT)
-    return fetcher.get_value_at(pv, date)
+    return fetcher.get_event_at(pv, date)
 
 
 def get_values(pv, start_date, end_date=None, count=None):

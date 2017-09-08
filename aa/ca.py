@@ -73,6 +73,3 @@ class CaFetcher(Fetcher):
             new_data = self._process_raw_data(events[skip:], pv)
             data.append(new_data)
         return data
-
-    def get_value_at(self, pv, instant):
-        return self.get_values(pv, instant, instant, 1)
