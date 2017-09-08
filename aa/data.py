@@ -89,6 +89,6 @@ class ArchiveData(object):
     def __eq__(self, other):
         return (isinstance(other, ArchiveData) and
                 self.pv == other.pv and
-                self.values == other.values and
-                self.timestamps == other.timestamps and
-                self.severities == other.severities)
+                numpy.array_equal(self.values, other.values) and
+                numpy.array_equal(self.timestamps, other.timestamps) and
+                numpy.array_equal(self.severities, other.severities))

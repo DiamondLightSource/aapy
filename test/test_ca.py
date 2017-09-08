@@ -44,7 +44,7 @@ def test_CaFetcher_process_raw_data_handles_1d_event(ca_fetcher):
 
 def test_CaFetcher_process_raw_data_handles_2d_event(ca_fetcher):
     result = ca_fetcher._process_raw_data([EVENT_2D], DUMMY_PV)
-    utils.assert_archive_data_equal(DATA_2D, result)
+    assert result == DATA_2D
 
 
 def test_CaFetcher_get_values_calls_client_get_once_if_response_less_than_count(ca_fetcher):
