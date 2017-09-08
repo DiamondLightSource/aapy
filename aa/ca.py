@@ -29,7 +29,7 @@ class CaFetcher(Fetcher):
 
     def _process_raw_data(self, events, pv):
         event_count = len(events)
-        wf_length = len(events[0]['value'])
+        wf_length = 0 if len(events) == 0 else len(events[0]['value'])
         values = numpy.zeros((event_count, wf_length))
         timestamps = numpy.zeros((event_count,))
         sevs = numpy.zeros((event_count,))
@@ -48,8 +48,6 @@ class CaFetcher(Fetcher):
         count = 2**31 if count is None else count
         requested = min(count, 10000)
         events = self._client.get(pv, start, end, requested)
-        if len(events) == 0:
-            raise ValueError('No events returned by Channel Archiver')
         # Fewer samples than requested means that that was all there were,
         # and so we are done.
         done = len(events) < requested

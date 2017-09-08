@@ -37,6 +37,13 @@ def ca_fetcher():
     return fetcher
 
 
+def test_CaFetcher_process_raw_data_handles_no_events(ca_fetcher):
+    result = ca_fetcher._process_raw_data([], DUMMY_PV)
+    empty_data = ArchiveData(DUMMY_PV, numpy.zeros(0,),
+                             numpy.zeros(0,), numpy.zeros(0,))
+    assert result == empty_data
+
+
 def test_CaFetcher_process_raw_data_handles_1d_event(ca_fetcher):
     result = ca_fetcher._process_raw_data([EVENT_1D], DUMMY_PV)
     assert result == DATA_1D
