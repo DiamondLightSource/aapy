@@ -13,8 +13,12 @@ class Fetcher(object):
     def get_values(self, pv, start, end=None, count=None):
         raise NotImplementedError()
 
-    def get_value_at(self, pv, instant):
-        raise NotImplementedError()
+    def get_event_at(self, pv, instant):
+        try:
+            return self.get_values(pv, instant, instant, 1).get_event(0)
+        except IndexError:
+            error_msg = 'No data found for pv {} at timestamp {}'
+            raise ValueError(error_msg.format(pv, instant))
 
 
 class AaFetcher(Fetcher):
@@ -45,9 +49,6 @@ class AaFetcher(Fetcher):
         if end is None:
             end = datetime.now()
         return self._get_values(pv, start, end, count)
-
-    def get_value_at(self, pv, instant):
-        return self._get_values(pv, instant, instant, 1)
 
     def _get_values(self, pv, start, end, count):
         raw_data = self._fetch_data(pv, start, end)

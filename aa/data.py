@@ -9,7 +9,7 @@ TIMESTAMP_ERROR = ('Last timestamp in first ArchiveData object: {}\n'
 
 class ArchiveEvent(object):
 
-    DESC = 'Archive event timestamp {:%Y-%m-%d %H:%M:%S.%f} value {:.3f} severity {:.0f}'
+    DESC = 'Archive event timestamp {:%Y-%m-%d %H:%M:%S.%f} value {} severity {:.0f}'
 
     def __init__(self, pv, value, timestamp, severity):
         self._pv = pv
@@ -40,11 +40,12 @@ class ArchiveEvent(object):
             self.severity)
 
     def __eq__(self, other):
-        return (isinstance(other, ArchiveEvent) and
-                self.pv == other.pv and
-                self.value == other.value and
-                self.timestamp == other.timestamp and
-                self.severity == other.severity)
+        equal = (isinstance(other, ArchiveEvent))
+        equal = equal and self.pv == other.pv
+        equal = equal and numpy.allclose(self.value, other.value)
+        equal = equal and self.timestamp == other.timestamp
+        equal = equal and self.severity == other.severity
+        return equal
 
 
 class ArchiveData(object):
@@ -87,8 +88,9 @@ class ArchiveData(object):
         self._severities = numpy.concatenate([self.severities, other.severities])
 
     def __eq__(self, other):
-        return (isinstance(other, ArchiveData) and
-                self.pv == other.pv and
-                numpy.array_equal(self.values, other.values) and
-                numpy.array_equal(self.timestamps, other.timestamps) and
-                numpy.array_equal(self.severities, other.severities))
+        equal = (isinstance(other, ArchiveData))
+        equal = equal and self.pv == other.pv
+        equal = equal and numpy.allclose(self.values, other.values)
+        equal = equal and numpy.allclose(self.timestamps, other.timestamps)
+        equal = equal and numpy.array_equal(self.severities, other.severities)
+        return equal

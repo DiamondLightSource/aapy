@@ -1,6 +1,24 @@
+"""Handle retrieval of data in the Archiver Appliance PB file format.
+
+The file format is described on this page:
+https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html
+
+The data can be parsed in the same way whether retrieved using the
+Rest API or whether reading files directly from disk. In either
+case, it is important to treat the data as binary data - a stream of
+bytes. The Google Protobuf library handles converting the stream of
+bytes into the objects defined by the EPICSEvent.proto file.
+
+The Archiver Appliance escapes certain characters as described on the
+page above, which allows one to deduce the number of events in the
+binary file using tools such as wc.
+
+The unescape_bytes() method handles unescaping these characters before
+handing the interpretation over to the Google Protobuf library.
+"""
 import aa
 from aa import fetcher, utils
-from aa import epics_event_pb2 as eepb
+from aa import epics_event_pb2 as ee
 from datetime import datetime
 import numpy
 import os
@@ -11,21 +29,21 @@ import logging as log
 # It is not clear to me why I can't extract this information
 # from the compiled protobuf file.
 TYPE_MAPPINGS = {
-        0: eepb.ScalarString,
-        1: eepb.ScalarShort,
-        2: eepb.ScalarFloat,
-        3: eepb.ScalarEnum,
-        4: eepb.ScalarByte,
-        5: eepb.ScalarInt,
-        6: eepb.ScalarDouble,
-        7: eepb.VectorString,
-        8: eepb.VectorShort,
-        9: eepb.VectorFloat,
-        10: eepb.VectorEnum,
-        11: eepb.VectorChar,
-        12: eepb.VectorInt,
-        13: eepb.VectorDouble,
-        14: eepb.V4GenericBytes
+        0: ee.ScalarString,
+        1: ee.ScalarShort,
+        2: ee.ScalarFloat,
+        3: ee.ScalarEnum,
+        4: ee.ScalarByte,
+        5: ee.ScalarInt,
+        6: ee.ScalarDouble,
+        7: ee.VectorString,
+        8: ee.VectorShort,
+        9: ee.VectorFloat,
+        10: ee.VectorEnum,
+        11: ee.VectorChar,
+        12: ee.VectorInt,
+        13: ee.VectorDouble,
+        14: ee.V4GenericBytes
         }
 
 
@@ -39,6 +57,11 @@ def unescape_bytes(byte_seq):
 
     This escaping is defined as part of the Archiver Appliance raw file
     format: https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html
+
+    Args:
+        byte_seq: any byte sequence
+    Returns:
+        the byte sequence unescaped according to the AA file format rules
     """
     REPLACEMENTS = {
         ESC_BYTE + b'\x01': ESC_BYTE,
@@ -116,7 +139,7 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
     for chunk in chunks:
         lines = chunk.split(b'\n')
         log.info('{} lines in chunk'.format(len(lines)))
-        chunk_info = eepb.PayloadInfo()
+        chunk_info = ee.PayloadInfo()
         chunk_info.ParseFromString(unescape_bytes(lines[0]))
         year_chunks[chunk_info.year] = chunk_info, lines[1:]
 
@@ -192,6 +215,3 @@ class PbFileFetcher(fetcher.Fetcher):
             pb_files.append(self._get_pb_file(pv, year))
         log.info('Parsing pb files {}'.format(pb_files))
         return self._read_pb_files(pb_files, pv, start, end, count)
-
-    def get_value_at(self, instant):
-        raise NotImplementedError()

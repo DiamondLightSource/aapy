@@ -73,9 +73,9 @@ def compare_archive_data(data_left, data_right):
                 count_left += 1
                 continue
 
-        log.debug('count_left {} count_right {}'.format(count_left, count_right))
-        log.debug('left event {}'.format(left_event))
-        log.debug('right event {}'.format(right_event))
+        log.debug('Count_left %d count_right %d', count_left, count_right)
+        log.debug('Left event %s', format(left_event))
+        log.debug('Right event %s', format(right_event))
 
         if left_event.timestamp > right_event.timestamp:
             diff.add_extra(ArchiveDataDiff.RIGHT, right_event)
