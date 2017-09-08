@@ -7,19 +7,6 @@ import logging as log
 EPOCH = pytz.UTC.localize(datetime(1970, 1, 1))
 
 
-def assert_archive_data_equal(data1, data2):
-    assert data1.pv == data2.pv
-    numpy.testing.assert_equal(data1.values, data2.values)
-    numpy.testing.assert_equal(data1.timestamps, data2.timestamps)
-    numpy.testing.assert_equal(data1.severities, data2.severities)
-
-
-def assert_event_similar(data1, index1, data2, index2):
-    numpy.testing.assert_allclose(data1.values[index1], data2.values[index2])
-    numpy.testing.assert_equal(data1.timestamps[index1], data2.timestamps[index2])
-    numpy.testing.assert_equal(data1.severities[index1], data2.severities[index2])
-
-
 def assert_archive_data_close(data1, data2):
     EPS = 1e-6
     assert data1.pv == data2.pv
