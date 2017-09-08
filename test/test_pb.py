@@ -2,7 +2,6 @@ from aa import pb
 import pytest
 import mock
 import os
-from curses import ascii
 
 
 TIMESTAMP_2001 = 978307200
