@@ -60,22 +60,18 @@ class CaFetcher(Fetcher):
             # The first two samples will be the last from the previous request
             # and the one before that.
             requested = min(count - len(data.values) + 2, 10000)
-            log.warn('Making additional request for {} samples.'.format(requested))
             start = utils.epoch_to_datetime(data.timestamps[-1])
-            print('Start of request {}'.format(start))
-            print('End of request {}'.format(end))
+            log.info('Making additional request for {} samples.'.format(requested))
+            log.info('Request start {} end {}'.format(start, end))
             events = self._client.get(pv, start, end, requested)
-            print('number of events {}'.format(len(events)))
             done = len(events) < requested
             skip = 0
             for event in events:
                 ts = event['secs'] + 1e-9 * event['nano']
                 if ts <= data.timestamps[-1]:
-                    print('skipping {}'.format(utils.epoch_to_datetime(ts)))
                     skip += 1
                 else:
                     break
-            print('skipping {}'.format(skip))
             new_data = self._process_raw_data(events[skip:], pv)
             data.append(new_data)
         return data
