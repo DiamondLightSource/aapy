@@ -18,7 +18,7 @@ handing the interpretation over to the Google Protobuf library.
 """
 import aa
 from aa import fetcher, utils
-from aa import epics_event_pb2 as eepb
+from aa import epics_event_pb2 as ee
 from datetime import datetime
 import numpy
 import os
@@ -29,21 +29,21 @@ import logging as log
 # It is not clear to me why I can't extract this information
 # from the compiled protobuf file.
 TYPE_MAPPINGS = {
-        0: eepb.ScalarString,
-        1: eepb.ScalarShort,
-        2: eepb.ScalarFloat,
-        3: eepb.ScalarEnum,
-        4: eepb.ScalarByte,
-        5: eepb.ScalarInt,
-        6: eepb.ScalarDouble,
-        7: eepb.VectorString,
-        8: eepb.VectorShort,
-        9: eepb.VectorFloat,
-        10: eepb.VectorEnum,
-        11: eepb.VectorChar,
-        12: eepb.VectorInt,
-        13: eepb.VectorDouble,
-        14: eepb.V4GenericBytes
+        0: ee.ScalarString,
+        1: ee.ScalarShort,
+        2: ee.ScalarFloat,
+        3: ee.ScalarEnum,
+        4: ee.ScalarByte,
+        5: ee.ScalarInt,
+        6: ee.ScalarDouble,
+        7: ee.VectorString,
+        8: ee.VectorShort,
+        9: ee.VectorFloat,
+        10: ee.VectorEnum,
+        11: ee.VectorChar,
+        12: ee.VectorInt,
+        13: ee.VectorDouble,
+        14: ee.V4GenericBytes
         }
 
 
@@ -139,7 +139,7 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
     for chunk in chunks:
         lines = chunk.split(b'\n')
         log.info('{} lines in chunk'.format(len(lines)))
-        chunk_info = eepb.PayloadInfo()
+        chunk_info = ee.PayloadInfo()
         chunk_info.ParseFromString(unescape_bytes(lines[0]))
         year_chunks[chunk_info.year] = chunk_info, lines[1:]
 

@@ -48,7 +48,6 @@ class ArchiveEvent(object):
         return equal
 
 
-
 class ArchiveData(object):
 
     def __init__(self, pv, values, timestamps, severities):

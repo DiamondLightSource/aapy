@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy
 from datetime import datetime
 import pytz
@@ -34,3 +35,9 @@ def datetime_to_epoch(dt):
 
 def epoch_to_datetime(secs):
     return datetime.fromtimestamp(secs, tz=pytz.UTC)
+
+
+def print_raw_bytes(byte_seq):
+    for b in byte_seq:
+        print('\\x{:02x}'.format(ord(b)), end='')
+    print('')
