@@ -4,11 +4,13 @@
 .cache
 
 # Virtualenv
-venv
-venv3
+venv*
 
 # Vim
 *.swp
+
+# Pycharm
+.idea
 
 # Coverage data
 .coverage

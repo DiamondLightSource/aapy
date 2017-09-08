@@ -10,15 +10,19 @@ class JsonFetcher(fetcher.AaFetcher):
         super(JsonFetcher, self).__init__(hostname, port)
         self._url = '{}/retrieval/data/getData.json'.format(self._endpoint)
 
-    def _parse_raw_data(self, raw_data, pv, count):
+    def _parse_raw_data(self, raw_data, pv, start, end, count):
         json_data = json.loads(raw_data)
-        if raw_data:
+        if json_data:
             events = json_data[0]['data']
-            array_size = min(count, len(events)) if count is not None else len(events)
-            values = numpy.zeros((array_size,))
-            timestamps = numpy.zeros((array_size,))
-            severities = numpy.zeros((array_size,))
-            for i, event in zip(range(array_size), events):
+            event_count = min(count, len(events)) if count is not None else len(events)
+            try:
+                wf_length = len(json_data[0]['data'][0]['val'])
+            except TypeError:
+                wf_length = 1
+            values = numpy.zeros((event_count,))
+            timestamps = numpy.zeros((event_count, wf_length))
+            severities = numpy.zeros((event_count,))
+            for i, event in zip(range(event_count), events):
                 values[i] = event['val']
                 timestamps[i] = event['secs'] + 1e-9 * event['nanos']
                 severities[i] = event['severity']
@@ -27,4 +31,4 @@ class JsonFetcher(fetcher.AaFetcher):
             timestamps = numpy.array((0,))
             severities = numpy.array((0,))
 
-        return aa.ArchiveData(pv, values, timestamps, severities)
+        return aa.data.ArchiveData(pv, values, timestamps, severities)
