@@ -1,3 +1,21 @@
+"""Handle retrieval of data in the Archiver Appliance PB file format.
+
+The file format is described on this page:
+https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html
+
+The data can be parsed in the same way whether retrieved using the
+Rest API or whether reading files directly from disk. In either
+case, it is important to treat the data as binary data - a stream of
+bytes. The Google Protobuf library handles converting the stream of
+bytes into the objects defined by the EPICSEvent.proto file.
+
+The Archiver Appliance escapes certain characters as described on the
+page above, which allows one to deduce the number of events in the
+binary file using tools such as wc.
+
+The unescape_bytes() method handles unescaping these characters before
+handing the interpretation over to the Google Protobuf library.
+"""
 import aa
 from aa import fetcher, utils
 from aa import epics_event_pb2 as eepb
@@ -39,6 +57,11 @@ def unescape_bytes(byte_seq):
 
     This escaping is defined as part of the Archiver Appliance raw file
     format: https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html
+
+    Args:
+        byte_seq: any byte sequence
+    Returns:
+        the byte sequence unescaped according to the AA file format rules
     """
     REPLACEMENTS = {
         ESC_BYTE + b'\x01': ESC_BYTE,
