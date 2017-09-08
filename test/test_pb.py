@@ -11,12 +11,12 @@ TIMESTAMP_INACCURACY = 1e-6
 
 def test_unescape_line_does_not_change_regular_bytes():
     test_bytes = b'hello:-1|bye'
-    assert pb.unescape_line(test_bytes) == test_bytes
+    assert pb.unescape_bytes(test_bytes) == test_bytes
 
 
-def test_unescape_line_handles_example_escaped_bytes():
-    test_bytes = b'hello' + pb.ESC + b'\x02' + b'bye'
-    assert pb.unescape_line(test_bytes) == b'hello' + pb.NL + b'bye'
+def test_unescape_bytes_handles_example_escaped_bytes():
+    test_bytes = b'hello' + pb.ESC_BYTE + b'\x02' + b'bye'
+    assert pb.unescape_bytes(test_bytes) == b'hello' + pb.NL_BYTE + b'bye'
 
 
 @pytest.mark.parametrize('year,timestamp', ((1970, 0), (2001, TIMESTAMP_2001)))
