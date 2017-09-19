@@ -106,3 +106,9 @@ class ArchiveData(object):
         equal = equal and numpy.allclose(self.timestamps, other.timestamps)
         equal = equal and numpy.array_equal(self.severities, other.severities)
         return equal
+
+    def __iter__(self):
+        for value, timestamp, severity in zip(self.values,
+                                              self.timestamps,
+                                              self.severities):
+            yield ArchiveEvent(self.pv, value, timestamp, severity)
