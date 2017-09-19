@@ -50,6 +50,10 @@ class ArchiveEvent(object):
 
 class ArchiveData(object):
 
+    DESC = ('Archive data: {} events'
+            ' first timestamp {:%Y-%m-%d %H:%M:%S.%f}'
+            ' last timestamp {:%Y-%m-%d %H:%M:%S.%f}')
+
     def __init__(self, pv, values, timestamps, severities):
         assert len(values) == len(timestamps) == len(severities)
         self._pv = pv
@@ -86,6 +90,14 @@ class ArchiveData(object):
         self._values = numpy.concatenate([self.values, other.values])
         self._timestamps = numpy.concatenate([self.timestamps, other.timestamps])
         self._severities = numpy.concatenate([self.severities, other.severities])
+
+    def __str__(self):
+        if len(self.values) == 0:
+            return 'Empty archive data'
+        else:
+            return ArchiveData.DESC.format(len(self.values),
+                utils.epoch_to_datetime(self.timestamps[0]),
+                utils.epoch_to_datetime(self.timestamps[-1]))
 
     def __eq__(self, other):
         equal = (isinstance(other, ArchiveData))

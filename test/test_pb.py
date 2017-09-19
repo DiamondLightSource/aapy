@@ -17,7 +17,7 @@ RAW_PAYLOAD_INFO = b'\x08\x06\x12\x14\x53\x52\x2d\x44\x49\x2d\x44\x43\x43\x54\x2
 RAW_EVENT = b'\x08\x8f\xd9\xa3\x01\x10\x86\x8f\xfd\x01\x19\x0c\x19\x52\xcb\x7d\x8a\x70\x40'
 # The contents of a PB file with a header and one event.
 PB_CHUNK = RAW_PAYLOAD_INFO + b'\n' + RAW_EVENT
-# The actual contents of the above raw strings.
+# The actual contents of the above raw strings (PV name is not stored)
 EVENT = data.ArchiveEvent(PV, 264.65571148, 1422752399.004147078, 0)
 
 
