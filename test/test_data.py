@@ -36,3 +36,20 @@ def test_ArchiveData_append_with_different_pv_names_raises_AssertionError():
     data2 = data.ArchiveData('dummy2', array, array, array)
     with pytest.raises(AssertionError):
         data1.append(data2)
+
+
+def test_empty_ArchiveData_iterates_zero_times():
+    array = numpy.zeros((0,))
+    empty_data = data.ArchiveData('dummy', array, array, array)
+    for _ in empty_data:
+        assert False
+
+
+def test_empty_ArchiveData_iterates_multiple_times():
+    array = numpy.zeros((1,))
+    zero_event = data.ArchiveEvent('dummy', array, array, array)
+    for i in range(3):
+        array = numpy.zeros((3,))
+        d = data.ArchiveData('dummy', array, array, array)
+        for event in d:
+            assert event == zero_event

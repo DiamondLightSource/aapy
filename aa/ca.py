@@ -48,13 +48,15 @@ class CaFetcher(Fetcher):
         count = 2**31 if count is None else count
         requested = min(count, 10000)
         events = self._client.get(pv, start, end, requested)
+        log.info('Making request for {} samples.'.format(requested))
+        log.info('Request start {} end {}'.format(start, end))
         # Fewer samples than requested means that that was all there were,
         # and so we are done.
         done = len(events) < requested
         data = self._process_raw_data(events, pv)
         while done is not True and len(data.values) < count:
-            log.warn('{} samples requested; {} fetched so far.'.format(count,
-                                                                       len(data.values)))
+            log.warn('{} samples fetched so far.'.format(count,
+                                                         len(data.values)))
             # The first two samples will be the last from the previous request
             # and the one before that.
             requested = min(count - len(data.values) + 2, 10000)
