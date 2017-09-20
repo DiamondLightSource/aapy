@@ -107,10 +107,10 @@ def binary_search(seq, f, target):
         f: function that returns a comparable when called on any input
         target: value
 
-    Returns: index of seq meeting search requirements
+    Returns: index of item in seq meeting search requirements
     """
-    if f(seq[0]) > target:
-        return 0
+    if len(seq) == 0 or f(seq[0]) > target:
+        return -1
     elif f(seq[-1]) < target:
         return len(seq)
     upper = len(seq)
@@ -163,8 +163,11 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
     event_count = min(count, len(events)) if count is not None else len(events)
     try:
         wf_length = len(events[0][0])
-    except TypeError:
+    except TypeError:  # Event value is not a waveform
         wf_length = 1
+    except IndexError:  # No events
+        wf_length = 0
+
     values = numpy.zeros((event_count, wf_length))
     timestamps = numpy.zeros((event_count,))
     severities = numpy.zeros((event_count,))

@@ -78,13 +78,12 @@ def test_event_timestamp_gives_correct_answer_2001():
 
 
 def test_binary_search_raises_IndexError_for_empty_seq():
-    with pytest.raises(IndexError):
-        pb.binary_search([], lambda x: x, 1) == -1
+    assert pb.binary_search([], lambda x: x, 1) == -1
 
 
-def test_binary_search_returns_zero_if_target_below_range():
+def test_binary_search_returns_minus_one_if_target_below_range():
     f = lambda x: x
-    assert pb.binary_search([2, 3, 4], f, 1) == 0
+    assert pb.binary_search([2, 3, 4], f, 1) == -1
 
 
 def test_binary_search_returns_len_seq_if_target_above_range():
