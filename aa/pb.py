@@ -16,11 +16,9 @@ binary file using tools such as wc.
 The unescape_bytes() method handles unescaping these characters before
 handing the interpretation over to the Google Protobuf library.
 """
-import aa
-from aa import fetcher, utils
-from aa import epics_event_pb2 as ee
+from . import data, fetcher, utils
+from . import epics_event_pb2 as ee
 from datetime import datetime
-import numpy
 import pytz
 import os
 import re
@@ -52,6 +50,13 @@ ESC_BYTE = b'\x1B'
 NL_BYTE = b'\x0A'
 CR_BYTE = b'\x0D'
 
+# The characters sequences required to unescape AA pb file format.
+PB_REPLACEMENTS = {
+    ESC_BYTE + b'\x01': ESC_BYTE,
+    ESC_BYTE + b'\x02': NL_BYTE,
+    ESC_BYTE + b'\x03': CR_BYTE
+}
+
 
 def unescape_bytes(byte_seq):
     """Replace specific sub-sequences in a bytes sequence.
@@ -64,13 +69,8 @@ def unescape_bytes(byte_seq):
     Returns:
         the byte sequence unescaped according to the AA file format rules
     """
-    REPLACEMENTS = {
-        ESC_BYTE + b'\x01': ESC_BYTE,
-        ESC_BYTE + b'\x02': NL_BYTE,
-        ESC_BYTE + b'\x03': CR_BYTE
-    }
-    for r in REPLACEMENTS:
-        byte_seq = byte_seq.replace(r, REPLACEMENTS[r])
+    for r in PB_REPLACEMENTS:
+        byte_seq = byte_seq.replace(r, PB_REPLACEMENTS[r])
     return byte_seq
 
 
@@ -96,7 +96,9 @@ def search_events(dt, chunk_info, lines):
     return utils.binary_search(lines, timestamp_from_line, target_time)
 
 
-def break_up_chunks(chunks):
+def break_up_chunks(raw_data):
+    chunks = [chunk.strip() for chunk in raw_data.split(b'\n\n')]
+    log.info('{} chunks in pb file'.format(len(chunks)))
     year_chunks = {}
     for chunk in chunks:
         lines = chunk.split(b'\n')
@@ -116,19 +118,15 @@ def event_from_line(line, pv, year, event_type):
     unescaped = unescape_bytes(line)
     event = TYPE_MAPPINGS[event_type]()
     event.ParseFromString(unescaped)
-    return aa.ArchiveEvent(pv,
-                           event.val,
-                           event_timestamp(year, event),
-                           event.severity)
+    return data.ArchiveEvent(pv,
+                             event.val,
+                             event_timestamp(year, event),
+                             event.severity)
 
 
 def parse_pb_data(raw_data, pv, start, end, count=None):
-    chunks = [chunk.strip() for chunk in raw_data.split(b'\n\n')]
-    log.info('{} chunks in pb file'.format(len(chunks)))
+    year_chunks = break_up_chunks(raw_data)
     events = []
-
-    year_chunks = break_up_chunks(chunks)
-
     chunk_info, lines = year_chunks[start.year]
     start_line = search_events(start, chunk_info, lines)
     chunk_info, lines = year_chunks[end.year]
@@ -139,27 +137,7 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
         info, lines = year_chunks[year]
         for line in lines[s:e]:
             events.append(event_from_line(line, pv, year, info.type))
-
-    event_count = min(count, len(events)) if count is not None else len(events)
-    try:
-        wf_length = len(events[0][0])
-    except TypeError:  # Event value is not a waveform
-        wf_length = 1
-    except IndexError:  # No events
-        wf_length = 0
-
-    values = numpy.zeros((event_count, wf_length))
-    timestamps = numpy.zeros((event_count,))
-    severities = numpy.zeros((event_count,))
-    for i, event in enumerate(events[:event_count]):
-        values[i] = event.value
-        timestamps[i] = event.timestamp
-        severities[i] = event.severity
-
-    if wf_length == 1:
-        values = numpy.squeeze(values, axis=1)
-
-    return aa.ArchiveData(pv, values, timestamps, severities)
+    return data.data_from_events(pv, events, count)
 
 
 class PbFetcher(fetcher.AaFetcher):
@@ -186,13 +164,14 @@ class PbFileFetcher(fetcher.Fetcher):
         return os.path.join(directory, filename)
 
     def _read_pb_files(self, files, pv, start, end, count):
-        data = bytearray()
+        raw_data = bytearray()
         for filepath in files:
             with open(filepath, 'rb') as f:
-                # Ascii code for new line character.
-                data.append(10)
-                data.extend(f.read())
-        return parse_pb_data(bytes(data), pv, start, end, count)
+                # Ascii code for new line character. Makes a
+                # new 'chunk' for each file.
+                raw_data.append(10)
+                raw_data.extend(f.read())
+        return parse_pb_data(bytes(raw_data), pv, start, end, count)
 
     def get_values(self, pv, start, end=None, count=None):
         end = datetime.now(pytz.utc) if end is None else end
