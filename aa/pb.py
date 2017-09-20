@@ -139,10 +139,15 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
     year_chunks = {}
     for chunk in chunks:
         lines = chunk.split(b'\n')
-        log.info('{} lines in chunk'.format(len(lines)))
         chunk_info = ee.PayloadInfo()
         chunk_info.ParseFromString(unescape_bytes(lines[0]))
-        year_chunks[chunk_info.year] = chunk_info, lines[1:]
+        log.info('Year {}: {} events in chunk'.format(chunk_info.year,
+                                                      len(lines) - 1))
+        try:
+            ci, ls = year_chunks[chunk_info.year]
+            ls.extend(lines[1:])
+        except KeyError:
+            year_chunks[chunk_info.year] = chunk_info, lines[1:]
 
     chunk_info, lines = year_chunks[start.year]
     start_line = search_events(start, chunk_info, lines)
