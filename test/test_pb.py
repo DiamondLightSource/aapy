@@ -1,6 +1,5 @@
-from aa import data, pb
+from aa import data, pb, utils
 from aa import epics_event_pb2 as ee
-import pytest
 import mock
 import pytz
 from datetime import datetime
@@ -32,7 +31,7 @@ def test_parse_ScalarDouble():
     e = ee.ScalarDouble()
     e.ParseFromString(RAW_EVENT)
     assert abs(e.val - EVENT.value) < 1e-7
-    year_timestamp = pb.year_timestamp(2015)
+    year_timestamp = utils.year_timestamp(2015)
     assert year_timestamp + e.secondsintoyear + 1e-9 * e.nano == EVENT.timestamp
     assert e.severity == EVENT.severity
 
@@ -55,10 +54,6 @@ def test_unescape_bytes_handles_example_escaped_bytes():
     assert pb.unescape_bytes(test_bytes) == b'hello' + pb.NL_BYTE + b'bye'
 
 
-@pytest.mark.parametrize('year,timestamp', ((1970, 0), (2001, TIMESTAMP_2001)))
-def test_year_timestamp_gives_correct_answer(year, timestamp):
-    assert pb.year_timestamp(year) == timestamp
-
 
 def test_event_timestamp_gives_correct_answer_1970():
     event = mock.MagicMock()
@@ -75,30 +70,6 @@ def test_event_timestamp_gives_correct_answer_2001():
     event.secondsintoyear = seconds
     event.nano = nanos
     assert pb.event_timestamp(2001, event) - expected < TIMESTAMP_INACCURACY
-
-
-def test_binary_search_raises_IndexError_for_empty_seq():
-    assert pb.binary_search([], lambda x: x, 1) == -1
-
-
-def test_binary_search_returns_minus_one_if_target_below_range():
-    f = lambda x: x
-    assert pb.binary_search([2, 3, 4], f, 1) == -1
-
-
-def test_binary_search_returns_len_seq_if_target_above_range():
-    f = lambda x: x
-    assert pb.binary_search([1, 2, 3], f, 4) == 3
-
-
-def test_binary_search_returns_lower_index():
-    f = lambda x: x
-    assert pb.binary_search([1, 2], f, 1.5) == 0
-
-
-def test_binary_search_returns_index_if_value_equals_item_in_seq():
-    f = lambda x: x
-    assert pb.binary_search([1, 2], f, 1) == 0
 
 
 def test_PbFileFetcher_get_pb_file_handles_pv_with_one_colon():

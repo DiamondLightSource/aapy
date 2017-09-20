@@ -74,12 +74,8 @@ def unescape_bytes(byte_seq):
     return byte_seq
 
 
-def year_timestamp(year):
-    return (datetime(year, 1, 1) - datetime(1970, 1, 1)).total_seconds()
-
-
 def event_timestamp(year, event):
-    year_start = year_timestamp(year)
+    year_start = utils.year_timestamp(year)
     # This will lose information (the last few decimal places) since
     # a double cannot store 18 significant figures.
     return year_start + event.secondsintoyear + 1e-9 * event.nano
@@ -94,42 +90,10 @@ def get_timestamp_from_line_function(chunk_info):
     return timestamp_from_line
 
 
-def binary_search(seq, f, target):
-    """Find no such that f(seq[no]) >= target and f(seq[no+1]) > target.
-
-    If f(seq[0]) > target, return -1
-    If f(seq[-1]) < target, return len(seq)
-
-    Assume f(seq[no]) < f(seq[no+1]).
-
-    Args:
-        seq: sequence of inputs on which to act
-        f: function that returns a comparable when called on any input
-        target: value
-
-    Returns: index of item in seq meeting search requirements
-    """
-    if len(seq) == 0 or f(seq[0]) > target:
-        return -1
-    elif f(seq[-1]) < target:
-        return len(seq)
-    upper = len(seq)
-    lower = -1
-    while (upper - lower) > 1:
-        current = (upper + lower) // 2
-        next_input = seq[current]
-        val = f(next_input)
-        if val > target:
-            upper = current
-        elif val <= target:
-            lower = current
-    return lower
-
-
 def search_events(dt, chunk_info, lines):
     target_time = utils.datetime_to_epoch(dt)
     timestamp_from_line = get_timestamp_from_line_function(chunk_info)
-    return binary_search(lines, timestamp_from_line, target_time)
+    return utils.binary_search(lines, timestamp_from_line, target_time)
 
 
 def break_up_chunks(chunks):
