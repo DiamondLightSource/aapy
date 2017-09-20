@@ -132,10 +132,7 @@ def search_events(dt, chunk_info, lines):
     return binary_search(lines, timestamp_from_line, target_time)
 
 
-def parse_pb_data(raw_data, pv, start, end, count=None):
-    chunks = [chunk.strip() for chunk in raw_data.split(b'\n\n')]
-    log.info('{} chunks in pb file'.format(len(chunks)))
-    events = []
+def break_up_chunks(chunks):
     year_chunks = {}
     for chunk in chunks:
         lines = chunk.split(b'\n')
@@ -148,6 +145,25 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
             ls.extend(lines[1:])
         except KeyError:
             year_chunks[chunk_info.year] = chunk_info, lines[1:]
+    return year_chunks
+
+
+def event_from_line(line, pv, year, event_type):
+    unescaped = unescape_bytes(line)
+    event = TYPE_MAPPINGS[event_type]()
+    event.ParseFromString(unescaped)
+    return aa.ArchiveEvent(pv,
+                           event.val,
+                           event_timestamp(year, event),
+                           event.severity)
+
+
+def parse_pb_data(raw_data, pv, start, end, count=None):
+    chunks = [chunk.strip() for chunk in raw_data.split(b'\n\n')]
+    log.info('{} chunks in pb file'.format(len(chunks)))
+    events = []
+
+    year_chunks = break_up_chunks(chunks)
 
     chunk_info, lines = year_chunks[start.year]
     start_line = search_events(start, chunk_info, lines)
@@ -158,12 +174,7 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
         e = end_line if year == end.year else None
         info, lines = year_chunks[year]
         for line in lines[s:e]:
-            unescaped = unescape_bytes(line)
-            event = TYPE_MAPPINGS[info.type]()
-            event.ParseFromString(unescaped)
-            events.append((event.val,
-                           event_timestamp(year, event),
-                           event.severity))
+            events.append(event_from_line(line, pv, year, info.type))
 
     event_count = min(count, len(events)) if count is not None else len(events)
     try:
@@ -176,8 +187,10 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
     values = numpy.zeros((event_count, wf_length))
     timestamps = numpy.zeros((event_count,))
     severities = numpy.zeros((event_count,))
-    for i, event in zip(range(event_count), events):
-        values[i], timestamps[i], severities[i] = event
+    for i, event in enumerate(events[:event_count]):
+        values[i] = event.value
+        timestamps[i] = event.timestamp
+        severities[i] = event.severity
 
     if wf_length == 1:
         values = numpy.squeeze(values, axis=1)
