@@ -21,6 +21,7 @@ from aa import fetcher, utils
 from aa import epics_event_pb2 as ee
 from datetime import datetime
 import numpy
+import pytz
 import os
 import re
 import logging as log
@@ -209,7 +210,7 @@ class PbFileFetcher(fetcher.Fetcher):
         return parse_pb_data(bytes(data), pv, start, end, count)
 
     def get_values(self, pv, start, end=None, count=None):
-        end = datetime.now() if end is None else end
+        end = datetime.now(pytz.utc) if end is None else end
         pb_files = []
         for year in range(start.year, end.year + 1):
             pb_files.append(self._get_pb_file(pv, year))
