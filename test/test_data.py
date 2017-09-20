@@ -42,7 +42,7 @@ def test_empty_ArchiveData_iterates_zero_times():
     array = numpy.zeros((0,))
     empty_data = data.ArchiveData('dummy', array, array, array)
     for _ in empty_data:
-        assert False
+        assert False  # we shouldn't get here
 
 
 def test_empty_ArchiveData_iterates_multiple_times():
