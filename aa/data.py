@@ -112,3 +112,26 @@ class ArchiveData(object):
                                               self.timestamps,
                                               self.severities):
             yield ArchiveEvent(self.pv, value, timestamp, severity)
+
+
+def data_from_events(pv, events, count):
+    event_count = min(count, len(events)) if count is not None else len(events)
+    try:
+        wf_length = len(events[0][0])
+    except TypeError:  # Event value is not a waveform
+        wf_length = 1
+    except IndexError:  # No events
+        wf_length = 0
+
+    values = numpy.zeros((event_count, wf_length))
+    timestamps = numpy.zeros((event_count,))
+    severities = numpy.zeros((event_count,))
+    for i, event in enumerate(events[:event_count]):
+        values[i] = event.value
+        timestamps[i] = event.timestamp
+        severities[i] = event.severity
+
+    if wf_length == 1:
+        values = numpy.squeeze(values, axis=1)
+
+    return ArchiveData(pv, values, timestamps, severities)

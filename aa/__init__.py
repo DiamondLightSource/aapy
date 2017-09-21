@@ -1,5 +1,5 @@
 from . import js
-from .data import ArchiveData
+from .data import ArchiveData, ArchiveEvent
 import logging
 
 

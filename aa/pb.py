@@ -16,11 +16,10 @@ binary file using tools such as wc.
 The unescape_bytes() method handles unescaping these characters before
 handing the interpretation over to the Google Protobuf library.
 """
-import aa
-from aa import fetcher, utils
-from aa import epics_event_pb2 as ee
+from . import data, fetcher, utils
+from . import epics_event_pb2 as ee
 from datetime import datetime
-import numpy
+import pytz
 import os
 import re
 import logging as log
@@ -51,6 +50,13 @@ ESC_BYTE = b'\x1B'
 NL_BYTE = b'\x0A'
 CR_BYTE = b'\x0D'
 
+# The characters sequences required to unescape AA pb file format.
+PB_REPLACEMENTS = {
+    ESC_BYTE + b'\x01': ESC_BYTE,
+    ESC_BYTE + b'\x02': NL_BYTE,
+    ESC_BYTE + b'\x03': CR_BYTE
+}
+
 
 def unescape_bytes(byte_seq):
     """Replace specific sub-sequences in a bytes sequence.
@@ -63,22 +69,13 @@ def unescape_bytes(byte_seq):
     Returns:
         the byte sequence unescaped according to the AA file format rules
     """
-    REPLACEMENTS = {
-        ESC_BYTE + b'\x01': ESC_BYTE,
-        ESC_BYTE + b'\x02': NL_BYTE,
-        ESC_BYTE + b'\x03': CR_BYTE
-    }
-    for r in REPLACEMENTS:
-        byte_seq = byte_seq.replace(r, REPLACEMENTS[r])
+    for r in PB_REPLACEMENTS:
+        byte_seq = byte_seq.replace(r, PB_REPLACEMENTS[r])
     return byte_seq
 
 
-def year_timestamp(year):
-    return (datetime(year, 1, 1) - datetime(1970, 1, 1)).total_seconds()
-
-
 def event_timestamp(year, event):
-    year_start = year_timestamp(year)
+    year_start = utils.year_timestamp(year)
     # This will lose information (the last few decimal places) since
     # a double cannot store 18 significant figures.
     return year_start + event.secondsintoyear + 1e-9 * event.nano
@@ -93,56 +90,43 @@ def get_timestamp_from_line_function(chunk_info):
     return timestamp_from_line
 
 
-def binary_search(seq, f, target):
-    """Find no such that f(seq[no]) >= target and f(seq[no+1]) > target.
-
-    If f(seq[0]) > target, return -1
-    If f(seq[-1]) < target, return len(seq)
-
-    Assume f(seq[no]) < f(seq[no+1]).
-
-    Args:
-        seq: sequence of inputs on which to act
-        f: function that returns a comparable when called on any input
-        target: value
-
-    Returns: index of seq meeting search requirements
-    """
-    if f(seq[0]) > target:
-        return 0
-    elif f(seq[-1]) < target:
-        return len(seq)
-    upper = len(seq)
-    lower = -1
-    while (upper - lower) > 1:
-        current = (upper + lower) // 2
-        next_input = seq[current]
-        val = f(next_input)
-        if val > target:
-            upper = current
-        elif val <= target:
-            lower = current
-    return lower
-
-
 def search_events(dt, chunk_info, lines):
     target_time = utils.datetime_to_epoch(dt)
     timestamp_from_line = get_timestamp_from_line_function(chunk_info)
-    return binary_search(lines, timestamp_from_line, target_time)
+    return utils.binary_search(lines, timestamp_from_line, target_time)
 
 
-def parse_pb_data(raw_data, pv, start, end, count=None):
+def break_up_chunks(raw_data):
     chunks = [chunk.strip() for chunk in raw_data.split(b'\n\n')]
     log.info('{} chunks in pb file'.format(len(chunks)))
-    events = []
     year_chunks = {}
     for chunk in chunks:
         lines = chunk.split(b'\n')
-        log.info('{} lines in chunk'.format(len(lines)))
         chunk_info = ee.PayloadInfo()
         chunk_info.ParseFromString(unescape_bytes(lines[0]))
-        year_chunks[chunk_info.year] = chunk_info, lines[1:]
+        log.info('Year {}: {} events in chunk'.format(chunk_info.year,
+                                                      len(lines) - 1))
+        try:
+            ci, ls = year_chunks[chunk_info.year]
+            ls.extend(lines[1:])
+        except KeyError:
+            year_chunks[chunk_info.year] = chunk_info, lines[1:]
+    return year_chunks
 
+
+def event_from_line(line, pv, year, event_type):
+    unescaped = unescape_bytes(line)
+    event = TYPE_MAPPINGS[event_type]()
+    event.ParseFromString(unescaped)
+    return data.ArchiveEvent(pv,
+                             event.val,
+                             event_timestamp(year, event),
+                             event.severity)
+
+
+def parse_pb_data(raw_data, pv, start, end, count=None):
+    year_chunks = break_up_chunks(raw_data)
+    events = []
     chunk_info, lines = year_chunks[start.year]
     start_line = search_events(start, chunk_info, lines)
     chunk_info, lines = year_chunks[end.year]
@@ -152,28 +136,8 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
         e = end_line if year == end.year else None
         info, lines = year_chunks[year]
         for line in lines[s:e]:
-            unescaped = unescape_bytes(line)
-            event = TYPE_MAPPINGS[info.type]()
-            event.ParseFromString(unescaped)
-            events.append((event.val,
-                           event_timestamp(year, event),
-                           event.severity))
-
-    event_count = min(count, len(events)) if count is not None else len(events)
-    try:
-        wf_length = len(events[0][0])
-    except TypeError:
-        wf_length = 1
-    values = numpy.zeros((event_count, wf_length))
-    timestamps = numpy.zeros((event_count,))
-    severities = numpy.zeros((event_count,))
-    for i, event in zip(range(event_count), events):
-        values[i], timestamps[i], severities[i] = event
-
-    if wf_length == 1:
-        values = numpy.squeeze(values, axis=1)
-
-    return aa.ArchiveData(pv, values, timestamps, severities)
+            events.append(event_from_line(line, pv, year, info.type))
+    return data.data_from_events(pv, events, count)
 
 
 class PbFetcher(fetcher.AaFetcher):
@@ -199,17 +163,22 @@ class PbFileFetcher(fetcher.Fetcher):
         filename = '{}:{}.pb'.format(suffix, year)
         return os.path.join(directory, filename)
 
-    def _read_pb_files(self, files, pv, start, end, count):
-        data = bytearray()
+    @staticmethod
+    def _read_pb_files(files, pv, start, end, count):
+        raw_data = bytearray()
         for filepath in files:
-            with open(filepath, 'rb') as f:
-                # Ascii code for new line character.
-                data.append(10)
-                data.extend(f.read())
-        return parse_pb_data(bytes(data), pv, start, end, count)
+            try:
+                with open(filepath, 'rb') as f:
+                    # Ascii code for new line character. Makes a
+                    # new 'chunk' for each file.
+                    raw_data.append(10)
+                    raw_data.extend(f.read())
+            except IOError: # File not found. No data.
+                log.warning('No pb file {} found')
+        return parse_pb_data(bytes(raw_data), pv, start, end, count)
 
     def get_values(self, pv, start, end=None, count=None):
-        end = datetime.now() if end is None else end
+        end = datetime.now(pytz.utc) if end is None else end
         pb_files = []
         for year in range(start.year, end.year + 1):
             pb_files.append(self._get_pb_file(pv, year))
