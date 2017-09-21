@@ -48,7 +48,7 @@ class CaFetcher(Fetcher):
         count = 2**31 if count is None else count
         requested = min(count, 10000)
         events = self._client.get(pv, start, end, requested)
-        log.info('Making request for {} samples.'.format(requested))
+        log.info('Request PV {} for {} samples.'.format(pv, requested))
         log.info('Request start {} end {}'.format(start, end))
         # Fewer samples than requested means that that was all there were,
         # and so we are done.
