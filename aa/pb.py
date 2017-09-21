@@ -163,14 +163,18 @@ class PbFileFetcher(fetcher.Fetcher):
         filename = '{}:{}.pb'.format(suffix, year)
         return os.path.join(directory, filename)
 
-    def _read_pb_files(self, files, pv, start, end, count):
+    @staticmethod
+    def _read_pb_files(files, pv, start, end, count):
         raw_data = bytearray()
         for filepath in files:
-            with open(filepath, 'rb') as f:
-                # Ascii code for new line character. Makes a
-                # new 'chunk' for each file.
-                raw_data.append(10)
-                raw_data.extend(f.read())
+            try:
+                with open(filepath, 'rb') as f:
+                    # Ascii code for new line character. Makes a
+                    # new 'chunk' for each file.
+                    raw_data.append(10)
+                    raw_data.extend(f.read())
+            except IOError: # File not found. No data.
+                log.warning('No pb file {} found')
         return parse_pb_data(bytes(raw_data), pv, start, end, count)
 
     def get_values(self, pv, start, end=None, count=None):
