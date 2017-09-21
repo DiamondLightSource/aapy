@@ -12,19 +12,20 @@ class CaClient(object):
     def __init__(self, url):
         self._proxy = ServerProxy(url)
 
+    @staticmethod
+    def _create_archive_event(pv, ca_event):
+        value = ca_event['value']
+        timestamp = ca_event['secs'] + 1e-9 * ca_event['nano']
+        severity = ca_event['sevr']
+        return data.ArchiveEvent(pv, value, timestamp, severity)
+
     def get(self, pv, start, end, count):
         start_secs = utils.datetime_to_epoch(start)
         end_secs = utils.datetime_to_epoch(end)
         response = self._proxy.archiver.values(1, [pv], start_secs, 0,
                                                end_secs, 0, count, 0)
-        events = []
-        for val in response[0]['values']:
-            value = val['value']
-            timestamp = val['secs'] + 1e-9 * val['nano']
-            severity = val['sevr']
-            events.append(data.ArchiveEvent(pv, value, timestamp, severity))
-
-        return events
+        return [CaClient._create_archive_event(pv, val)
+                for val in response[0]['values']]
 
 
 class CaFetcher(Fetcher):
