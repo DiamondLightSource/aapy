@@ -113,11 +113,24 @@ class ArchiveData(object):
                                               self.severities):
             yield ArchiveEvent(self.pv, value, timestamp, severity)
 
+    def __len__(self):
+        return len(self.values)
 
-def data_from_events(pv, events, count):
+
+def data_from_events(pv, events, count=None):
+    """Convert multiple ArchiveEvents into an ArchiveData object
+
+    Args:
+        pv: pv name for all archive events
+        events: sequence of ArchiveEvent objects
+        count: maximum number of events to include.  If None, return all events
+
+    Returns:
+        ArchiveData object
+    """
     event_count = min(count, len(events)) if count is not None else len(events)
     try:
-        wf_length = len(events[0][0])
+        wf_length = len(events[0].value)
     except TypeError:  # Event value is not a waveform
         wf_length = 1
     except IndexError:  # No events

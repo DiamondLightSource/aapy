@@ -38,9 +38,7 @@ def test_ArchiveData_append_with_different_pv_names_raises_AssertionError():
         data1.append(data2)
 
 
-def test_empty_ArchiveData_iterates_zero_times():
-    array = numpy.zeros((0,))
-    empty_data = data.ArchiveData('dummy', array, array, array)
+def test_empty_ArchiveData_iterates_zero_times(empty_data):
     for _ in empty_data:
         assert False  # we shouldn't get here
 
@@ -53,3 +51,19 @@ def test_empty_ArchiveData_iterates_multiple_times():
         d = data.ArchiveData('dummy', array, array, array)
         for event in d:
             assert event == zero_event
+
+
+def test_data_from_events_returns_empty_data_if_no_events_provided(dummy_pv, empty_data):
+    assert data.data_from_events(dummy_pv, []) == empty_data
+
+
+def test_data_from_events_handles_one_event(dummy_pv, event_1d, data_1d):
+    assert data.data_from_events(dummy_pv, (event_1d,)) == data_1d
+
+
+def test_data_from_events_handles_two_events(dummy_pv, event_1d, event_1d_alt, data_2_events):
+    assert data.data_from_events(dummy_pv, (event_1d, event_1d_alt)) == data_2_events
+
+
+def test_data_from_events_handles_two_2d_events(dummy_pv, event_2d, event_2d_alt, data_2d_2_events):
+    assert data.data_from_events(dummy_pv, (event_2d, event_2d_alt)) == data_2d_2_events
