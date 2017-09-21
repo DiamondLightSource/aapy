@@ -113,8 +113,11 @@ class ArchiveData(object):
                                               self.severities):
             yield ArchiveEvent(self.pv, value, timestamp, severity)
 
+    def __len__(self):
+        return len(self.values)
 
-def data_from_events(pv, events, count):
+
+def data_from_events(pv, events, count=None):
     event_count = min(count, len(events)) if count is not None else len(events)
     try:
         wf_length = len(events[0][0])
