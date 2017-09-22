@@ -5,13 +5,19 @@ except ImportError:  # Python 2 compatibility.
     from urllib import quote
     from urllib2 import urlopen
 
+import pytz
 from datetime import datetime
 
 
 class Fetcher(object):
 
-    def get_values(self, pv, start, end=None, count=None):
+    def _get_values(self, pv, start, end, count):
         raise NotImplementedError()
+
+    def get_values(self, pv, start, end=None, count=None):
+        if end is None:
+            end = pytz.utc.localize(datetime.now())
+        return self._get_values(pv, start, end, count)
 
     def get_event_at(self, pv, instant):
         try:
@@ -44,11 +50,6 @@ class AaFetcher(Fetcher):
         url = self._construct_url(pv, start, end)
         urlinfo = urlopen(url)
         return urlinfo.read()
-
-    def get_values(self, pv, start, end=None, count=None):
-        if end is None:
-            end = datetime.now()
-        return self._get_values(pv, start, end, count)
 
     def _get_values(self, pv, start, end, count):
         raw_data = self._fetch_data(pv, start, end)
