@@ -1,8 +1,6 @@
 from __future__ import print_function
-import numpy
 from datetime import datetime
 import pytz
-import logging as log
 
 
 EPOCH = pytz.UTC.localize(datetime(1970, 1, 1))
