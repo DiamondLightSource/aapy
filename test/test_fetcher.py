@@ -14,6 +14,12 @@ def aa_fetcher():
     return fetcher.AaFetcher('localhost', '3003')
 
 
+def test_Fetcher_get_values_raises_NotImplementedError():
+    f = fetcher.Fetcher()
+    with pytest.raises(NotImplementedError):
+        f._get_values(1, 2, 3, 4)
+
+
 def test_AaFetcher_constructs_endpoint_correctly(aa_fetcher):
     assert aa_fetcher._endpoint == 'http://localhost:3003'
 
@@ -41,3 +47,6 @@ def test_AaFetcher_creates_default_for_end_if_not_provided(aa_fetcher):
     assert isinstance(args[2], datetime)
 
 
+def test_Fetcher_parse_raw_data_raises_NotImplementedError(aa_fetcher):
+    with pytest.raises(NotImplementedError):
+        aa_fetcher._parse_raw_data(1, 2, 3, 4, 5)

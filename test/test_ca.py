@@ -1,4 +1,5 @@
 import pytest
+import copy
 import mock
 from aa import ca
 
@@ -65,8 +66,13 @@ def test_CaFetcher_get_values_calls_client_get_once_if_response_less_than_count(
 
 
 def test_CaFetcher_get_values_calls_client_get_twice_if_count_exceeds_10000(ca_fetcher, event_1d, event_1d_alt, data_2_events):
-    # One value will be returned.
-    ca_fetcher._client.get.side_effect = ([event_1d] * 10000, [event_1d_alt])
+    # Ensure events with increasing timestamps.
+    events = []
+    for i in range(10000):
+        e = copy.deepcopy(event_1d)
+        e._timestamp = i * 1e-6
+        events.append(e)
+    ca_fetcher._client.get.side_effect = (events, [event_1d_alt])
     # Ask for two values.
     response = ca_fetcher.get_values('dummy', 'dummy_date_1', 'dummy_date_2', 10001)
     assert len(ca_fetcher._client.get.call_args_list) == 2
