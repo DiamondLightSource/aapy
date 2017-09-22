@@ -22,6 +22,7 @@ from datetime import datetime
 import pytz
 import os
 import re
+import collections
 import logging as log
 
 
@@ -99,7 +100,7 @@ def search_events(dt, chunk_info, lines):
 def break_up_chunks(raw_data):
     chunks = [chunk.strip() for chunk in raw_data.split(b'\n\n')]
     log.info('{} chunks in pb file'.format(len(chunks)))
-    year_chunks = {}
+    year_chunks = collections.OrderedDict()
     for chunk in chunks:
         lines = chunk.split(b'\n')
         chunk_info = ee.PayloadInfo()
@@ -127,16 +128,13 @@ def event_from_line(line, pv, year, event_type):
 def parse_pb_data(raw_data, pv, start, end, count=None):
     year_chunks = break_up_chunks(raw_data)
     events = []
-    chunk_info, lines = year_chunks[start.year]
-    start_line = search_events(start, chunk_info, lines)
-    chunk_info, lines = year_chunks[end.year]
-    end_line = search_events(end, chunk_info, lines) + 1
-    for year in range(start.year, end.year + 1):
-        s = start_line if year == start.year else 0
-        e = end_line if year == end.year else None
-        info, lines = year_chunks[year]
+    for year, (chunk_info, lines) in year_chunks.items():
+        s = search_events(start, chunk_info, lines) if year == start.year else 0
+        if s == -1:
+            s = 0
+        e = search_events(end, chunk_info, lines) if year == end.year else None
         for line in lines[s:e]:
-            events.append(event_from_line(line, pv, year, info.type))
+            events.append(event_from_line(line, pv, year, chunk_info.type))
     return data.data_from_events(pv, events, count)
 
 
