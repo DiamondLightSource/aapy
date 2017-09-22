@@ -1,6 +1,7 @@
 import logging as log
 from aa import data, utils
 from aa.fetcher import Fetcher
+import numpy
 try:
     from xmlrpc.client import ServerProxy
 except ImportError:  # Python 2 compatibility
@@ -37,30 +38,21 @@ class CaFetcher(Fetcher):
         # Make count a large number if not specified to ensure we get all
         # data.
         count = 2**31 if count is None else count
-        requested = min(count, 10000)
-        events = self._client.get(pv, start, end, requested)
-        log.info('Request PV {} for {} samples.'.format(pv, requested))
-        log.info('Request start {} end {}'.format(start, end))
-        # Fewer samples than requested means that that was all there were,
-        # and so we are done.
-        done = len(events) < requested
-        all_data = data.data_from_events(pv, events)
+        empty_array = numpy.zeros((0,))
+        all_data = data.ArchiveData(pv, empty_array, empty_array, empty_array)
+        last_timestamp = -1
+        done = False
         while done is not True and len(all_data) < count:
-            log.warn('{} samples fetched so far.'.format(len(all_data)))
-            # The first two samples will be the last from the previous request
-            # and the one before that.
-            requested = min(count - len(all_data) + 2, 10000)
-            start = utils.epoch_to_datetime(all_data.timestamps[-1])
-            log.info('Making additional request for {} samples.'.format(requested))
+            requested = min(count - len(all_data), 10000)
+            if len(all_data.timestamps):
+                last_timestamp = all_data.timestamps[-1]
+                start = utils.epoch_to_datetime(last_timestamp)
+            log.info('Request PV {} for {} samples.'.format(pv, requested))
             log.info('Request start {} end {}'.format(start, end))
             events = self._client.get(pv, start, end, requested)
             done = len(events) < requested
-            skip = 0
-            for event in events:
-                if event.timestamp <= all_data.timestamps[-1]:
-                    skip += 1
-                else:
-                    break
-            new_data = data.data_from_events(pv, events[skip:])
+            # Drop any events that are earlier than ones already fetched.
+            events = [e for e in events if e.timestamp > last_timestamp]
+            new_data = data.data_from_events(pv, events)
             all_data.append(new_data)
         return all_data
