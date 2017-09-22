@@ -46,18 +46,18 @@ class CaFetcher(Fetcher):
         done = len(events) < requested
         all_data = data.data_from_events(pv, events)
         while done is not True and len(all_data) < count:
-            log.warn('{} samples fetched so far.'.format(count, len(all_data)))
+            log.warn('{} samples fetched so far.'.format(len(all_data)))
             # The first two samples will be the last from the previous request
             # and the one before that.
             requested = min(count - len(all_data) + 2, 10000)
-            start = utils.epoch_to_datetime(data.timestamps[-1])
+            start = utils.epoch_to_datetime(all_data.timestamps[-1])
             log.info('Making additional request for {} samples.'.format(requested))
             log.info('Request start {} end {}'.format(start, end))
             events = self._client.get(pv, start, end, requested)
             done = len(events) < requested
             skip = 0
             for event in events:
-                if event.timestamp <= data.timestamps[-1]:
+                if event.timestamp <= all_data.timestamps[-1]:
                     skip += 1
                 else:
                     break
