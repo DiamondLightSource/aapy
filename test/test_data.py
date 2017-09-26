@@ -38,6 +38,35 @@ def test_ArchiveData_concatenate_with_different_pv_names_raises_AssertionError()
         data1.concatenate(data2)
 
 
+def test_ArchiveData_check_timestamps_returns_True_for_ascending_array(empty_data):
+    a = numpy.arange(1, 2, 0.1)
+    assert empty_data._check_timestamps(a)
+
+
+def test_ArchiveData_check_timestamps_returns_True_for_constant_array(empty_data):
+    a = numpy.zeros((10,))
+    assert empty_data._check_timestamps(a)
+
+
+def test_ArchiveData_check_timestamps_returns_False_for_descending_array(empty_data):
+    a = numpy.arange(2, 1, -0.1)
+    assert not empty_data._check_timestamps(a)
+
+
+def test_ArchiveData_constructor_raises_AssertionError_if_array_lengths_different(dummy_pv):
+    empty_10 = numpy.zeros((10,))
+    empty_11 = numpy.zeros((11,))
+    with pytest.raises(AssertionError):
+        data.ArchiveData(dummy_pv, empty_10, empty_10, empty_11)
+
+
+def test_ArchiveData_constructor_raises_AssertionError_if_timestamps_descending(dummy_pv):
+    empty_array = numpy.zeros((10,))
+    desc = numpy.arange(2, 1, -0.1)
+    with pytest.raises(AssertionError):
+        data.ArchiveData(dummy_pv, empty_array, desc, empty_array)
+
+
 def test_empty_ArchiveData_iterates_zero_times(empty_data):
     for _ in empty_data:
         assert False  # we shouldn't get here

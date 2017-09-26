@@ -55,10 +55,15 @@ class ArchiveData(object):
 
     def __init__(self, pv, values, timestamps, severities):
         assert len(values) == len(timestamps) == len(severities)
+        assert self._check_timestamps(timestamps), TIMESTAMP_ERROR
         self._pv = pv
         self._values = values
         self._timestamps = timestamps
         self._severities = severities
+
+    @staticmethod
+    def _check_timestamps(ts_array):
+        return numpy.all(numpy.diff(ts_array) >= 0)
 
     @property
     def pv(self):
@@ -94,7 +99,7 @@ class ArchiveData(object):
         """
         assert other.pv == self.pv, DIFFERENT_PV_ERROR
         timestamps = numpy.concatenate([self.timestamps, other.timestamps])
-        assert numpy.all(numpy.diff(timestamps) >= 0), TIMESTAMP_ERROR
+        assert self._check_timestamps(timestamps), TIMESTAMP_ERROR
         values = numpy.concatenate([self.values, other.values])
         severities = numpy.concatenate([self.severities, other.severities])
         return ArchiveData(self.pv, values, timestamps, severities)
