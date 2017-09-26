@@ -128,12 +128,15 @@ def data_from_events(pv, events, count=None):
     event_count = min(count, len(events)) if count is not None else len(events)
     try:
         wf_length = len(events[0].value)
+        dt = numpy.dtype(type(events[0].value[0]))
     except TypeError:  # Event value is not a waveform
         wf_length = 1
+        dt = numpy.dtype(type(events[0].value))
     except IndexError:  # No events
         wf_length = 0
+        dt = numpy.float64
 
-    values = numpy.zeros((event_count, wf_length))
+    values = numpy.zeros((event_count, wf_length), dtype=dt)
     timestamps = numpy.zeros((event_count,))
     severities = numpy.zeros((event_count,))
     for i, event in enumerate(events[:event_count]):

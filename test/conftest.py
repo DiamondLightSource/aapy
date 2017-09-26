@@ -20,7 +20,7 @@ def event_1d_alt(dummy_pv):
 
 @pytest.fixture
 def event_2d(dummy_pv):
-    return data.ArchiveEvent(dummy_pv, numpy.array((1, 2, 3)), 10.21, 1)
+    return data.ArchiveEvent(dummy_pv, numpy.array((1.1, 2, 3)), 10.21, 1)
 
 
 @pytest.fixture
@@ -61,7 +61,7 @@ def data_2d_2_events(dummy_pv):
         2d ArchiveData with two events.
     """
     return data.ArchiveData(dummy_pv,
-                            numpy.array(((1, 2, 3), (3, 4.5, 6))),
+                            numpy.array(((1.1, 2, 3), (3, 4.5, 6))),
                             numpy.array((10.21, 11.01)),
                             numpy.array((1, 5)))
 
@@ -74,6 +74,6 @@ def event_1d(dummy_pv):
 @pytest.fixture
 def data_2d(dummy_pv):
     return data.ArchiveData(dummy_pv,
-                            numpy.array(((1, 2, 3),)),
+                            numpy.array(((1.1, 2, 3),)),
                             numpy.array((10.21,)),
                             numpy.array((1,)))

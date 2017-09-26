@@ -11,7 +11,7 @@ CA_EVENT_1D = {'value': [1],
                }
 
 
-CA_EVENT_2D = {'value': [1, 2, 3],
+CA_EVENT_2D = {'value': [1.1, 2, 3],
                'secs': 10,
                'nano': 21e7,
                'sevr': 1
