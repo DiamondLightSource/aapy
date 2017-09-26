@@ -80,13 +80,24 @@ class ArchiveData(object):
         return ArchiveEvent(self.pv, self.values[index],
                             self.timestamps[index], self.severities[index])
 
-    def append(self, other):
+    def concatenate(self, other):
+        """Combine two ArchiveData objects.
+
+        Create a new object so that ArchiveData objects can be treated as
+        immutable.
+
+        Args:
+            other: ArchiveData object with later timestamps
+
+        Returns:
+            new ArchiveData object combining self and other
+        """
         assert other.pv == self.pv, DIFFERENT_PV_ERROR
         timestamps = numpy.concatenate([self.timestamps, other.timestamps])
         assert numpy.all(numpy.diff(timestamps) >= 0), TIMESTAMP_ERROR
-        self._values = numpy.concatenate([self.values, other.values])
-        self._timestamps = timestamps
-        self._severities = numpy.concatenate([self.severities, other.severities])
+        values = numpy.concatenate([self.values, other.values])
+        severities = numpy.concatenate([self.severities, other.severities])
+        return ArchiveData(self.pv, values, timestamps, severities)
 
     def __str__(self):
         if len(self.values) == 0:

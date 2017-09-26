@@ -3,19 +3,19 @@ import pytest
 from aa import data
 
 
-def test_ArchiveData_append_works_for_two_items():
+def test_ArchiveData_concatenate_works_for_two_items():
     zeros = numpy.zeros((1,))
     ones = numpy.ones((1,))
     data1 = data.ArchiveData('dummy', zeros, zeros, zeros)
     data2 = data.ArchiveData('dummy', ones, ones, ones)
     expected = numpy.array((0,1))
-    data1.append(data2)
-    numpy.testing.assert_equal(data1.values, expected)
-    numpy.testing.assert_equal(data1.timestamps, expected)
-    numpy.testing.assert_equal(data1.severities, expected)
+    data3 = data1.concatenate(data2)
+    numpy.testing.assert_equal(data3.values, expected)
+    numpy.testing.assert_equal(data3.timestamps, expected)
+    numpy.testing.assert_equal(data3.severities, expected)
 
 
-def test_ArchiveData_append_works_for_2d_arrays():
+def test_ArchiveData_concatenate_works_for_2d_arrays():
     zeros = numpy.zeros((1,))
     zeros_2d = numpy.zeros((1,2))
     ones = numpy.ones((1,))
@@ -24,18 +24,18 @@ def test_ArchiveData_append_works_for_2d_arrays():
     data2 = data.ArchiveData('dummy', ones_2d, ones, ones)
     expected = numpy.array((0,1))
     expected_2d = numpy.array(((0,0),(1,1)))
-    data1.append(data2)
-    numpy.testing.assert_equal(data1.values, expected_2d)
-    numpy.testing.assert_equal(data1.timestamps, expected)
-    numpy.testing.assert_equal(data1.severities, expected)
+    data3 = data1.concatenate(data2)
+    numpy.testing.assert_equal(data3.values, expected_2d)
+    numpy.testing.assert_equal(data3.timestamps, expected)
+    numpy.testing.assert_equal(data3.severities, expected)
 
 
-def test_ArchiveData_append_with_different_pv_names_raises_AssertionError():
+def test_ArchiveData_concatenate_with_different_pv_names_raises_AssertionError():
     array = numpy.zeros((1,))
     data1 = data.ArchiveData('dummy1', array, array, array)
     data2 = data.ArchiveData('dummy2', array, array, array)
     with pytest.raises(AssertionError):
-        data1.append(data2)
+        data1.concatenate(data2)
 
 
 def test_empty_ArchiveData_iterates_zero_times(empty_data):
