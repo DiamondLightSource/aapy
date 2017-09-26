@@ -83,7 +83,7 @@ class ArchiveData(object):
     def append(self, other):
         assert other.pv == self.pv, DIFFERENT_PV_ERROR
         timestamps = numpy.concatenate([self.timestamps, other.timestamps])
-        assert numpy.all(numpy.diff(timestamps) > 0), TIMESTAMP_ERROR
+        assert numpy.all(numpy.diff(timestamps) >= 0), TIMESTAMP_ERROR
         self._values = numpy.concatenate([self.values, other.values])
         self._timestamps = timestamps
         self._severities = numpy.concatenate([self.severities, other.severities])
