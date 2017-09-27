@@ -65,6 +65,11 @@ class ArchiveData(object):
     def _check_timestamps(ts_array):
         return numpy.all(numpy.diff(ts_array) >= 0)
 
+    @staticmethod
+    def empty(pv):
+        empty_array = numpy.zeros((0,))
+        return ArchiveData(pv, empty_array, empty_array, empty_array)
+
     @property
     def pv(self):
         return self._pv
@@ -149,7 +154,7 @@ def data_from_events(pv, events, count=None):
         wf_length = 1
         dt = numpy.dtype(type(events[0].value))
     except IndexError:  # No events
-        wf_length = 0
+        wf_length = 1
         dt = numpy.float64
 
     values = numpy.zeros((event_count, wf_length), dtype=dt)

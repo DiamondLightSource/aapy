@@ -30,8 +30,7 @@ def event_2d_alt(dummy_pv):
 
 @pytest.fixture
 def empty_data(dummy_pv):
-    array = numpy.zeros((0,))
-    return data.ArchiveData(dummy_pv, array, array, array)
+    return data.ArchiveData.empty(dummy_pv)
 
 
 @pytest.fixture
