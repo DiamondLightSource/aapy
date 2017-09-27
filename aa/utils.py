@@ -1,6 +1,14 @@
 from __future__ import print_function
 from datetime import datetime
 import pytz
+try:
+    from urllib.parse import quote
+    from urllib.request import urlopen
+    from urllib.error import HTTPError
+except ImportError:  # Python 2 compatibility.
+    from urllib import quote
+    from urllib2 import urlopen
+    from urllib2 import HTTPError
 
 
 EPOCH = pytz.UTC.localize(datetime(1970, 1, 1))

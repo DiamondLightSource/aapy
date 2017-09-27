@@ -1,10 +1,4 @@
-try:
-    from urllib.parse import quote
-    from urllib.request import urlopen
-except ImportError:  # Python 2 compatibility.
-    from urllib import quote
-    from urllib2 import urlopen
-
+from utils import quote, urlopen
 import pytz
 from datetime import datetime
 
