@@ -54,5 +54,5 @@ class CaFetcher(Fetcher):
             # Drop any events that are earlier than ones already fetched.
             events = [e for e in events if e.timestamp > last_timestamp]
             new_data = data.data_from_events(pv, events)
-            all_data = all_data.concatenate(new_data)
+            all_data = all_data.concatenate(new_data, zero_pad=True)
         return all_data

@@ -90,7 +90,7 @@ class ArchiveData(object):
         return ArchiveEvent(self.pv, self.values[index],
                             self.timestamps[index], self.severities[index])
 
-    def concatenate(self, other):
+    def concatenate(self, other, zero_pad=False):
         """Combine two ArchiveData objects.
 
         Create a new object so that ArchiveData objects can be treated as
@@ -98,6 +98,9 @@ class ArchiveData(object):
 
         Args:
             other: ArchiveData object with later timestamps
+            zero_pad: if the values arrays differ in their second dimension,
+                      expand the smaller to the size of the larger, padding
+                      with zeros.
 
         Returns:
             new ArchiveData object combining self and other
@@ -105,9 +108,25 @@ class ArchiveData(object):
         assert other.pv == self.pv, DIFFERENT_PV_ERROR
         timestamps = numpy.concatenate([self.timestamps, other.timestamps])
         assert self._check_timestamps(timestamps), TIMESTAMP_ERROR
-        values = numpy.concatenate([self.values, other.values])
+        if zero_pad:
+            first_values = (self.values.reshape((-1, 1))
+                            if self.values.ndim == 1 else self.values)
+            second_values = (other.values.reshape((-1, 1))
+                             if other.values.ndim == 1 else other.values)
+            first_length, first_size = first_values.shape
+            second_length, second_size = second_values.shape
+
+            target_shape = (first_length + second_length,
+                            max(first_size, second_size))
+            new_values = numpy.zeros(target_shape)
+            new_values[:first_length, :first_size] = first_values
+            new_values[first_length:, :second_size] = second_values
+            if new_values.shape[1] == 1:
+                new_values = numpy.squeeze(new_values, axis=1)
+        else:
+            new_values = numpy.concatenate([self.values, other.values])
         severities = numpy.concatenate([self.severities, other.severities])
-        return ArchiveData(self.pv, values, timestamps, severities)
+        return ArchiveData(self.pv, new_values, timestamps, severities)
 
     def __str__(self):
         if len(self.values) == 0:
