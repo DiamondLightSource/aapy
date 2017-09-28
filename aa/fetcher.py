@@ -1,4 +1,4 @@
-from utils import quote, urlopen
+from .utils import quote, urlopen
 import pytz
 from datetime import datetime
 
