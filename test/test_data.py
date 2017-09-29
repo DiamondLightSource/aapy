@@ -28,9 +28,10 @@ def test_ArchiveData_concatenate_works_for_two_items():
     ones = numpy.ones((1,))
     data1 = data.ArchiveData('dummy', zeros, zeros, zeros)
     data2 = data.ArchiveData('dummy', ones, ones, ones)
-    expected = numpy.array((0,1))
+    expected = numpy.array((0, 1))
     data3 = data1.concatenate(data2)
-    numpy.testing.assert_equal(data3.values, expected)
+    # Note that values is always a 2d array.
+    numpy.testing.assert_equal(data3.values, expected.reshape(2, 1))
     numpy.testing.assert_equal(data3.timestamps, expected)
     numpy.testing.assert_equal(data3.severities, expected)
 
@@ -95,7 +96,8 @@ def test_data_from_events_handles_one_event(dummy_pv, event_1d, data_1d):
 
 
 def test_data_from_events_handles_two_events(dummy_pv, event_1d, event_1d_alt, data_2_events):
-    assert data.data_from_events(dummy_pv, (event_1d, event_1d_alt)) == data_2_events
+    result = data.data_from_events(dummy_pv, (event_1d, event_1d_alt))
+    assert result == data_2_events
 
 
 def test_data_from_events_handles_two_2d_events(dummy_pv, event_2d, event_2d_alt, data_2d_2_events):
