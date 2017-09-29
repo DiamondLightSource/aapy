@@ -17,7 +17,7 @@ def aa_fetcher():
 def test_Fetcher_get_values_raises_NotImplementedError():
     f = fetcher.Fetcher()
     with pytest.raises(NotImplementedError):
-        f._get_values(1, 2, 3, 4)
+        f.get_values(1, 2, 3, 4)
 
 
 def test_Fetcher_get_event_at_raises_ValueError_if_no_data_returned_by_query():
