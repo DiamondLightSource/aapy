@@ -15,7 +15,6 @@ def jan_2017():
     return pytz.utc.localize(datetime(2017, 1, 1))
 
 
-
 @pytest.fixture
 def event_1d(dummy_pv):
     return data.ArchiveEvent(dummy_pv, 1, 100.1, 0)
