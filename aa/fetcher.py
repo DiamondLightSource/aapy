@@ -29,7 +29,8 @@ class AaFetcher(Fetcher):
         self._endpoint = 'http://{}:{}'.format(self._host, self._port)
         self._url = None
 
-    def _format_datetime(self, dt):
+    @staticmethod
+    def _format_datetime(dt):
         return dt.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def _construct_url(self, pv, start, end):
