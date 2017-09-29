@@ -20,6 +20,14 @@ def test_Fetcher_get_values_raises_NotImplementedError():
         f._get_values(1, 2, 3, 4)
 
 
+def test_Fetcher_get_event_at_raises_ValueError_if_no_data_returned_by_query():
+    f = fetcher.Fetcher()
+    f.get_values = mock.MagicMock()
+    f.get_values.side_effect = IndexError
+    with pytest.raises(ValueError):
+        f.get_event_at(1, 2)
+
+
 def test_AaFetcher_constructs_endpoint_correctly(aa_fetcher):
     assert aa_fetcher._endpoint == 'http://localhost:3003'
 
