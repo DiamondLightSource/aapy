@@ -27,8 +27,8 @@ class JsonFetcher(fetcher.AaFetcher):
                 timestamps[i] = event['secs'] + 1e-9 * event['nanos']
                 severities[i] = event['severity']
         else:  # no values returned
-            values = numpy.array((0,))
-            timestamps = numpy.array((0,))
-            severities = numpy.array((0,))
+            values = numpy.zeros((0,))
+            timestamps = numpy.zeros((0,))
+            severities = numpy.zeros((0,))
 
         return aa.data.ArchiveData(pv, values, timestamps, severities)
