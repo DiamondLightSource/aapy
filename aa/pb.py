@@ -185,8 +185,7 @@ class PbFileFetcher(fetcher.Fetcher):
                 log.warning('No pb file {} found')
         return parse_pb_data(bytes(raw_data), pv, start, end, count)
 
-    def get_values(self, pv, start, end=None, count=None):
-        end = datetime.now(pytz.utc) if end is None else end
+    def _get_values(self, pv, start, end=None, count=None):
         pb_files = []
         for year in range(start.year, end.year + 1):
             pb_files.append(self._get_pb_file(pv, year))

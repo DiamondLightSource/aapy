@@ -13,7 +13,7 @@ def test_ArchiveData_concatenate_with_different_pv_names_raises_AssertionError()
 
 def test_ArchiveData_concatenate_raises_ValueError_for_different_sized_array(data_1d, data_2d):
     with pytest.raises(ValueError):
-        # default is zero_pad=False
+        # default is zero_pad=False and the arrays are different dimensions
         data_2d.concatenate(data_1d)
 
 
@@ -50,21 +50,6 @@ def test_ArchiveData_concatenate_works_for_2d_arrays():
     numpy.testing.assert_equal(data3.severities, expected)
 
 
-def test_ArchiveData_check_timestamps_returns_True_for_ascending_array(empty_data):
-    a = numpy.arange(1, 2, 0.1)
-    assert empty_data._check_timestamps(a)
-
-
-def test_ArchiveData_check_timestamps_returns_True_for_constant_array(empty_data):
-    a = numpy.zeros((10,))
-    assert empty_data._check_timestamps(a)
-
-
-def test_ArchiveData_check_timestamps_returns_False_for_descending_array(empty_data):
-    a = numpy.arange(2, 1, -0.1)
-    assert not empty_data._check_timestamps(a)
-
-
 def test_ArchiveData_constructor_raises_AssertionError_if_array_lengths_different(dummy_pv):
     empty_10 = numpy.zeros((10,))
     empty_11 = numpy.zeros((11,))
@@ -77,6 +62,13 @@ def test_ArchiveData_constructor_raises_AssertionError_if_timestamps_descending(
     desc = numpy.arange(2, 1, -0.1)
     with pytest.raises(AssertionError):
         data.ArchiveData(dummy_pv, empty_array, desc, empty_array)
+
+
+# Test both ascending array and constant array.
+@pytest.mark.parametrize('timestamps', (numpy.arange(1, 2, 0.1), numpy.ones(10,)))
+def test_ArchiveData_constructor_raises_no_exception_if_timestamps_valid(dummy_pv, timestamps):
+    empty_array = numpy.zeros((10,))
+    data.ArchiveData(dummy_pv, empty_array, timestamps, empty_array)
 
 
 def test_empty_ArchiveData_iterates_zero_times(empty_data):

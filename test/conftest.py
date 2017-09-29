@@ -1,11 +1,18 @@
 from aa import data
 import pytest
 import numpy
+import pytz
+from datetime import datetime
 
 
 @pytest.fixture
 def dummy_pv():
     return 'dummy'
+
+
+@pytest.fixture
+def jan_2017():
+    return pytz.utc.localize(datetime(2017, 1, 1))
 
 
 @pytest.fixture

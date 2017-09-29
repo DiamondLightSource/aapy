@@ -1,17 +1,23 @@
 from __future__ import print_function
 from datetime import datetime
 import pytz
+# Manage differences between Python 2 and Python 3.
 try:
-    from urllib.parse import quote
+    from urllib.parse import quote as urlquote
     from urllib.request import urlopen
     from urllib.error import HTTPError
 except ImportError:  # Python 2 compatibility.
-    from urllib import quote
+    from urllib import quote as urlquote
     from urllib2 import urlopen
     from urllib2 import HTTPError
 
 
 EPOCH = pytz.UTC.localize(datetime(1970, 1, 1))
+
+
+def urlget(url):
+    urlinfo = urlopen(url)
+    return urlinfo.read()
 
 
 def datetime_to_epoch(dt):

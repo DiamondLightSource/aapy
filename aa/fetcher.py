@@ -1,4 +1,4 @@
-from .utils import quote, urlopen
+from .utils import urlquote, urlget
 import pytz
 from datetime import datetime
 
@@ -29,21 +29,21 @@ class AaFetcher(Fetcher):
         self._endpoint = 'http://{}:{}'.format(self._host, self._port)
         self._url = None
 
-    def _format_datetime(self, dt):
+    @staticmethod
+    def _format_datetime(dt):
         return dt.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def _construct_url(self, pv, start, end):
-        encoded_pv = quote(pv)
-        encoded_start = quote(self._format_datetime(start))
-        encoded_end = quote(self._format_datetime(end))
+        encoded_pv = urlquote(pv)
+        encoded_start = urlquote(self._format_datetime(start))
+        encoded_end = urlquote(self._format_datetime(end))
         suffix = '?pv={}&from={}&to={}'.format(encoded_pv,
                 encoded_start, encoded_end)
         return '{}{}'.format(self._url, suffix)
 
     def _fetch_data(self, pv, start, end):
         url = self._construct_url(pv, start, end)
-        urlinfo = urlopen(url)
-        return urlinfo.read()
+        return urlget(url)
 
     def _get_values(self, pv, start, end, count):
         raw_data = self._fetch_data(pv, start, end)
