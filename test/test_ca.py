@@ -11,7 +11,7 @@ CA_EVENT_1D = {'value': [1],
                }
 
 
-CA_EVENT_2D = {'value': [1, 2, 3],
+CA_EVENT_2D = {'value': [1.1, 2, 3],
                'secs': 10,
                'nano': 21e7,
                'sevr': 1
@@ -66,13 +66,8 @@ def test_CaFetcher_get_values_calls_client_get_once_if_response_less_than_count(
 
 
 def test_CaFetcher_get_values_calls_client_get_twice_if_count_exceeds_10000(ca_fetcher, event_1d, event_1d_alt, data_2_events):
-    # Ensure events with increasing timestamps.
-    events = []
-    for i in range(10000):
-        e = copy.deepcopy(event_1d)
-        e._timestamp = i * 1e-6
-        events.append(e)
+    events = [event_1d] * 10000
     ca_fetcher._client.get.side_effect = (events, [event_1d_alt])
     # Ask for two values.
-    response = ca_fetcher.get_values('dummy', 'dummy_date_1', 'dummy_date_2', 10001)
+    ca_fetcher.get_values('dummy', 'dummy_date_1', 'dummy_date_2', 10001)
     assert len(ca_fetcher._client.get.call_args_list) == 2

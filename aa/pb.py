@@ -144,6 +144,16 @@ class PbFetcher(fetcher.AaFetcher):
         super(PbFetcher, self).__init__(hostname, port)
         self._url = '{}/retrieval/data/getData.raw'.format(self._endpoint)
 
+    def _get_values(self, pv, start, end, count):
+        try:
+            return super(PbFetcher, self)._get_values(pv, start, end, count)
+        except utils.HTTPError as e:
+            # Not found typically means no data for the PV in this time range.
+            if e.code == 404:
+                return data.ArchiveData.empty(pv)
+            else:
+                raise e
+
     def _parse_raw_data(self, raw_data, pv, start, end, count):
         return parse_pb_data(raw_data, pv, start, end, count)
 

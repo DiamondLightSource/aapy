@@ -1,6 +1,9 @@
 import logging as log
 
 
+DIFF_EVENT = 'Different events with identical timestamps:\n{}\n{}'
+
+
 class ArchiveDataDiff(object):
 
     LEFT = 'left'
@@ -86,7 +89,8 @@ def compare_archive_data(data_left, data_right):
             count_left += 1
             previous_left_event = left_event
         else:
-            assert left_event == right_event
+            assert left_event == right_event, DIFF_EVENT.format(left_event,
+                                                                right_event)
             count_left += 1
             count_right += 1
             previous_left_event = left_event

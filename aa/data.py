@@ -55,10 +55,20 @@ class ArchiveData(object):
 
     def __init__(self, pv, values, timestamps, severities):
         assert len(values) == len(timestamps) == len(severities)
+        assert self._check_timestamps(timestamps), TIMESTAMP_ERROR
         self._pv = pv
         self._values = values
         self._timestamps = timestamps
         self._severities = severities
+
+    @staticmethod
+    def _check_timestamps(ts_array):
+        return numpy.all(numpy.diff(ts_array) >= 0)
+
+    @staticmethod
+    def empty(pv):
+        empty_array = numpy.zeros((0,))
+        return ArchiveData(pv, empty_array, empty_array, empty_array)
 
     @property
     def pv(self):
@@ -80,13 +90,43 @@ class ArchiveData(object):
         return ArchiveEvent(self.pv, self.values[index],
                             self.timestamps[index], self.severities[index])
 
-    def append(self, other):
+    def concatenate(self, other, zero_pad=False):
+        """Combine two ArchiveData objects.
+
+        Create a new object so that ArchiveData objects can be treated as
+        immutable.
+
+        Args:
+            other: ArchiveData object with later timestamps
+            zero_pad: if the values arrays differ in their second dimension,
+                      expand the smaller to the size of the larger, padding
+                      with zeros.
+
+        Returns:
+            new ArchiveData object combining self and other
+        """
         assert other.pv == self.pv, DIFFERENT_PV_ERROR
         timestamps = numpy.concatenate([self.timestamps, other.timestamps])
-        assert numpy.all(numpy.diff(timestamps) > 0), TIMESTAMP_ERROR
-        self._values = numpy.concatenate([self.values, other.values])
-        self._timestamps = timestamps
-        self._severities = numpy.concatenate([self.severities, other.severities])
+        assert self._check_timestamps(timestamps), TIMESTAMP_ERROR
+        if zero_pad:
+            first_values = (self.values.reshape((-1, 1))
+                            if self.values.ndim == 1 else self.values)
+            second_values = (other.values.reshape((-1, 1))
+                             if other.values.ndim == 1 else other.values)
+            first_length, first_size = first_values.shape
+            second_length, second_size = second_values.shape
+
+            target_shape = (first_length + second_length,
+                            max(first_size, second_size))
+            new_values = numpy.zeros(target_shape)
+            new_values[:first_length, :first_size] = first_values
+            new_values[first_length:, :second_size] = second_values
+            if new_values.shape[1] == 1:
+                new_values = numpy.squeeze(new_values, axis=1)
+        else:
+            new_values = numpy.concatenate([self.values, other.values])
+        severities = numpy.concatenate([self.severities, other.severities])
+        return ArchiveData(self.pv, new_values, timestamps, severities)
 
     def __str__(self):
         if len(self.values) == 0:
@@ -128,12 +168,15 @@ def data_from_events(pv, events, count=None):
     event_count = min(count, len(events)) if count is not None else len(events)
     try:
         wf_length = len(events[0].value)
+        dt = numpy.dtype(type(events[0].value[0]))
     except TypeError:  # Event value is not a waveform
         wf_length = 1
+        dt = numpy.dtype(type(events[0].value))
     except IndexError:  # No events
-        wf_length = 0
+        wf_length = 1
+        dt = numpy.float64
 
-    values = numpy.zeros((event_count, wf_length))
+    values = numpy.zeros((event_count, wf_length), dtype=dt)
     timestamps = numpy.zeros((event_count,))
     severities = numpy.zeros((event_count,))
     for i, event in enumerate(events[:event_count]):

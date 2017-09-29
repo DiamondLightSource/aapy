@@ -3,19 +3,39 @@ import pytest
 from aa import data
 
 
-def test_ArchiveData_append_works_for_two_items():
+def test_ArchiveData_concatenate_with_different_pv_names_raises_AssertionError():
+    array = numpy.zeros((1,))
+    data1 = data.ArchiveData('dummy1', array, array, array)
+    data2 = data.ArchiveData('dummy2', array, array, array)
+    with pytest.raises(AssertionError):
+        data1.concatenate(data2)
+
+
+def test_ArchiveData_concatenate_raises_ValueError_for_different_sized_array(data_1d, data_2d):
+    with pytest.raises(ValueError):
+        # default is zero_pad=False
+        data_2d.concatenate(data_1d)
+
+
+def test_ArchiveData_concatenate_correctly_zero_pads(data_1d, data_2d):
+    result = data_2d.concatenate(data_1d, zero_pad=True)
+    expected = numpy.array(((1.1, 2, 3), (1, 0, 0)))
+    numpy.testing.assert_equal(result.values, expected)
+
+
+def test_ArchiveData_concatenate_works_for_two_items():
     zeros = numpy.zeros((1,))
     ones = numpy.ones((1,))
     data1 = data.ArchiveData('dummy', zeros, zeros, zeros)
     data2 = data.ArchiveData('dummy', ones, ones, ones)
     expected = numpy.array((0,1))
-    data1.append(data2)
-    numpy.testing.assert_equal(data1.values, expected)
-    numpy.testing.assert_equal(data1.timestamps, expected)
-    numpy.testing.assert_equal(data1.severities, expected)
+    data3 = data1.concatenate(data2)
+    numpy.testing.assert_equal(data3.values, expected)
+    numpy.testing.assert_equal(data3.timestamps, expected)
+    numpy.testing.assert_equal(data3.severities, expected)
 
 
-def test_ArchiveData_append_works_for_2d_arrays():
+def test_ArchiveData_concatenate_works_for_2d_arrays():
     zeros = numpy.zeros((1,))
     zeros_2d = numpy.zeros((1,2))
     ones = numpy.ones((1,))
@@ -24,18 +44,39 @@ def test_ArchiveData_append_works_for_2d_arrays():
     data2 = data.ArchiveData('dummy', ones_2d, ones, ones)
     expected = numpy.array((0,1))
     expected_2d = numpy.array(((0,0),(1,1)))
-    data1.append(data2)
-    numpy.testing.assert_equal(data1.values, expected_2d)
-    numpy.testing.assert_equal(data1.timestamps, expected)
-    numpy.testing.assert_equal(data1.severities, expected)
+    data3 = data1.concatenate(data2)
+    numpy.testing.assert_equal(data3.values, expected_2d)
+    numpy.testing.assert_equal(data3.timestamps, expected)
+    numpy.testing.assert_equal(data3.severities, expected)
 
 
-def test_ArchiveData_append_with_different_pv_names_raises_AssertionError():
-    array = numpy.zeros((1,))
-    data1 = data.ArchiveData('dummy1', array, array, array)
-    data2 = data.ArchiveData('dummy2', array, array, array)
+def test_ArchiveData_check_timestamps_returns_True_for_ascending_array(empty_data):
+    a = numpy.arange(1, 2, 0.1)
+    assert empty_data._check_timestamps(a)
+
+
+def test_ArchiveData_check_timestamps_returns_True_for_constant_array(empty_data):
+    a = numpy.zeros((10,))
+    assert empty_data._check_timestamps(a)
+
+
+def test_ArchiveData_check_timestamps_returns_False_for_descending_array(empty_data):
+    a = numpy.arange(2, 1, -0.1)
+    assert not empty_data._check_timestamps(a)
+
+
+def test_ArchiveData_constructor_raises_AssertionError_if_array_lengths_different(dummy_pv):
+    empty_10 = numpy.zeros((10,))
+    empty_11 = numpy.zeros((11,))
     with pytest.raises(AssertionError):
-        data1.append(data2)
+        data.ArchiveData(dummy_pv, empty_10, empty_10, empty_11)
+
+
+def test_ArchiveData_constructor_raises_AssertionError_if_timestamps_descending(dummy_pv):
+    empty_array = numpy.zeros((10,))
+    desc = numpy.arange(2, 1, -0.1)
+    with pytest.raises(AssertionError):
+        data.ArchiveData(dummy_pv, empty_array, desc, empty_array)
 
 
 def test_empty_ArchiveData_iterates_zero_times(empty_data):

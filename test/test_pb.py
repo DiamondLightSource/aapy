@@ -54,7 +54,6 @@ def test_unescape_bytes_handles_example_escaped_bytes():
     assert pb.unescape_bytes(test_bytes) == b'hello' + pb.NL_BYTE + b'bye'
 
 
-
 def test_event_timestamp_gives_correct_answer_1970():
     event = mock.MagicMock()
     event.secondsintoyear = 10
@@ -70,6 +69,11 @@ def test_event_timestamp_gives_correct_answer_2001():
     event.secondsintoyear = seconds
     event.nano = nanos
     assert pb.event_timestamp(2001, event) - expected < TIMESTAMP_INACCURACY
+
+
+def test_PbFetcher_creates_correct_url():
+    pb_fetcher = pb.PbFetcher('dummy.com', 8000)
+    assert pb_fetcher._url == 'http://dummy.com:8000/retrieval/data/getData.raw'
 
 
 def test_PbFileFetcher_get_pb_file_handles_pv_with_one_colon():
