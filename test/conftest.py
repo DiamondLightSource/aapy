@@ -55,7 +55,7 @@ def data_2_events(dummy_pv):
         1d ArchiveData with two events.
     """
     return data.ArchiveData(dummy_pv,
-                            numpy.array((1, 2)),
+                            numpy.array((1, 2)).reshape(2, 1),
                             numpy.array((100.1, 100.2)),
                             numpy.array((0, 1)))
 

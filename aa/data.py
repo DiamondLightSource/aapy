@@ -54,7 +54,12 @@ class ArchiveData(object):
             ' last timestamp {:%Y-%m-%d %H:%M:%S.%f}')
 
     def __init__(self, pv, values, timestamps, severities):
+        values = numpy.array(values)
+        timestamps = numpy.array(timestamps)
+        severities = numpy.array(severities)
         assert len(values) == len(timestamps) == len(severities)
+        if values.ndim == 1:
+            values = values.reshape((-1, 1))
         assert self._check_timestamps(timestamps), TIMESTAMP_ERROR
         self._pv = pv
         self._values = values
@@ -109,20 +114,14 @@ class ArchiveData(object):
         timestamps = numpy.concatenate([self.timestamps, other.timestamps])
         assert self._check_timestamps(timestamps), TIMESTAMP_ERROR
         if zero_pad:
-            first_values = (self.values.reshape((-1, 1))
-                            if self.values.ndim == 1 else self.values)
-            second_values = (other.values.reshape((-1, 1))
-                             if other.values.ndim == 1 else other.values)
-            first_length, first_size = first_values.shape
-            second_length, second_size = second_values.shape
+            first_length, first_size = self.values.shape
+            second_length, second_size = other.values.shape
 
             target_shape = (first_length + second_length,
                             max(first_size, second_size))
             new_values = numpy.zeros(target_shape)
-            new_values[:first_length, :first_size] = first_values
-            new_values[first_length:, :second_size] = second_values
-            if new_values.shape[1] == 1:
-                new_values = numpy.squeeze(new_values, axis=1)
+            new_values[:first_length, :first_size] = self.values
+            new_values[first_length:, :second_size] = other.values
         else:
             new_values = numpy.concatenate([self.values, other.values])
         severities = numpy.concatenate([self.severities, other.severities])
@@ -183,8 +182,5 @@ def data_from_events(pv, events, count=None):
         values[i] = event.value
         timestamps[i] = event.timestamp
         severities[i] = event.severity
-
-    if wf_length == 1:
-        values = numpy.squeeze(values, axis=1)
 
     return ArchiveData(pv, values, timestamps, severities)

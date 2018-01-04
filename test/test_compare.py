@@ -1,4 +1,4 @@
-from aa import compare, data, utils
+from aa import compare, data
 import numpy
 
 

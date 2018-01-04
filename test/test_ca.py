@@ -1,5 +1,4 @@
 import pytest
-import copy
 import mock
 from aa import ca
 
