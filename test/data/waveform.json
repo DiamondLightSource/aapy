@@ -1,0 +1,7 @@
+[{
+  "meta": { "name": "WAVEFORM_PV" , "PREC": "0"},
+  "data": [
+    { "secs": 10, "val": [1.1,2.0,3.0], "nanos": 210000000, "severity":1, "status":0 },
+    { "secs": 11, "val": [3.0,4.5,6.0], "nanos": 10000000, "severity":5, "status":0 }
+  ]
+}]
