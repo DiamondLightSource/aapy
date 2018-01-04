@@ -19,8 +19,8 @@ class JsonFetcher(fetcher.AaFetcher):
                 wf_length = len(json_data[0]['data'][0]['val'])
             except TypeError:
                 wf_length = 1
-            values = numpy.zeros((event_count,))
-            timestamps = numpy.zeros((event_count, wf_length))
+            values = numpy.zeros((event_count, wf_length))
+            timestamps = numpy.zeros((event_count,))
             severities = numpy.zeros((event_count,))
             for i, event in zip(range(event_count), events):
                 values[i] = event['val']
