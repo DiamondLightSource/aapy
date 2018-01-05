@@ -18,8 +18,6 @@ handing the interpretation over to the Google Protobuf library.
 """
 from . import data, fetcher, utils
 from . import epics_event_pb2 as ee
-from datetime import datetime
-import pytz
 import os
 import re
 import collections

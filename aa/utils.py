@@ -11,6 +11,12 @@ except ImportError:  # Python 2 compatibility.
     from urllib2 import urlopen
     from urllib2 import HTTPError
 
+# string23 is used for type-checking string on both Python 2 and Python 3.
+try:
+    string23 = basestring
+except NameError:
+    string23 = str
+
 
 EPOCH = pytz.UTC.localize(datetime(1970, 1, 1))
 

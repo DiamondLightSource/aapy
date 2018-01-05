@@ -3,27 +3,12 @@ from datetime import datetime
 import numpy
 import mock
 import pytest
-import os
+import utils
 
 
 EARLY_DATE = datetime(2001, 1, 1, 1, 1)
 LATE_DATE = datetime(2010, 2, 3, 4, 5)
 EMPTY_ARRAY = numpy.array((0,))
-
-
-def load_from_file(filename):
-    """
-    Load the contents of a file in the data directory.
-    Args:
-        filename: name of file to load
-
-    Returns:
-        contents of file as a string
-
-    """
-    filepath = os.path.join(os.path.dirname(__file__), 'data', filename)
-    with open(filepath) as f:
-        return f.read()
 
 
 @pytest.fixture
@@ -42,7 +27,7 @@ def test_JsonFetcher_decodes_empty_json_correctly(dummy_pv, empty_data, json_fet
 
 
 def test_JsonFetcher_decodes_single_event_correctly(dummy_pv, json_fetcher):
-    event_json = load_from_file('event.json')
+    event_json = utils.load_from_file('event.json')
     json_fetcher._fetch_data = mock.MagicMock(return_value=event_json)
     aa_data = json_fetcher.get_values(dummy_pv, EARLY_DATE, LATE_DATE)
     assert aa_data.pv == dummy_pv
@@ -51,8 +36,18 @@ def test_JsonFetcher_decodes_single_event_correctly(dummy_pv, json_fetcher):
     assert aa_data.severities[0] == 1
 
 
+def test_JsonFetcher_decodes_string_event_correctly(dummy_pv, json_fetcher):
+    event_json = utils.load_from_file('string_event.json')
+    json_fetcher._fetch_data = mock.MagicMock(return_value=event_json)
+    aa_data = json_fetcher.get_values(dummy_pv, EARLY_DATE, LATE_DATE)
+    assert aa_data.pv == dummy_pv
+    assert aa_data.values[0] == '2015-01-08 19:47:01 UTC'
+    assert aa_data.timestamps[0] == 1507712433.235971000
+    assert aa_data.severities[0] == 0
+
+
 def test_JsonFetcher_decodes_waveform_events_correctly(dummy_pv, json_fetcher, data_2d_2_events):
-    waveform_json = load_from_file('waveform.json')
+    waveform_json = utils.load_from_file('waveform.json')
     json_fetcher._fetch_data = mock.MagicMock(return_value=waveform_json)
     aa_data = json_fetcher.get_values(dummy_pv, EARLY_DATE, LATE_DATE)
     assert aa_data == data_2d_2_events

@@ -11,8 +11,13 @@ def dummy_pv():
 
 
 @pytest.fixture
-def jan_2017():
-    return pytz.utc.localize(datetime(2017, 1, 1))
+def jan_2001():
+    return pytz.utc.localize(datetime(2001, 1, 1))
+
+
+@pytest.fixture
+def jan_2018():
+    return pytz.utc.localize(datetime(2018, 1, 1))
 
 
 @pytest.fixture

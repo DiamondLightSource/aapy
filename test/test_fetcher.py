@@ -1,4 +1,4 @@
-from aa import fetcher, pb
+from aa import fetcher
 from datetime import datetime
 import pytest
 import mock
@@ -54,7 +54,7 @@ def test_AaFetcher_creates_default_for_end_if_not_provided(dummy_pv, aa_fetcher)
     assert isinstance(args[2], datetime)
 
 
-def test_AaFetcher_get_values_raises_NotImplementedError(dummy_pv, jan_2017, aa_fetcher):
+def test_AaFetcher_get_values_raises_NotImplementedError(dummy_pv, jan_2018, aa_fetcher):
     with mock.patch('aa.fetcher.urlget'):
         with pytest.raises(NotImplementedError):
-            aa_fetcher.get_values(dummy_pv, jan_2017)
+            aa_fetcher.get_values(dummy_pv, jan_2018)

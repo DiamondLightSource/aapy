@@ -165,12 +165,19 @@ def data_from_events(pv, events, count=None):
         ArchiveData object
     """
     event_count = min(count, len(events)) if count is not None else len(events)
+
+    # Use the first event to determine the type of array to use.
     try:
-        wf_length = len(events[0].value)
-        dt = numpy.dtype(type(events[0].value[0]))
+        first_event = events[0]
+        if isinstance(first_event.value, utils.string23):
+            wf_length = 1
+            dt = numpy.dtype('U100')
+        else:
+            wf_length = len(first_event.value)
+            dt = numpy.dtype(type(first_event.value[0]))
     except TypeError:  # Event value is not a waveform
         wf_length = 1
-        dt = numpy.dtype(type(events[0].value))
+        dt = numpy.dtype(type(first_event.value))
     except IndexError:  # No events
         wf_length = 1
         dt = numpy.float64
