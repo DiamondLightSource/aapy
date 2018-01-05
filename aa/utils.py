@@ -10,6 +10,10 @@ except ImportError:  # Python 2 compatibility.
     from urllib import quote as urlquote
     from urllib2 import urlopen
     from urllib2 import HTTPError
+try:
+    string23 = basestring
+except NameError:
+    string23 = str
 
 
 EPOCH = pytz.UTC.localize(datetime(1970, 1, 1))

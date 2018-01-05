@@ -1,0 +1,17 @@
+[
+  {
+    "meta": {
+      "name": "BL02I-RS-RDMON-01:MANRESETTIME",
+      "PREC": "0"
+    },
+    "data": [
+      {
+        "secs": 1507712433,
+        "val": "2015-01-08 19:47:01 UTC",
+        "nanos": 235971000,
+        "severity": 0,
+        "status": 0
+      }
+    ]
+  }
+]
