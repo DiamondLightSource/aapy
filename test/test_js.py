@@ -4,6 +4,8 @@ import numpy
 import mock
 import pytest
 import utils
+import json
+import jsonschema
 
 
 EARLY_DATE = datetime(2001, 1, 1, 1, 1)
@@ -14,6 +16,17 @@ EMPTY_ARRAY = numpy.array((0,))
 @pytest.fixture
 def json_fetcher():
     return js.JsonFetcher('localhost', 5000)
+
+
+@pytest.mark.parametrize(
+    "filename", ['event', 'string_event', 'waveform']
+)
+def test_json_matches_schema(filename):
+    schema_string = utils.load_from_file('aa_schema.json')
+    schema_obj = json.loads(schema_string)
+    json_string = utils.load_from_file(filename + '.json')
+    json_obj = json.loads(json_string)
+    jsonschema.validate(json_obj, schema_obj)
 
 
 def test_JsonFetcher_constructs_url_correctly(json_fetcher):

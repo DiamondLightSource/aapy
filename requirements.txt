@@ -7,3 +7,4 @@ numpy
 pytz
 tox
 tox-travis
+jsonschema
