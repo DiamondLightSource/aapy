@@ -1,5 +1,6 @@
 from aa import data, pb, utils
 from aa import epics_event_pb2 as ee
+import utils as testutils
 import pytest
 import mock
 import pytz
@@ -77,27 +78,27 @@ def test_PbFetcher_creates_correct_url():
     assert pb_fetcher._url == 'http://dummy.com:8000/retrieval/data/getData.raw'
 
 
-def test_PbFetcher_get_calls_urlget_with_correct_url(dummy_pv, jan_2017):
+def test_PbFetcher_get_calls_urlget_with_correct_url(dummy_pv, jan_2018):
     with mock.patch('aa.fetcher.urlget') as mock_urlget:
         mock_urlget.return_value = PB_CHUNK
         pb_fetcher = pb.PbFetcher('dummy.com', 8000)
-        pb_fetcher.get_event_at(dummy_pv, jan_2017)
-        expected_url = 'http://dummy.com:8000/retrieval/data/getData.raw?pv=dummy&from=2017-01-01T00%3A00%3A00Z&to=2017-01-01T00%3A00%3A00Z'
+        pb_fetcher.get_event_at(dummy_pv, jan_2018)
+        expected_url = 'http://dummy.com:8000/retrieval/data/getData.raw?pv=dummy&from=2018-01-01T00%3A00%3A00Z&to=2018-01-01T00%3A00%3A00Z'
         mock_urlget.assert_called_with(expected_url)
 
 
-def test_PbFetcher_get_returns_empty_data_if_urlget_throws_HTTPError_404(dummy_pv, jan_2017, empty_data):
+def test_PbFetcher_get_returns_empty_data_if_urlget_throws_HTTPError_404(dummy_pv, jan_2018, empty_data):
     with mock.patch('aa.fetcher.urlget') as mock_urlget:
         mock_urlget.return_value = PB_CHUNK
         generic_mock = mock.MagicMock()
         http_error = utils.HTTPError('url', 404, 'msg', generic_mock, generic_mock)
         mock_urlget.side_effect = http_error
         pb_fetcher = pb.PbFetcher('dummy.com', 8000)
-        result = pb_fetcher.get_values(dummy_pv, jan_2017, jan_2017)
+        result = pb_fetcher.get_values(dummy_pv, jan_2018, jan_2018)
         assert result == empty_data
 
 
-def test_PbFetcher_get_raises_if_urlget_throws_HTTPError_not_404(dummy_pv, jan_2017, empty_data):
+def test_PbFetcher_get_raises_if_urlget_throws_HTTPError_not_404(dummy_pv, jan_2018, empty_data):
     with mock.patch('aa.fetcher.urlget') as mock_urlget:
         mock_urlget.return_value = PB_CHUNK
         generic_mock = mock.MagicMock()
@@ -105,7 +106,7 @@ def test_PbFetcher_get_raises_if_urlget_throws_HTTPError_not_404(dummy_pv, jan_2
         mock_urlget.side_effect = http_error
         pb_fetcher = pb.PbFetcher('dummy.com', 8000)
         with pytest.raises(utils.HTTPError):
-            pb_fetcher.get_values(dummy_pv, jan_2017, jan_2017)
+            pb_fetcher.get_values(dummy_pv, jan_2018, jan_2018)
 
 
 def test_PbFileFetcher_get_pb_file_handles_pv_with_one_colon():
@@ -117,10 +118,19 @@ def test_PbFileFetcher_get_pb_file_handles_pv_with_one_colon():
     assert fetcher._get_pb_file(pv, year) == expected
 
 
-def test_PbFileFetcher_get_pb_file_handles_pv_with_two_colon():
+def test_PbFileFetcher_get_pb_file_handles_pv_with_two_colons():
     root = 'root'
     year = 2001
     pv = 'a-b-c:d:e'
     fetcher = pb.PbFileFetcher(root)
     expected = os.path.join('root', 'a', 'b', 'c', 'd', 'e:2001.pb')
     assert fetcher._get_pb_file(pv, year) == expected
+
+
+def test_PbFileFetcher_read_pb_files(dummy_pv, jan_2001, jan_2018):
+    filepath = testutils.get_data_filepath('string_event.pb')
+    root = 'root'
+    fetcher = pb.PbFileFetcher(root)
+    data = fetcher._read_pb_files([filepath], dummy_pv, jan_2001, jan_2018, None)
+    assert data.values[0] == '2015-01-08 19:47:01 UTC'
+    assert data.timestamps[0] == 1507712433.235971
