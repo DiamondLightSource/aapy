@@ -3,12 +3,19 @@
   "items": {
     "type": "object",
     "properties": {
-      "meta": { "type": "object" },
+      "meta": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string"},
+          "PREC": { "type": "string"}
+        }
+      },
       "data": {
         "type": "array",
         "items": {
           "type": "object",
           "properties": {
+            "fields": { "type": "object" },
             "nanos": { "type": "number" },
             "secs": { "type": "number" },
             "severity": { "type": "number" },
