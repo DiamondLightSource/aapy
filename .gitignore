@@ -18,3 +18,7 @@ htmlcov/
 
 # Tox working directory
 .tox
+
+# Various build files
+dist/
+aapy.egg-info/

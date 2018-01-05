@@ -3,8 +3,15 @@ import json
 
 
 class JsonFetcher(fetcher.AaFetcher):
+    """Class to fetch data from the Archiver Appliance using JSON."""
 
     def __init__(self, hostname, port):
+        """
+
+        Args:
+            hostname: hostname of Archiver Appliance
+            port: port to connect to
+        """
         super(JsonFetcher, self).__init__(hostname, port)
         self._url = '{}/retrieval/data/getData.json'.format(self._endpoint)
 

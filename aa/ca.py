@@ -9,18 +9,45 @@ except ImportError:  # Python 2 compatibility
 
 
 class CaClient(object):
+    """Class to handle XMLRPC interaction with a channel archiver."""
 
     def __init__(self, url):
+        """
+        Args:
+            url: url for the channel archiver
+        """
         self._proxy = ServerProxy(url)
 
     @staticmethod
     def _create_archive_event(pv, ca_event):
+        """Create ArchiveEvent from the objects received over XMLRPC.
+
+        Args:
+            pv: PV name to add to the event
+            ca_event: object received over XMLRPC
+
+        Returns:
+            ArchiveEvent object
+
+        """
         value = ca_event['value']
         timestamp = ca_event['secs'] + 1e-9 * ca_event['nano']
         severity = ca_event['sevr']
         return data.ArchiveEvent(pv, value, timestamp, severity)
 
     def get(self, pv, start, end, count):
+        """Request events over XMLRPC.
+
+        Args:
+            pv: PV name to request events for
+            start: datetime of start of requested period
+            end: datetime of end of requested period
+            count: maximum number of events to retrieve
+
+        Returns:
+            List of ArchiveEvent objects
+
+        """
         start_secs = utils.datetime_to_epoch(start)
         end_secs = utils.datetime_to_epoch(end)
         response = self._proxy.archiver.values(1, [pv], start_secs, 0,
@@ -30,8 +57,13 @@ class CaClient(object):
 
 
 class CaFetcher(Fetcher):
+    """Class to retrieve data from a channel archiver."""
 
     def __init__(self, url):
+        """
+        Args:
+            url: url for the channel archiver
+        """
         self._client = CaClient(url)
 
     def _get_values(self, pv, start, end=None, count=None):
