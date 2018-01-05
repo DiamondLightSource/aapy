@@ -15,3 +15,6 @@ venv*
 # Coverage data
 .coverage
 htmlcov/
+
+# Tox working directory
+.tox

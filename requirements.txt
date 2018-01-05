@@ -5,3 +5,5 @@ protobuf
 python-coveralls
 numpy
 pytz
+tox
+tox-travis
