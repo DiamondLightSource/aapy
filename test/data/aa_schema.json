@@ -1,0 +1,35 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "meta": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string"},
+          "PREC": { "type": "string"}
+        }
+      },
+      "data": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "fields": { "type": "object" },
+            "nanos": { "type": "number" },
+            "secs": { "type": "number" },
+            "severity": { "type": "number" },
+            "val": {
+              "anyOf": [
+                { "type": "number" },
+                { "type": "string" },
+                { "type": "array", "items": { "type": "number" } },
+                { "type": "array", "items": { "type": "string" } }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
