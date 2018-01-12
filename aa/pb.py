@@ -128,8 +128,6 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
     events = []
     for year, (chunk_info, lines) in year_chunks.items():
         s = search_events(start, chunk_info, lines) if year == start.year else 0
-        if s == -1:
-            s = 0
         e = search_events(end, chunk_info, lines) if year == end.year else None
         for line in lines[s:e]:
             events.append(event_from_line(line, pv, year, chunk_info.type))
