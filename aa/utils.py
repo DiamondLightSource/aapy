@@ -69,10 +69,9 @@ def binary_search(seq, f, target):
     lower = 0
     while (upper - lower) > 1:
         current = (upper + lower) // 2
-        next_input = seq[current]
-        val = f(next_input)
-        if val > target:
+        next_val = f(seq[current])
+        if next_val > target:
             upper = current
-        elif val <= target:
+        elif next_val <= target:
             lower = current
     return upper
