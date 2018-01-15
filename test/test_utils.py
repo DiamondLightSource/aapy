@@ -56,6 +56,12 @@ def test_binary_search_returns_upper_index():
     assert utils.binary_search([1, 2], f, 1.5) == 1
 
 
+def test_binary_search_returns_upper_index_for_larger_sequence():
+    # This tests an otherwise-untested block in the algorithm.
+    f = lambda x: x
+    assert utils.binary_search([1, 2, 3, 4], f, 3.5) == 3
+
+
 def test_binary_search_returns_index_plus_one_if_value_equals_item_in_seq():
     f = lambda x: x
     assert utils.binary_search([1, 2], f, 1) == 1
