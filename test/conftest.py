@@ -1,8 +1,6 @@
-from aa import data
+from aa import data, utils
 import pytest
 import numpy
-import pytz
-from datetime import datetime
 
 
 @pytest.fixture
@@ -12,12 +10,12 @@ def dummy_pv():
 
 @pytest.fixture
 def jan_2001():
-    return pytz.utc.localize(datetime(2001, 1, 1))
+    return utils.utc_datetime(2001, 1, 1)
 
 
 @pytest.fixture
 def jan_2018():
-    return pytz.utc.localize(datetime(2018, 1, 1))
+    return utils.utc_datetime(2018, 1, 1)
 
 
 @pytest.fixture
