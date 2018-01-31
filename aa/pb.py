@@ -127,8 +127,23 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
     year_chunks = break_up_chunks(raw_data)
     events = []
     for year, (chunk_info, lines) in year_chunks.items():
-        s = search_events(start, chunk_info, lines) if year == start.year else 0
-        e = search_events(end, chunk_info, lines) if year == end.year else None
+        if start.year == year:  # search for the start
+            s = search_events(start, chunk_info, lines)
+        elif start.year > year:  # ignore this chunk
+            s = len(lines) - 1
+        else:  # start.year < year: all events from the start of the year
+            s = 0
+        if end.year == year:  # search for the end
+            e = search_events(end, chunk_info, lines)
+        elif end.year < year:  # ignore this chunk
+            e = 0
+        else:  # end.year > year: all events to the end of the year
+            e = None
+        # Include the event preceding the time range. This won't work over
+        # year boundaries for the time being.
+        if s > 0:
+            s -= 1
+        log.info('Year {} start {} end {}'.format(year, s, e))
         for line in lines[s:e]:
             events.append(event_from_line(line, pv, year, chunk_info.type))
     return data.data_from_events(pv, events, count)

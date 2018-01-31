@@ -133,3 +133,22 @@ def test_PbFileFetcher_read_pb_files(dummy_pv, jan_2001, jan_2018):
     data = fetcher._read_pb_files([filepath], dummy_pv, jan_2001, jan_2018, None)
     assert data.values[0] == '2015-01-08 19:47:01 UTC'
     assert data.timestamps[0] == 1507712433.235971
+
+
+def test_PbFileFetcher_read_pb_files_returns_preceding_event(dummy_pv, jan_2018):
+    filepath = testutils.get_data_filepath('jan_2016.pb')
+    root = 'root'
+    fetcher = pb.PbFileFetcher(root)
+    feb_2016 = utils.utc_datetime(2016, 2, 1)
+    data = fetcher._read_pb_files([filepath], dummy_pv, feb_2016, jan_2018, None)
+    assert data.values[0] == [0]
+    assert data.timestamps[0] == 1453202116.1772349
+
+
+def test_PbFileFetcher_read_pb_files_omits_subsequent_event(dummy_pv, jan_2001):
+    filepath = testutils.get_data_filepath('jan_2016.pb')
+    root = 'root'
+    fetcher = pb.PbFileFetcher(root)
+    dec_2015 = utils.utc_datetime(2015, 12, 1)
+    data = fetcher._read_pb_files([filepath], dummy_pv, jan_2001, dec_2015, None)
+    assert len(data) == 0
