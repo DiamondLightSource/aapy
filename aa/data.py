@@ -162,6 +162,12 @@ class ArchiveData(object):
     def __len__(self):
         return len(self.values)
 
+    def __getitem__(self, i):
+        return ArchiveEvent(self.pv,
+                            self.values[i],
+                            self.timestamps[i],
+                            self.severities[i])
+
 
 def data_from_events(pv, events, count=None):
     """Convert multiple ArchiveEvents into an ArchiveData object
