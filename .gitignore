@@ -20,5 +20,6 @@ htmlcov/
 .tox
 
 # Various build files
+build/
 dist/
 aapy.egg-info/
