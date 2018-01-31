@@ -1,5 +1,6 @@
 from __future__ import print_function
 from datetime import datetime
+import logging as log
 import pytz
 # Manage differences between Python 2 and Python 3.
 try:
@@ -22,6 +23,7 @@ EPOCH = pytz.UTC.localize(datetime(1970, 1, 1))
 
 
 def urlget(url):
+    log.debug('Fetching url {}'.format(url))
     urlinfo = urlopen(url)
     return urlinfo.read()
 
