@@ -4,7 +4,6 @@ import utils as testutils
 import pytest
 import mock
 import pytz
-from datetime import datetime
 import os
 
 
@@ -39,8 +38,8 @@ def test_parse_ScalarDouble():
 
 
 def test_parse_pb_data():
-    start = pytz.UTC.localize(datetime(2015, 1, 1))
-    end = pytz.UTC.localize(datetime(2015, 12, 1))
+    start = utils.utc_datetime(2015, 1, 1)
+    end = utils.utc_datetime(2015, 12, 1)
     result = pb.parse_pb_data(PB_CHUNK, PV, start, end)
     event = result.get_event(0)
     assert event == EVENT

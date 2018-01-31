@@ -77,6 +77,15 @@ def test_empty_ArchiveData_iterates_zero_times(empty_data):
         assert False  # we shouldn't get here
 
 
+def test_empty_ArchiveData_raises_IndexError_if_indexed(empty_data):
+    with pytest.raises(IndexError):
+        empty_data[0]
+
+
+def test_indexing_ArchiveData(data_1d, event_1d):
+    assert data_1d[0] == event_1d
+
+
 def test_empty_ArchiveData_iterates_multiple_times():
     array = numpy.zeros((1,))
     zero_event = data.ArchiveEvent('dummy', array, array, array)

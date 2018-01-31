@@ -8,7 +8,8 @@ TIMESTAMP_ERROR = 'Concatenated ArchiveData objects must have increasing timesta
 
 class ArchiveEvent(object):
 
-    DESC = 'Archive event timestamp {:%Y-%m-%d %H:%M:%S.%f} value {} severity {:.0f}'
+    DESC = ('Archive event for PV {}: '
+            'timestamp {:%Y-%m-%d %H:%M:%S.%f} value {} severity {:.0f}')
 
     def __init__(self, pv, value, timestamp, severity):
         self._pv = pv
@@ -34,9 +35,13 @@ class ArchiveEvent(object):
 
     def __str__(self):
         return ArchiveEvent.DESC.format(
+            self.pv,
             utils.epoch_to_datetime(self.timestamp),
             self.value,
-            self.severity)
+            self.severity
+        )
+
+    __repr__ = __str__
 
     def __eq__(self, other):
         equal = (isinstance(other, ArchiveEvent))
@@ -49,7 +54,7 @@ class ArchiveEvent(object):
 
 class ArchiveData(object):
 
-    DESC = ('Archive data: {} events'
+    DESC = ('Archive data for PV {}: {} events'
             ' first timestamp {:%Y-%m-%d %H:%M:%S.%f}'
             ' last timestamp {:%Y-%m-%d %H:%M:%S.%f}')
 
@@ -129,11 +134,16 @@ class ArchiveData(object):
 
     def __str__(self):
         if len(self.values) == 0:
-            return 'Empty archive data'
+            return "Empty archive data for PV '{}'".format(self.pv)
         else:
-            return ArchiveData.DESC.format(len(self.values),
+            return ArchiveData.DESC.format(
+                self.pv,
+                len(self.values),
                 utils.epoch_to_datetime(self.timestamps[0]),
-                utils.epoch_to_datetime(self.timestamps[-1]))
+                utils.epoch_to_datetime(self.timestamps[-1])
+            )
+
+    __repr__ = __str__
 
     def __eq__(self, other):
         equal = (isinstance(other, ArchiveData))
@@ -151,6 +161,12 @@ class ArchiveData(object):
 
     def __len__(self):
         return len(self.values)
+
+    def __getitem__(self, i):
+        return ArchiveEvent(self.pv,
+                            self.values[i],
+                            self.timestamps[i],
+                            self.severities[i])
 
 
 def data_from_events(pv, events, count=None):
