@@ -19,7 +19,11 @@ except NameError:
     string23 = str
 
 
-EPOCH = pytz.UTC.localize(datetime(1970, 1, 1))
+def utc_datetime(*args):
+    return pytz.UTC.localize(datetime(*args))
+
+
+EPOCH = utc_datetime(1970, 1, 1)
 
 
 def urlget(url):

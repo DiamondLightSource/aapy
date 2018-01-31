@@ -12,6 +12,14 @@ DATETIME_BST = TZ_BST.localize(datetime(2017, 8, 29, 17, 26, 9))
 TIMESTAMP_2001 = 978307200
 
 
+def test_utc_datetime_correctly_creates_datetime():
+    utc_2001 = utils.utc_datetime(2001, 1, 1)
+    assert utc_2001.year == 2001
+    assert utc_2001.month == 1
+    assert utc_2001.day == 1
+    assert utc_2001.tzinfo == pytz.UTC
+
+
 def test_datetime_to_epoch_works_for_short_difference():
     assert utils.datetime_to_epoch(JUST_AFTER_EPOCH) == 15
 
