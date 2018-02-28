@@ -86,7 +86,15 @@ def test_indexing_ArchiveData(data_1d, event_1d):
     assert data_1d[0] == event_1d
 
 
-def test_empty_ArchiveData_iterates_multiple_times():
+def test_empty_ArchiveData_evaluates_as_False(empty_data):
+    assert not empty_data
+
+
+def test_non_empty_ArchiveData_evaluates_as_True(data_1d):
+    assert data_1d
+
+
+def test_ArchiveData_iterates_multiple_times():
     array = numpy.zeros((1,))
     zero_event = data.ArchiveEvent('dummy', array, array, array)
     for i in range(3):
