@@ -23,6 +23,10 @@ def utc_datetime(*args):
     return pytz.UTC.localize(datetime(*args))
 
 
+def utc_now():
+    return pytz.UTC.localize(datetime.now())
+
+
 EPOCH = utc_datetime(1970, 1, 1)
 
 
