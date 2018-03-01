@@ -12,6 +12,9 @@ venv*
 # Pycharm
 .idea
 
+# Pytest
+.pytest_cache/
+
 # Coverage data
 .coverage
 htmlcov/
