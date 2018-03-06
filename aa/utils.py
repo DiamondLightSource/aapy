@@ -2,16 +2,6 @@ from __future__ import print_function
 from datetime import datetime
 import logging as log
 import pytz
-# Manage differences between Python 2 and Python 3.
-try:
-    from urllib.parse import quote as urlquote
-    from urllib.request import urlopen
-    from urllib.error import HTTPError
-except ImportError:  # Python 2 compatibility.
-    from urllib import quote as urlquote
-    from urllib2 import urlopen
-    from urllib2 import HTTPError
-
 # string23 is used for type-checking for strings in both Python 2 and Python 3.
 try:
     string23 = basestring
@@ -28,12 +18,6 @@ def utc_now():
 
 
 EPOCH = utc_datetime(1970, 1, 1)
-
-
-def urlget(url):
-    log.debug('Fetching url {}'.format(url))
-    urlinfo = urlopen(url)
-    return urlinfo.read()
 
 
 def datetime_to_epoch(dt):
