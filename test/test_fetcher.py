@@ -39,7 +39,7 @@ def test_AaFetcher_format_datetime(aa_fetcher):
 def test_AaFetcher_constructs_url_correctly(dummy_pv, aa_fetcher):
     aa_fetcher._url = 'dummy-url'
     constructed = aa_fetcher._construct_url(dummy_pv, EARLY_DATE, LATE_DATE)
-    expected = 'dummy-url?pv=dummy&from=2001-01-01T01%3A01%3A00Z&to=2010-02-03T04%3A05%3A00Z'
+    expected = 'dummy-url?pv=dummy&from=2001-01-01T01:01:00Z&to=2010-02-03T04:05:00Z'
     assert constructed == expected
 
 

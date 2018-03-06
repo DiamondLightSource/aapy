@@ -82,7 +82,7 @@ def test_PbFetcher_get_calls_urlget_with_correct_url(dummy_pv, jan_2018):
         mock_urlget.return_value = PB_CHUNK
         pb_fetcher = pb.PbFetcher('dummy.com', 8000)
         pb_fetcher.get_event_at(dummy_pv, jan_2018)
-        expected_url = 'http://dummy.com:8000/retrieval/data/getData.raw?pv=dummy&from=2018-01-01T00%3A00%3A00Z&to=2018-01-01T00%3A00%3A00Z'
+        expected_url = 'http://dummy.com:8000/retrieval/data/getData.raw?pv=dummy&from=2018-01-01T00:00:00Z&to=2018-01-01T00:00:00Z'
         mock_urlget.assert_called_with(expected_url)
 
 
