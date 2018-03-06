@@ -1,7 +1,8 @@
 from __future__ import print_function
 from datetime import datetime
-import logging as log
+import logging
 import pytz
+import requests
 # string23 is used for type-checking for strings in both Python 2 and Python 3.
 try:
     string23 = basestring
@@ -30,6 +31,11 @@ def epoch_to_datetime(secs):
 
 def year_timestamp(year):
     return (datetime(year, 1, 1) - datetime(1970, 1, 1)).total_seconds()
+
+
+def urlget(url):
+    logging.debug('Fetching URL {}'.format(url))
+    return requests.get(url)
 
 
 def print_raw_bytes(byte_seq):
