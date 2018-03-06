@@ -22,6 +22,7 @@ import os
 import re
 import collections
 import logging as log
+import requests
 
 
 # It is not clear to me why I can't extract this information
@@ -158,9 +159,9 @@ class PbFetcher(fetcher.AaFetcher):
     def _get_values(self, pv, start, end, count):
         try:
             return super(PbFetcher, self)._get_values(pv, start, end, count)
-        except utils.HTTPError as e:
+        except requests.exceptions.HTTPError as e:
             # Not found typically means no data for the PV in this time range.
-            if e.code == 404:
+            if e.response.status_code == 404:
                 return data.ArchiveData.empty(pv)
             else:
                 raise e
