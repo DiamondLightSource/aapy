@@ -33,6 +33,9 @@ class AaRestClient(object):
     def get_pv_info(self, pv_name):
         return make_rest_call(self._hostname, 'getPVTypeInfo', pv=pv_name)
 
+    def get_pv_status(self, pv_name):
+        return make_rest_call(self._hostname, 'getPVStatus', pv=pv_name)
+
     def get_pv_statuses(self, pv_names):
         url = construct_url(self._hostname, 'getPVStatus')
         payload = 'pv=' + ','.join(pv_names)
