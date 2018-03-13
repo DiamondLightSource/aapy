@@ -95,7 +95,9 @@ class AaRestClient(object):
                 logging.debug('Not changing {} - parameters correct'.format(pv))
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 404:
-                logging.info('PV {} not found - adding to AA'.format(pv, e))
-                self.archive_pv(pv, period, method)
+                response = self.archive_pv(pv, period, method)
+                # This PV could still have been requested but never connected.
+                if response[0]['status'] != 'Already submitted':
+                    logging.info('PV {} not found - adding to AA'.format(pv, e))
             else:
                 raise e
