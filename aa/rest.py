@@ -24,8 +24,8 @@ def make_rest_call(hostname, command, **kwargs):
 
 class AaRestClient(object):
 
-    def __init__(self, hostname):
-        self._hostname = hostname
+    def __init__(self, hostname, port=80):
+        self._hostname = '{}:{}'.format(hostname, port)
 
     def get_all_pvs(self, limit=-1):
         return make_rest_call(self._hostname, 'getAllPVs', limit=limit)
