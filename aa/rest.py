@@ -1,5 +1,3 @@
-import json
-import utils
 import logging
 import requests
 
@@ -38,7 +36,9 @@ class AaRestClient(object):
     def get_pv_statuses(self, pv_names):
         url = construct_url(self._hostname, 'getPVStatus')
         payload = 'pv=' + ','.join(pv_names)
-        response = requests.post(url, data=payload, headers={'Content-Type': 'application/x-www-form-urlencoded'})
+        response = requests.post(url, data=payload, headers={
+            'Content-Type': 'application/x-www-form-urlencoded'
+        })
         return response.json()
 
     def get_never_connected_pvs(self):
@@ -84,6 +84,8 @@ class AaRestClient(object):
                               samplingmethod=method.upper())
 
     def upload_or_update_pv(self, pv, period, method):
+        # Note: a previous upload_pvs() method has been removed but is in
+        # Git history. There was some subtlety in making the rest calls.
         try:
             info = self.get_pv_info(pv)
             if period != float(info['samplingPeriod']) or method != info['samplingMethod']:
@@ -97,22 +99,3 @@ class AaRestClient(object):
                 self.archive_pv(pv, period, method)
             else:
                 raise e
-
-    def upload_pvs(self, pv_specs):
-        specs_list = []
-        for spec in pv_specs:
-            self.archive_pv(spec.pv, spec.period, spec.method)
-            specs_list.append({'pv': spec.pv,
-                               # Something in the AA requires these numbers to
-                               # be strings, otherwise I don't get a sensible
-                               # response.
-                               'samplingperiod': str(spec.period),
-                               'samplingmethod': spec.method})
-        json_list = json.dumps(specs_list)
-        print(json_list)
-        url = construct_url(self._hostname, 'archivePV')
-        print(url)
-        req = utils.Request(url, json_list, {'Content-Type': 'application/json'})
-        response = json.loads(utils.urlopen(req).read())
-
-        print("response |{}|".format(response))
