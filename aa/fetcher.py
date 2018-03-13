@@ -1,6 +1,7 @@
-from .utils import urlquote, urlget
 import pytz
 from datetime import datetime
+
+from .utils import urlget
 
 
 class Fetcher(object):
@@ -61,11 +62,11 @@ class AaFetcher(Fetcher):
         return dt.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def _construct_url(self, pv, start, end):
-        encoded_pv = urlquote(pv)
-        encoded_start = urlquote(self._format_datetime(start))
-        encoded_end = urlquote(self._format_datetime(end))
-        suffix = '?pv={}&from={}&to={}'.format(encoded_pv,
-                encoded_start, encoded_end)
+        suffix = '?pv={}&from={}&to={}'.format(
+            pv,
+            self._format_datetime(start),
+            self._format_datetime(end)
+        )
         return '{}{}'.format(self._url, suffix)
 
     def _fetch_data(self, pv, start, end):
