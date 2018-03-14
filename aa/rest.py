@@ -48,6 +48,10 @@ class AaRestClient(object):
         pv_info = make_rest_call(self._hostname, 'getNeverConnectedPVs')
         return [info['pvName'] for info in pv_info]
 
+    def get_disconnected_pvs(self):
+        pv_info = make_rest_call(self._hostname, 'getCurrentlyDisconnectedPVs')
+        return [info['pvName'] for info in pv_info]
+
     def archive_pv(self, pv, period, method=aa.SCAN):
         if method not in [aa.SCAN, aa.MONITOR]:
             raise ValueError('Sampling method {} not valid'.format(method))
