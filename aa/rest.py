@@ -86,21 +86,43 @@ class AaRestClient(object):
                               samplingperiod=period,
                               samplingmethod=method.upper())
 
-    def upload_or_update_pv(self, pv, period, method):
+    def upload_or_update_pv(self, pv, period, method, status_dict=None):
+        """Ensure PV is being archived with the specified parameters.
+
+        If status_dict is None, request the current status of the PV.
+
+        If it is not being archived, add it to the AA. If it is being
+        archived, check whether the parameters match those supplied. If
+        not, change the archival parameters. If the PV has been
+        requested but has never connected, do nothing.
+
+        Args:
+            pv: PV name
+            period: sampling period
+            method: sampling method
+            status_dict: dict returned by get_pv_status()
+
+        """
         # Note: a previous upload_pvs() method has been removed but is in
         # Git history. There was some subtlety in making the rest calls.
-        try:
-            info = self.get_pv_info(pv)
-            if period != float(info['samplingPeriod']) or method != info['samplingMethod']:
+        if status_dict is None:
+            status_dict = self.get_pv_status(pv)[0]
+        status_string = status_dict['status']
+        if status_string == 'Initial sampling':
+            # Requested but never connected
+            logging.info(
+                'PV {} was previously requested but has never connected'.format(pv)
+            )
+        elif status_string == 'Not being archived':
+            logging.info('Adding PV {} to AA'.format(pv))
+            self.archive_pv(pv, period, method)
+        elif status_string == 'Being archived':
+            # Compare sampling period only to 1 d.p.
+            current_period = round(float(status_dict['samplingPeriod']), 1)
+            current_monitored = status_dict['isMonitored'] == 'true'
+            request_monitored = method == aa.MONITOR
+            if (period != current_period or current_monitored != request_monitored):
                 logging.info('Changing parameters for {}'.format(pv))
                 self.change_pv(pv, period, method)
-            else:
-                logging.debug('Not changing {} - parameters correct'.format(pv))
-        except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 404:
-                response = self.archive_pv(pv, period, method)
-                # This PV could still have been requested but never connected.
-                if response[0]['status'] != 'Already submitted':
-                    logging.info('PV {} not found - adding to AA'.format(pv, e))
-            else:
-                raise e
+        else:
+            logging.warning('Unexpected PV status {}'.format(status_string))
