@@ -15,23 +15,25 @@ def aa_client():
 
 
 @pytest.mark.parametrize('kwargs', ({}, {'a': 'b'}, {'a': 'b', 'c': 'd'}))
-def test_construct_url(kwargs):
-    url = rest.construct_url(HOSTNAME, 'cmd', **kwargs)
-    assert url.startswith('http://host/mgmt/bpl/cmd')
+def test_AaRestClient_construct_url(kwargs, aa_client):
+    url = aa_client._construct_url('cmd', **kwargs)
+    assert url.startswith('http://host:80/mgmt/bpl/cmd')
     for k, v in kwargs.items():
         assert '{}={}'.format(k, v) in url
 
 
-@mock.patch('aa.rest.make_rest_call')
-def test_AaRestClient_get_all_pvs(mock_rest_call,aa_client):
+@mock.patch('aa.utils.urlget')
+def test_AaRestClient_get_all_pvs(mock_urlget, aa_client):
     aa_client.get_all_pvs()
-    mock_rest_call.assert_called_with(SOCKET, 'getAllPVs', limit=-1)
+    command = 'getAllPVs'
+    target_url = 'http://{}/mgmt/bpl/{}?limit=-1'.format(SOCKET, command)
+    mock_urlget.assert_called_with(target_url)
 
 
-@mock.patch('aa.rest.make_rest_call')
-def test_AaRestClient_get_pv_info(mock_rest_call,aa_client):
+def test_AaRestClient_get_pv_info(aa_client):
+    aa_client._make_rest_call = mock.MagicMock()
     aa_client.get_pv_info(PV)
-    mock_rest_call.assert_called_with(SOCKET, 'getPVTypeInfo', pv=PV)
+    aa_client._make_rest_call.assert_called_with('getPVTypeInfo', pv=PV)
 
 
 def test_delete_or_abort_calls_remove_pv(aa_client):

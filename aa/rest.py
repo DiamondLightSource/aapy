@@ -5,39 +5,37 @@ import aa
 from aa import utils
 
 
-def construct_url(hostname, command, **kwargs):
-    url = 'http://{}/mgmt/bpl/{}'.format(hostname, command)
-    if kwargs:
-        k, v = kwargs.popitem()
-        url += '?{}={}'.format(k, str(v))
-        for k, v in kwargs.items():
-            url += '&{}={}'.format(k, str(v))
-    return url
-
-
-def make_rest_call(hostname, command, **kwargs):
-    url = construct_url(hostname, command, **kwargs)
-    response = utils.urlget(url)
-    response.raise_for_status()
-    return response.json()
-
-
 class AaRestClient(object):
 
     def __init__(self, hostname, port=80):
         self._hostname = '{}:{}'.format(hostname, port)
 
+    def _construct_url(self, command, **kwargs):
+        url = 'http://{}/mgmt/bpl/{}'.format(self._hostname, command)
+        if kwargs:
+            k, v = kwargs.popitem()
+            url += '?{}={}'.format(k, str(v))
+            for k, v in kwargs.items():
+                url += '&{}={}'.format(k, str(v))
+        return url
+
+    def _make_rest_call(self, command, **kwargs):
+        url = self._construct_url(command, **kwargs)
+        response = utils.urlget(url)
+        response.raise_for_status()
+        return response.json()
+
     def get_all_pvs(self, limit=-1):
-        return make_rest_call(self._hostname, 'getAllPVs', limit=limit)
+        return self._make_rest_call('getAllPVs', limit=limit)
 
     def get_pv_info(self, pv_name):
-        return make_rest_call(self._hostname, 'getPVTypeInfo', pv=pv_name)
+        return self._make_rest_call('getPVTypeInfo', pv=pv_name)
 
     def get_pv_status(self, pv_name):
-        return make_rest_call(self._hostname, 'getPVStatus', pv=pv_name)
+        return self._make_rest_call('getPVStatus', pv=pv_name)
 
     def get_pv_statuses(self, pv_names):
-        url = construct_url(self._hostname, 'getPVStatus')
+        url = self._construct_url('getPVStatus')
         payload = 'pv=' + ','.join(pv_names)
         response = requests.post(url, data=payload, headers={
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -45,29 +43,28 @@ class AaRestClient(object):
         return response.json()
 
     def get_never_connected_pvs(self):
-        pv_info = make_rest_call(self._hostname, 'getNeverConnectedPVs')
+        pv_info = self._make_rest_call('getNeverConnectedPVs')
         return [info['pvName'] for info in pv_info]
 
     def get_disconnected_pvs(self):
-        pv_info = make_rest_call(self._hostname, 'getCurrentlyDisconnectedPVs')
+        pv_info = self._make_rest_call('getCurrentlyDisconnectedPVs')
         return [info['pvName'] for info in pv_info]
 
     def archive_pv(self, pv, period, method=aa.SCAN):
         if method not in [aa.SCAN, aa.MONITOR]:
             raise ValueError('Sampling method {} not valid'.format(method))
-        return make_rest_call(self._hostname, 'archivePV',
-                              pv=pv,
-                              samplingperiod=period,
-                              samplingmethod=method)
+        return self._make_rest_call(
+            'archivePV', pv=pv, samplingperiod=period, samplingmethod=method
+        )
 
     def pause_pv(self, pv):
-        return make_rest_call(self._hostname, 'pauseArchivingPV', pv=pv)
+        return self._make_rest_call('pauseArchivingPV', pv=pv)
 
     def delete_pv(self, pv):
-        return make_rest_call(self._hostname, 'deletePV', pv=pv)
+        return self._make_rest_call('deletePV', pv=pv)
 
     def abort_request(self, pv):
-        return make_rest_call(self._hostname, 'abortArchivingPV', pv=pv)
+        return self._make_rest_call('abortArchivingPV', pv=pv)
 
     def delete_or_abort(self, pv):
         try:
@@ -85,10 +82,12 @@ class AaRestClient(object):
         self.delete_pv(pv)
 
     def change_pv(self, pv, period, method=aa.MONITOR):
-        return make_rest_call(self._hostname, 'changeArchivalParameters',
-                              pv=pv,
-                              samplingperiod=period,
-                              samplingmethod=method.upper())
+        return self._make_rest_call(
+            'changeArchivalParameters',
+            pv=pv,
+            samplingperiod=period,
+            samplingmethod=method.upper()
+        )
 
     def upload_or_update_pv(self, pv, period, method, status_dict=None):
         """Ensure PV is being archived with the specified parameters.
