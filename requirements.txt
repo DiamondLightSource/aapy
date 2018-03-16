@@ -1,10 +1,13 @@
+# Runtime
+numpy
+pytz
+requests
+# Development
 pytest
 mock
 pytest-cov
 protobuf
 coveralls
-numpy
-pytz
 tox
 tox-travis
 jsonschema

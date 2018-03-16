@@ -3,8 +3,8 @@ from aa import epics_event_pb2 as ee
 import utils as testutils
 import pytest
 import mock
-import pytz
 import os
+import requests
 
 
 TIMESTAMP_2001 = 978307200
@@ -82,15 +82,15 @@ def test_PbFetcher_get_calls_urlget_with_correct_url(dummy_pv, jan_2018):
         mock_urlget.return_value = PB_CHUNK
         pb_fetcher = pb.PbFetcher('dummy.com', 8000)
         pb_fetcher.get_event_at(dummy_pv, jan_2018)
-        expected_url = 'http://dummy.com:8000/retrieval/data/getData.raw?pv=dummy&from=2018-01-01T00%3A00%3A00Z&to=2018-01-01T00%3A00%3A00Z'
+        expected_url = 'http://dummy.com:8000/retrieval/data/getData.raw?pv=dummy&from=2018-01-01T00:00:00Z&to=2018-01-01T00:00:00Z'
         mock_urlget.assert_called_with(expected_url)
 
 
 def test_PbFetcher_get_returns_empty_data_if_urlget_throws_HTTPError_404(dummy_pv, jan_2018, empty_data):
     with mock.patch('aa.fetcher.urlget') as mock_urlget:
         mock_urlget.return_value = PB_CHUNK
-        generic_mock = mock.MagicMock()
-        http_error = utils.HTTPError('url', 404, 'msg', generic_mock, generic_mock)
+        mock_response = mock.MagicMock(status_code=404)
+        http_error = requests.exceptions.HTTPError(response=mock_response)
         mock_urlget.side_effect = http_error
         pb_fetcher = pb.PbFetcher('dummy.com', 8000)
         result = pb_fetcher.get_values(dummy_pv, jan_2018, jan_2018)
@@ -100,11 +100,11 @@ def test_PbFetcher_get_returns_empty_data_if_urlget_throws_HTTPError_404(dummy_p
 def test_PbFetcher_get_raises_if_urlget_throws_HTTPError_not_404(dummy_pv, jan_2018, empty_data):
     with mock.patch('aa.fetcher.urlget') as mock_urlget:
         mock_urlget.return_value = PB_CHUNK
-        generic_mock = mock.MagicMock()
-        http_error = utils.HTTPError('url', 405, 'msg', generic_mock, generic_mock)
+        mock_response = mock.MagicMock(status_code=405)
+        http_error = requests.exceptions.HTTPError(response=mock_response)
         mock_urlget.side_effect = http_error
         pb_fetcher = pb.PbFetcher('dummy.com', 8000)
-        with pytest.raises(utils.HTTPError):
+        with pytest.raises(requests.exceptions.HTTPError):
             pb_fetcher.get_values(dummy_pv, jan_2018, jan_2018)
 
 
