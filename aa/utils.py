@@ -3,6 +3,8 @@ from datetime import datetime
 import logging
 import pytz
 import requests
+from requests.exceptions import HTTPError
+
 # string23 is used for type-checking for strings in both Python 2 and Python 3.
 try:
     string23 = basestring
@@ -36,6 +38,11 @@ def year_timestamp(year):
 def urlget(url):
     logging.debug('Fetching URL {}'.format(url))
     return requests.get(url)
+
+
+def urlpost(url, payload, headers):
+    logging.debug('Posting to URL {}'.format(url))
+    return requests.get(url, payload, headers=headers)
 
 
 def print_raw_bytes(byte_seq):

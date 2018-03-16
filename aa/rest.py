@@ -1,5 +1,4 @@
 import logging
-import requests
 
 import aa
 from aa import utils
@@ -19,58 +18,62 @@ class AaRestClient(object):
                 url += '&{}={}'.format(k, str(v))
         return url
 
-    def _make_rest_call(self, command, **kwargs):
+    def _rest_get(self, command, **kwargs):
         url = self._construct_url(command, **kwargs)
         response = utils.urlget(url)
         response.raise_for_status()
         return response.json()
 
+    def _rest_post(self, command, payload, headers, **kwargs):
+        url = self._construct_url(command, **kwargs)
+        response = utils.urlpost(url, payload, headers)
+        return response.json()
+
     def get_all_pvs(self, limit=-1):
-        return self._make_rest_call('getAllPVs', limit=limit)
+        return self._rest_get('getAllPVs', limit=limit)
 
     def get_pv_info(self, pv_name):
-        return self._make_rest_call('getPVTypeInfo', pv=pv_name)
+        return self._rest_get('getPVTypeInfo', pv=pv_name)
 
     def get_pv_status(self, pv_name):
-        return self._make_rest_call('getPVStatus', pv=pv_name)
+        return self._rest_get('getPVStatus', pv=pv_name)
 
     def get_pv_statuses(self, pv_names):
-        url = self._construct_url('getPVStatus')
         payload = 'pv=' + ','.join(pv_names)
-        response = requests.post(url, data=payload, headers={
+        response = self._rest_post('getPVStatus', data=payload, headers={
             'Content-Type': 'application/x-www-form-urlencoded'
         })
         return response.json()
 
     def get_never_connected_pvs(self):
-        pv_info = self._make_rest_call('getNeverConnectedPVs')
+        pv_info = self._rest_get('getNeverConnectedPVs')
         return [info['pvName'] for info in pv_info]
 
     def get_disconnected_pvs(self):
-        pv_info = self._make_rest_call('getCurrentlyDisconnectedPVs')
+        pv_info = self._rest_get('getCurrentlyDisconnectedPVs')
         return [info['pvName'] for info in pv_info]
 
     def archive_pv(self, pv, period, method=aa.SCAN):
         if method not in [aa.SCAN, aa.MONITOR]:
             raise ValueError('Sampling method {} not valid'.format(method))
-        return self._make_rest_call(
+        return self._rest_get(
             'archivePV', pv=pv, samplingperiod=period, samplingmethod=method
         )
 
     def pause_pv(self, pv):
-        return self._make_rest_call('pauseArchivingPV', pv=pv)
+        return self._rest_get('pauseArchivingPV', pv=pv)
 
     def delete_pv(self, pv):
-        return self._make_rest_call('deletePV', pv=pv)
+        return self._rest_get('deletePV', pv=pv)
 
     def abort_request(self, pv):
-        return self._make_rest_call('abortArchivingPV', pv=pv)
+        return self._rest_get('abortArchivingPV', pv=pv)
 
     def delete_or_abort(self, pv):
         try:
             self.remove_pv(pv)
             logging.info('Deleted {} from AA'.format(pv))
-        except requests.exceptions.HTTPError:
+        except utils.HTTPError:
             response = self.abort_request(pv)
             if response['status'] == 'ok':
                 logging.info('Aborted pending request for {}'.format(pv))
@@ -82,7 +85,7 @@ class AaRestClient(object):
         self.delete_pv(pv)
 
     def change_pv(self, pv, period, method=aa.MONITOR):
-        return self._make_rest_call(
+        return self._rest_get(
             'changeArchivalParameters',
             pv=pv,
             samplingperiod=period,

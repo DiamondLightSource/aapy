@@ -30,10 +30,13 @@ def test_AaRestClient_get_all_pvs(mock_urlget, aa_client):
     mock_urlget.assert_called_with(target_url)
 
 
-def test_AaRestClient_get_pv_info(aa_client):
-    aa_client._make_rest_call = mock.MagicMock()
-    aa_client.get_pv_info(PV)
-    aa_client._make_rest_call.assert_called_with('getPVTypeInfo', pv=PV)
+@mock.patch('aa.utils.urlget')
+def test_AaRestClient_get_all_pvs(mock_urlget, aa_client):
+    pv = 'dummy'
+    aa_client.get_pv_info(pv)
+    command = 'getPVTypeInfo'
+    target_url = 'http://{}/mgmt/bpl/{}?pv={}'.format(SOCKET, command, pv)
+    mock_urlget.assert_called_with(target_url)
 
 
 def test_delete_or_abort_calls_remove_pv(aa_client):
