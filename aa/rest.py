@@ -2,6 +2,7 @@ import logging
 import requests
 
 import aa
+from aa import utils
 
 
 def construct_url(hostname, command, **kwargs):
@@ -16,8 +17,7 @@ def construct_url(hostname, command, **kwargs):
 
 def make_rest_call(hostname, command, **kwargs):
     url = construct_url(hostname, command, **kwargs)
-    logging.debug('Making call to {}'.format(url))
-    response = requests.get(url)
+    response = utils.urlget(url)
     response.raise_for_status()
     return response.json()
 
