@@ -32,11 +32,11 @@ class AaRestClient(object):
     def get_all_pvs(self, limit=-1):
         return self._rest_get('getAllPVs', limit=limit)
 
-    def get_pv_info(self, pv_name):
-        return self._rest_get('getPVTypeInfo', pv=pv_name)
+    def get_pv_info(self, pv):
+        return self._rest_get('getPVTypeInfo', pv=pv)
 
-    def get_pv_status(self, pv_name):
-        return self._rest_get('getPVStatus', pv=pv_name)
+    def get_pv_status(self, pv):
+        return self._rest_get('getPVStatus', pv=pv)
 
     def get_pv_statuses(self, pv_names):
         payload = 'pv=' + ','.join(pv_names)
@@ -69,6 +69,14 @@ class AaRestClient(object):
     def abort_request(self, pv):
         return self._rest_get('abortArchivingPV', pv=pv)
 
+    def change_pv(self, pv, period, method=aa.MONITOR):
+        return self._rest_get(
+            'changeArchivalParameters',
+            pv=pv,
+            samplingperiod=period,
+            samplingmethod=method.upper()
+        )
+
     def delete_or_abort(self, pv):
         try:
             self.remove_pv(pv)
@@ -83,14 +91,6 @@ class AaRestClient(object):
     def remove_pv(self, pv):
         self.pause_pv(pv)
         self.delete_pv(pv)
-
-    def change_pv(self, pv, period, method=aa.MONITOR):
-        return self._rest_get(
-            'changeArchivalParameters',
-            pv=pv,
-            samplingperiod=period,
-            samplingmethod=method.upper()
-        )
 
     def upload_or_update_pv(self, pv, period, method, status_dict=None):
         """Ensure PV is being archived with the specified parameters.
