@@ -80,11 +80,14 @@ class AaRestClient(object):
         pv_info = self._rest_get('getCurrentlyDisconnectedPVs')
         return [info['pvName'] for info in pv_info]
 
-    def archive_pv(self, pv, period, method=aa.SCAN):
-        if method not in [aa.SCAN, aa.MONITOR]:
-            raise ValueError('Sampling method {} not valid'.format(method))
+    def archive_pv(self, pv, samplingperiod, samplingmethod=aa.SCAN):
+        if samplingmethod not in [aa.SCAN, aa.MONITOR]:
+            raise ValueError('Sampling method {} not valid'.format(samplingmethod))
         return self._rest_get(
-            'archivePV', pv=pv, samplingperiod=period, samplingmethod=method
+            'archivePV',
+            pv=pv,
+            samplingperiod=samplingperiod,
+            samplingmethod=samplingmethod
         )
 
     def pause_archiving_pv(self, pv):

@@ -1,6 +1,6 @@
 import mock
 import pytest
-from aa import rest
+from aa import rest, MONITOR
 
 
 HOSTNAME = 'host'
@@ -31,6 +31,7 @@ def test_AaRestClient_construct_url(kwargs, aa_client):
         ('getPVStatus', 'get_pv_status', {'pv': 'dummy'}),
         ('getNeverConnectedPVs', 'get_never_connected_pvs', {}),
         ('getCurrentlyDisconnectedPVs', 'get_currently_disconnected_pvs', {}),
+        ('archivePV', 'archive_pv', {'pv': 'dummy', 'samplingperiod': 10, 'samplingmethod': MONITOR}),
         ('pauseArchivingPV', 'pause_archiving_pv', {'pv': 'dummy'}),
         ('deletePV', 'delete_pv', {'pv': 'dummy'}),
         ('abortArchivingPV', 'abort_archiving_pv', {'pv': 'dummy'})
@@ -41,3 +42,7 @@ def test_AaRestClient_simple_gets(mock_urlget, command, method, kwargs, aa_clien
     getattr(aa_client, method)(**kwargs)
     mock_urlget.assert_called_with(target_url)
 
+
+def test_AaRestClient_archive_pv_raises_ValueError_if_method_invalid(aa_client):
+    with pytest.raises(ValueError):
+        aa_client.archive_pv('dummy', 10, 'not-scan-or-monitor')
