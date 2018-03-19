@@ -5,11 +5,19 @@ from aa import utils
 
 
 class AaRestClient(object):
+    """Class used for making calls to the AA Rest API."""
 
     def __init__(self, hostname, port=80):
         self._hostname = '{}:{}'.format(hostname, port)
 
     def _construct_url(self, command, **kwargs):
+        """Construct the appropriate URL for the AA Rest API.
+
+        Args:
+            command: AA Rest API command
+            kwargs: any parameters used in the URL
+
+        """
         url = 'http://{}/mgmt/bpl/{}'.format(self._hostname, command)
         if kwargs:
             k, v = kwargs.popitem()
@@ -19,6 +27,16 @@ class AaRestClient(object):
         return url
 
     def _rest_get(self, command, **kwargs):
+        """Construct appropriate URL and call GET.
+
+        Args:
+            command: AA Rest API command
+            kwargs: any parameters used in the URL
+
+        Returns:
+            parsed JSON objects
+
+        """
         url = self._construct_url(command, **kwargs)
         response = utils.urlget(url)
         response.raise_for_status()
