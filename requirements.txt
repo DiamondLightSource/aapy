@@ -1,12 +1,12 @@
 # Runtime
 numpy
+protobuf
 pytz
 requests
 # Development
 pytest
 mock
 pytest-cov
-protobuf
 coveralls
 tox
 tox-travis
