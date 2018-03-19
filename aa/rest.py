@@ -60,7 +60,7 @@ class AaRestClient(object):
     def get_all_pvs(self, limit=-1):
         return self._rest_get('getAllPVs', limit=limit)
 
-    def get_pv_info(self, pv):
+    def get_pv_type_info(self, pv):
         return self._rest_get('getPVTypeInfo', pv=pv)
 
     def get_pv_status(self, pv):
@@ -76,7 +76,7 @@ class AaRestClient(object):
         pv_info = self._rest_get('getNeverConnectedPVs')
         return [info['pvName'] for info in pv_info]
 
-    def get_disconnected_pvs(self):
+    def get_currently_disconnected_pvs(self):
         pv_info = self._rest_get('getCurrentlyDisconnectedPVs')
         return [info['pvName'] for info in pv_info]
 
@@ -87,16 +87,16 @@ class AaRestClient(object):
             'archivePV', pv=pv, samplingperiod=period, samplingmethod=method
         )
 
-    def pause_pv(self, pv):
+    def pause_archiving_pv(self, pv):
         return self._rest_get('pauseArchivingPV', pv=pv)
 
     def delete_pv(self, pv):
         return self._rest_get('deletePV', pv=pv)
 
-    def abort_request(self, pv):
+    def abort_archiving_pv(self, pv):
         return self._rest_get('abortArchivingPV', pv=pv)
 
-    def change_pv(self, pv, period, method=aa.MONITOR):
+    def change_archival_parameters(self, pv, period, method=aa.MONITOR):
         return self._rest_get(
             'changeArchivalParameters',
             pv=pv,
