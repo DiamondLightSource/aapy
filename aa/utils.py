@@ -3,7 +3,7 @@ from datetime import datetime
 import logging
 import pytz
 import requests
-from requests.exceptions import HTTPError
+from requests.exceptions import ConnectionError, HTTPError
 
 # string23 is used for type-checking for strings in both Python 2 and Python 3.
 try:
