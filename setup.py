@@ -8,8 +8,9 @@ setup(
       license='Apache License 2.0',
       packages=['aa'],
       install_requires=[
-          'pytz',
           'numpy',
-          'protobuf'
+          'protobuf',
+          'pytz',
+          'requests'
       ]
      )
