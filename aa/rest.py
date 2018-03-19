@@ -25,6 +25,18 @@ class AaRestClient(object):
         return response.json()
 
     def _rest_post(self, command, payload, headers, **kwargs):
+        """Construct and POST payload to appropriate URL.
+
+        Args:
+            command: AA Rest API command
+            payload: appropriate payload for POST
+            headers: HTTP headers including appropriate MIME-TYPE
+            kwargs: any parameters used in the URL
+
+        Returns:
+            parsed JSON objects
+
+        """
         url = self._construct_url(command, **kwargs)
         response = utils.urlpost(url, payload, headers)
         return response.json()
@@ -40,10 +52,9 @@ class AaRestClient(object):
 
     def get_pv_statuses(self, pv_names):
         payload = 'pv=' + ','.join(pv_names)
-        response = self._rest_post('getPVStatus', data=payload, headers={
+        return self._rest_post('getPVStatus', payload=payload, headers={
             'Content-Type': 'application/x-www-form-urlencoded'
         })
-        return response.json()
 
     def get_never_connected_pvs(self):
         pv_info = self._rest_get('getNeverConnectedPVs')

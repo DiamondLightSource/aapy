@@ -36,13 +36,15 @@ def year_timestamp(year):
 
 
 def urlget(url):
+    """Simple shim to call requests.get()."""
     logging.debug('Fetching URL {}'.format(url))
     return requests.get(url)
 
 
 def urlpost(url, payload, headers):
+    """Simple shim to call requests.post()."""
     logging.debug('Posting to URL {}'.format(url))
-    return requests.get(url, payload, headers=headers)
+    return requests.post(url, payload, headers=headers)
 
 
 def print_raw_bytes(byte_seq):
