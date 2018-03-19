@@ -1,6 +1,5 @@
 import mock
 import pytest
-import requests
 from aa import rest
 
 
@@ -60,26 +59,3 @@ def test_AaRestClient_get_pv_info(mock_urlget, aa_client):
     mock_urlget.assert_called_with(target_url)
 
 
-def test_delete_or_abort_calls_remove_pv(aa_client):
-    aa_client.remove_pv = mock.MagicMock()
-    aa_client.abort_request = mock.MagicMock()
-    aa_client.delete_or_abort(PV)
-    aa_client.remove_pv.assert_called_with(PV)
-    aa_client.abort_request.assert_not_called()
-
-
-def test_delete_or_abort_calls_abort_pv_if_remove_throws_HTTPError(aa_client):
-    exception = requests.exceptions.HTTPError()
-    aa_client.remove_pv = mock.MagicMock(side_effect=exception)
-    aa_client.abort_request = mock.MagicMock()
-    aa_client.delete_or_abort(PV)
-    aa_client.remove_pv.assert_called_with(PV)
-    aa_client.abort_request.assert_called_with(PV)
-
-
-def test_remove_pv_calls_pause_pv_and_delete_pv(aa_client):
-    aa_client.pause_pv = mock.MagicMock()
-    aa_client.delete_pv = mock.MagicMock()
-    aa_client.remove_pv(PV)
-    aa_client.pause_pv.assert_called_with(PV)
-    aa_client.delete_pv.assert_called_with(PV)

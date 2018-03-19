@@ -1,5 +1,3 @@
-import logging
-
 import aa
 from aa import utils
 
@@ -106,58 +104,3 @@ class AaRestClient(object):
             samplingmethod=method.upper()
         )
 
-    def delete_or_abort(self, pv):
-        try:
-            self.remove_pv(pv)
-            logging.info('Deleted {} from AA'.format(pv))
-        except utils.HTTPError:
-            response = self.abort_request(pv)
-            if response['status'] == 'ok':
-                logging.info('Aborted pending request for {}'.format(pv))
-            else:
-                logging.warning('PV {} not found in AA'.format(pv))
-
-    def remove_pv(self, pv):
-        self.pause_pv(pv)
-        self.delete_pv(pv)
-
-    def upload_or_update_pv(self, pv, period, method, status_dict=None):
-        """Ensure PV is being archived with the specified parameters.
-
-        If status_dict is None, request the current status of the PV.
-
-        If it is not being archived, add it to the AA. If it is being
-        archived, check whether the parameters match those supplied. If
-        not, change the archival parameters. If the PV has been
-        requested but has never connected, do nothing.
-
-        Args:
-            pv: PV name
-            period: sampling period
-            method: sampling method
-            status_dict: dict returned by get_pv_status()
-
-        """
-        # Note: a previous upload_pvs() method has been removed but is in
-        # Git history. There was some subtlety in making the rest calls.
-        if status_dict is None:
-            status_dict = self.get_pv_status(pv)[0]
-        status_string = status_dict['status']
-        if status_string == 'Initial sampling':
-            # Requested but never connected
-            logging.info(
-                'PV {} was previously requested but has never connected'.format(pv)
-            )
-        elif status_string == 'Not being archived':
-            logging.info('Adding PV {} to AA'.format(pv))
-            self.archive_pv(pv, period, method)
-        elif status_string == 'Being archived':
-            # Compare sampling period only to 1 d.p.
-            current_period = round(float(status_dict['samplingPeriod']), 1)
-            current_monitored = status_dict['isMonitored'] == 'true'
-            request_monitored = method == aa.MONITOR
-            if (period != current_period or current_monitored != request_monitored):
-                logging.info('Changing parameters for {}'.format(pv))
-                self.change_pv(pv, period, method)
-        else:
-            logging.warning('Unexpected PV status {}'.format(status_string))
