@@ -1,4 +1,17 @@
+import json
+import mock
 import os
+
+
+def mock_response(json_str=None, raw=None):
+    resp = mock.MagicMock()
+    if json_str is not None:
+        loaded_json = json.loads(json_str)
+        resp.json = mock.MagicMock(return_value=loaded_json)
+    if raw is not None:
+        resp.raw = mock.MagicMock()
+        resp.raw.read = mock.MagicMock(return_value=raw)
+    return resp
 
 
 def get_data_filepath(filename):

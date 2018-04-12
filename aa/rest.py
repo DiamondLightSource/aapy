@@ -1,5 +1,6 @@
 import aa
 from aa import utils
+import requests
 
 
 class AaRestClient(object):
@@ -36,7 +37,7 @@ class AaRestClient(object):
 
         """
         url = self._construct_url(command, **kwargs)
-        response = utils.urlget(url)
+        response = requests.get(url)
         response.raise_for_status()
         return response.json()
 

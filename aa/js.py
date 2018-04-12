@@ -15,8 +15,8 @@ class JsonFetcher(fetcher.AaFetcher):
         super(JsonFetcher, self).__init__(hostname, port)
         self._url = '{}/retrieval/data/getData.json'.format(self._endpoint)
 
-    def _parse_raw_data(self, raw_data, pv, start, end, count):
-        json_data = json.loads(raw_data)
+    def _parse_raw_data(self, response, pv, start, end, count):
+        json_data = response.json()
         archive_data = data.ArchiveData.empty(pv)
 
         if json_data:
