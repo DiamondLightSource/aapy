@@ -50,11 +50,12 @@ class Fetcher(object):
 class AaFetcher(Fetcher):
     """Abstract base class for fetching data from the Archiver Appliance."""
 
-    def __init__(self, hostname, port):
+    def __init__(self, hostname, port, binary=False):
         self._host = hostname
         self._port = port
         self._endpoint = 'http://{}:{}'.format(self._host, self._port)
         self._url = None
+        self._binary = binary
 
     @staticmethod
     def _format_datetime(dt):
@@ -70,19 +71,20 @@ class AaFetcher(Fetcher):
 
     def _fetch_data(self, pv, start, end):
         url = self._construct_url(pv, start, end)
-        return requests.get(url)
+        return requests.get(url, stream=self._binary)
 
     def _get_values(self, pv, start, end, count):
-        raw_data = self._fetch_data(pv, start, end)
-        return self._parse_raw_data(raw_data, pv, start, end, count)
+        response = self._fetch_data(pv, start, end)
+        response.raise_for_status()
+        return self._parse_raw_data(response, pv, start, end, count)
 
-    def _parse_raw_data(self, raw_data, pv, start, end, count):
+    def _parse_raw_data(self, response, pv, start, end, count):
         """Convert raw data received from the Archiver Appliance.
 
         This must be implemented by any subclasses.
 
         Args:
-            raw_data: raw data received
+            response: requests response object
             pv: PV name requested
             start: datetime of start of request
             end: datetime of end of request

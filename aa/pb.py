@@ -153,7 +153,7 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
 class PbFetcher(fetcher.AaFetcher):
 
     def __init__(self, hostname, port):
-        super(PbFetcher, self).__init__(hostname, port)
+        super(PbFetcher, self).__init__(hostname, port, binary=True)
         self._url = '{}/retrieval/data/getData.raw'.format(self._endpoint)
 
     def _get_values(self, pv, start, end, count):
@@ -166,7 +166,8 @@ class PbFetcher(fetcher.AaFetcher):
             else:
                 raise e
 
-    def _parse_raw_data(self, raw_data, pv, start, end, count):
+    def _parse_raw_data(self, response, pv, start, end, count):
+        raw_data = response.raw.read()
         return parse_pb_data(raw_data, pv, start, end, count)
 
 
