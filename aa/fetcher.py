@@ -1,3 +1,4 @@
+import logging
 import pytz
 from datetime import datetime
 
@@ -13,24 +14,36 @@ class Fetcher(object):
     def get_values(self, pv, start, end=None, count=None):
         """Retrieve archive data.
 
+        start and end are datetime objects. If they are not timezone aware,
+        assume that they are in UTC.
+
         Args:
             pv: PV to request data for
             start: datetime at start of requested period
             end: datetime at end of requested period. If None, request all
                 events to the current time
-            count: maximum number of events to return. In None, return all
+            count: maximum number of events to return. If None, return all
                 events
 
         Returns:
             ArchiveData object representing all events
 
         """
-        if end is None:
+        if start.tzinfo is None:
+            logging.info('Assuming start datetime {} is UTC'.format(start))
+            start.replace(tzinfo=pytz.UTC)
+        if end is not None:
+            if end.tzinfo is None:
+                logging.info('Assuming end datetime {} is UTC'.format(start))
+                end.replace(tzinfo=pytz.UTC)
+        else:
             end = pytz.utc.localize(datetime.now())
         return self._get_values(pv, start, end, count)
 
     def get_event_at(self, pv, instant):
         """Retrieve the event preceding the specified datetime.
+
+        If the datetime is not timezone aware, assume that it is in UTC.
 
         Args:
             pv: PV to request event for

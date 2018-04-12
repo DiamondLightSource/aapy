@@ -13,10 +13,10 @@ def aa_fetcher():
     return fetcher.AaFetcher('localhost', '3003')
 
 
-def test_Fetcher_get_values_raises_NotImplementedError():
+def test_Fetcher_get_values_raises_NotImplementedError(dummy_pv):
     f = fetcher.Fetcher()
     with pytest.raises(NotImplementedError):
-        f.get_values(1, 2, 3, 4)
+        f.get_values(dummy_pv, datetime.now(), datetime.now(), 4)
 
 
 def test_Fetcher_get_event_at_raises_ValueError_if_no_data_returned_by_query():

@@ -1,5 +1,6 @@
-import pytest
+from datetime import datetime
 import mock
+import pytest
 from aa import ca
 
 
@@ -51,7 +52,7 @@ def test_CaClient_create_archive_event_handles_2d_event(ca_client, dummy_pv, eve
 def test_CaClient_get_returns_event(ca_client, dummy_pv, event_1d):
     print(ca_client)
     with mock.patch('aa.utils.datetime_to_epoch'):
-        events = ca_client.get(dummy_pv, 'dummy_date_1', 'dummy_date_2', 2)
+        events = ca_client.get(dummy_pv, datetime.now(), datetime.now(), 2)
     assert events == [event_1d]
 
 
@@ -59,7 +60,7 @@ def test_CaFetcher_get_values_calls_client_get_once_if_response_less_than_count(
     # One value will be returned.
     ca_fetcher._client.get.return_value = [event_1d]
     # Ask for two values.
-    response = ca_fetcher.get_values('dummy', 'dummy_date_1', 'dummy_date_2', 2)
+    response = ca_fetcher.get_values('dummy', datetime.now(), datetime.now(), 2)
     assert len(ca_fetcher._client.get.call_args_list) == 1
     assert response == data_1d
 
@@ -68,5 +69,5 @@ def test_CaFetcher_get_values_calls_client_get_twice_if_count_exceeds_10000(ca_f
     events = [event_1d] * 10000
     ca_fetcher._client.get.side_effect = (events, [event_1d_alt])
     # Ask for two values.
-    ca_fetcher.get_values('dummy', 'dummy_date_1', 'dummy_date_2', 10001)
+    ca_fetcher.get_values('dummy', datetime.now(), datetime.now(), 10001)
     assert len(ca_fetcher._client.get.call_args_list) == 2
