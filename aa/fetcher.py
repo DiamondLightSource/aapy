@@ -30,12 +30,12 @@ class Fetcher(object):
 
         """
         if start.tzinfo is None:
-            logging.info('Assuming start datetime {} is UTC'.format(start))
-            start.replace(tzinfo=pytz.UTC)
+            logging.warning('Assuming start datetime {} is UTC'.format(start))
+            start = start.replace(tzinfo=pytz.UTC)
         if end is not None:
             if end.tzinfo is None:
-                logging.info('Assuming end datetime {} is UTC'.format(start))
-                end.replace(tzinfo=pytz.UTC)
+                logging.warning('Assuming end datetime {} is UTC'.format(end))
+                end = end.replace(tzinfo=pytz.UTC)
         else:
             end = pytz.utc.localize(datetime.now())
         return self._get_values(pv, start, end, count)
@@ -54,6 +54,9 @@ class Fetcher(object):
             datetime
 
         """
+        if instant.tzinfo is None:
+            logging.warning('Assuming datetime {} is UTC'.format(instant))
+            instant = instant.replace(tzinfo=pytz.UTC)
         try:
             return self.get_values(pv, instant, instant, 1).get_event(0)
         except IndexError:
