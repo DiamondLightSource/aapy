@@ -34,14 +34,16 @@ def test_JsonFetcher_constructs_url_correctly(json_fetcher):
 
 
 def test_JsonFetcher_decodes_empty_json_correctly(dummy_pv, empty_data, json_fetcher):
-    json_fetcher._fetch_data = mock.MagicMock(return_value='[]')
+    mock_response = utils.mock_response(json_str='[]')
+    json_fetcher._fetch_data = mock_response
     aa_data = json_fetcher.get_values(dummy_pv, EARLY_DATE, LATE_DATE)
     assert aa_data == empty_data
 
 
 def test_JsonFetcher_decodes_single_event_correctly(dummy_pv, json_fetcher):
     event_json = utils.load_from_file('event.json')
-    json_fetcher._fetch_data = mock.MagicMock(return_value=event_json)
+    mock_response = utils.mock_response(json_str=event_json)
+    json_fetcher._fetch_data = mock.MagicMock(return_value=mock_response)
     aa_data = json_fetcher.get_values(dummy_pv, EARLY_DATE, LATE_DATE)
     assert aa_data.pv == dummy_pv
     assert aa_data.values[0] == 1.23
@@ -51,8 +53,10 @@ def test_JsonFetcher_decodes_single_event_correctly(dummy_pv, json_fetcher):
 
 def test_JsonFetcher_decodes_string_event_correctly(dummy_pv, json_fetcher):
     event_json = utils.load_from_file('string_event.json')
-    json_fetcher._fetch_data = mock.MagicMock(return_value=event_json)
+    mock_response = utils.mock_response(json_str=event_json)
+    json_fetcher._fetch_data = mock.MagicMock(return_value=mock_response)
     aa_data = json_fetcher.get_values(dummy_pv, EARLY_DATE, LATE_DATE)
+    print(aa_data)
     assert aa_data.pv == dummy_pv
     assert aa_data.values[0] == '2015-01-08 19:47:01 UTC'
     assert aa_data.timestamps[0] == 1507712433.235971000
@@ -61,6 +65,7 @@ def test_JsonFetcher_decodes_string_event_correctly(dummy_pv, json_fetcher):
 
 def test_JsonFetcher_decodes_waveform_events_correctly(dummy_pv, json_fetcher, data_2d_2_events):
     waveform_json = utils.load_from_file('waveform.json')
-    json_fetcher._fetch_data = mock.MagicMock(return_value=waveform_json)
+    mock_response = utils.mock_response(json_str=waveform_json)
+    json_fetcher._fetch_data = mock.MagicMock(return_value=mock_response)
     aa_data = json_fetcher.get_values(dummy_pv, EARLY_DATE, LATE_DATE)
     assert aa_data == data_2d_2_events
