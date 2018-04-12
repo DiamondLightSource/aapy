@@ -1,7 +1,8 @@
 from aa import fetcher
 from datetime import datetime
-import pytest
 import mock
+import pytest
+import pytz
 
 
 EARLY_DATE = datetime(2001, 1, 1, 1, 1)
@@ -24,7 +25,7 @@ def test_Fetcher_get_event_at_raises_ValueError_if_no_data_returned_by_query():
     f.get_values = mock.MagicMock()
     f.get_values.side_effect = IndexError
     with pytest.raises(ValueError):
-        f.get_event_at(1, 2)
+        f.get_event_at(1, datetime.now())
 
 
 def test_AaFetcher_constructs_endpoint_correctly(aa_fetcher):
@@ -44,7 +45,7 @@ def test_AaFetcher_constructs_url_correctly(dummy_pv, aa_fetcher):
 
 
 def test_AaFetcher_creates_default_for_end_if_not_provided(dummy_pv, aa_fetcher):
-    dummy_datetime = datetime(2017, 1, 1)
+    dummy_datetime = datetime(2017, 1, 1, tzinfo=pytz.UTC)
     dummy_get_values = mock.MagicMock()
     aa_fetcher._get_values = dummy_get_values
     aa_fetcher.get_values(dummy_pv, dummy_datetime, end=None)
@@ -53,6 +54,16 @@ def test_AaFetcher_creates_default_for_end_if_not_provided(dummy_pv, aa_fetcher)
     assert args[1] == dummy_datetime
     assert isinstance(args[2], datetime)
 
+def test_AaFetcher_converts_to_UTC_if_no_timezone(dummy_pv, aa_fetcher):
+    dummy_datetime = datetime(2017, 1, 1)
+    utc_dummy_datetime = dummy_datetime.replace(tzinfo=pytz.UTC)
+    dummy_get_values = mock.MagicMock()
+    aa_fetcher._get_values = dummy_get_values
+    aa_fetcher.get_values(dummy_pv, dummy_datetime, end=None)
+    args, _ = dummy_get_values.call_args
+    assert args[0] == dummy_pv
+    assert args[1] == utc_dummy_datetime
+    assert isinstance(args[2], datetime)
 
 def test_AaFetcher_get_values_raises_NotImplementedError(dummy_pv, jan_2018, aa_fetcher):
     with mock.patch('aa.fetcher.urlget'):
