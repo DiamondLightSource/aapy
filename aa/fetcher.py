@@ -1,7 +1,6 @@
 import pytz
+import requests
 from datetime import datetime
-
-from .utils import urlget
 
 
 class Fetcher(object):
@@ -71,7 +70,7 @@ class AaFetcher(Fetcher):
 
     def _fetch_data(self, pv, start, end):
         url = self._construct_url(pv, start, end)
-        return urlget(url)
+        return requests.get(url)
 
     def _get_values(self, pv, start, end, count):
         raw_data = self._fetch_data(pv, start, end)

@@ -77,32 +77,32 @@ def test_PbFetcher_creates_correct_url():
     assert pb_fetcher._url == 'http://dummy.com:8000/retrieval/data/getData.raw'
 
 
-def test_PbFetcher_get_calls_urlget_with_correct_url(dummy_pv, jan_2018):
-    with mock.patch('aa.fetcher.urlget') as mock_urlget:
-        mock_urlget.return_value = PB_CHUNK
+def test_PbFetcher_get_calls_get_with_correct_url(dummy_pv, jan_2018):
+    with mock.patch('requests.get') as mock_get:
+        mock_get.return_value = PB_CHUNK
         pb_fetcher = pb.PbFetcher('dummy.com', 8000)
         pb_fetcher.get_event_at(dummy_pv, jan_2018)
         expected_url = 'http://dummy.com:8000/retrieval/data/getData.raw?pv=dummy&from=2018-01-01T00:00:00Z&to=2018-01-01T00:00:00Z'
-        mock_urlget.assert_called_with(expected_url)
+        mock_get.assert_called_with(expected_url)
 
 
-def test_PbFetcher_get_returns_empty_data_if_urlget_throws_HTTPError_404(dummy_pv, jan_2018, empty_data):
-    with mock.patch('aa.fetcher.urlget') as mock_urlget:
-        mock_urlget.return_value = PB_CHUNK
+def test_PbFetcher_get_returns_empty_data_if_get_throws_HTTPError_404(dummy_pv, jan_2018, empty_data):
+    with mock.patch('requests.get') as mock_get:
+        mock_get.return_value = PB_CHUNK
         mock_response = mock.MagicMock(status_code=404)
         http_error = requests.exceptions.HTTPError(response=mock_response)
-        mock_urlget.side_effect = http_error
+        mock_get.side_effect = http_error
         pb_fetcher = pb.PbFetcher('dummy.com', 8000)
         result = pb_fetcher.get_values(dummy_pv, jan_2018, jan_2018)
         assert result == empty_data
 
 
-def test_PbFetcher_get_raises_if_urlget_throws_HTTPError_not_404(dummy_pv, jan_2018, empty_data):
-    with mock.patch('aa.fetcher.urlget') as mock_urlget:
-        mock_urlget.return_value = PB_CHUNK
+def test_PbFetcher_get_raises_if_get_throws_HTTPError_not_404(dummy_pv, jan_2018, empty_data):
+    with mock.patch('requests.get') as mock_get:
+        mock_get.return_value = PB_CHUNK
         mock_response = mock.MagicMock(status_code=405)
         http_error = requests.exceptions.HTTPError(response=mock_response)
-        mock_urlget.side_effect = http_error
+        mock_get.side_effect = http_error
         pb_fetcher = pb.PbFetcher('dummy.com', 8000)
         with pytest.raises(requests.exceptions.HTTPError):
             pb_fetcher.get_values(dummy_pv, jan_2018, jan_2018)

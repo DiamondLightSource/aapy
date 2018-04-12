@@ -55,6 +55,6 @@ def test_AaFetcher_creates_default_for_end_if_not_provided(dummy_pv, aa_fetcher)
 
 
 def test_AaFetcher_get_values_raises_NotImplementedError(dummy_pv, jan_2018, aa_fetcher):
-    with mock.patch('aa.fetcher.urlget'):
+    with mock.patch('requests.get'):
         with pytest.raises(NotImplementedError):
             aa_fetcher.get_values(dummy_pv, jan_2018)

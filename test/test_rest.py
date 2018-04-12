@@ -36,11 +36,11 @@ def test_AaRestClient_construct_url(kwargs, aa_client):
         ('deletePV', 'delete_pv', {'pv': 'dummy'}),
         ('abortArchivingPV', 'abort_archiving_pv', {'pv': 'dummy'})
 ])
-@mock.patch('aa.utils.urlget')
-def test_AaRestClient_simple_gets(mock_urlget, command, method, kwargs, aa_client):
+@mock.patch('requests.get')
+def test_AaRestClient_simple_gets(mock_get, command, method, kwargs, aa_client):
     target_url = aa_client._construct_url(command, **kwargs)
     getattr(aa_client, method)(**kwargs)
-    mock_urlget.assert_called_with(target_url)
+    mock_get.assert_called_with(target_url)
 
 
 def test_AaRestClient_archive_pv_raises_ValueError_if_method_invalid(aa_client):
