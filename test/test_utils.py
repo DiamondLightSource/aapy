@@ -47,6 +47,12 @@ def test_add_local_timezone_adds_timezone():
     assert dt.tzinfo == localtz
 
 
+def test_add_local_timezone_raises_AssertionError_if_arg_has_timezone():
+    dt = datetime.now(tz=pytz.UTC)
+    with pytest.raises(AssertionError):
+        utils.add_local_timezone(dt)
+
+
 @pytest.mark.parametrize('year,timestamp', ((1970, 0), (2001, TIMESTAMP_2001)))
 def test_year_timestamp_gives_correct_answer(year, timestamp):
     assert utils.year_timestamp(year) == timestamp
