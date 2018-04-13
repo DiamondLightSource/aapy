@@ -10,7 +10,7 @@ TIMESTAMP_ERROR = 'Concatenated ArchiveData objects must have increasing timesta
 class ArchiveEvent(object):
 
     DESC = ('Archive event for PV {}: '
-            'timestamp {:%Y-%m-%d %H:%M:%S.%f} value {} severity {:.0f}')
+            'timestamp {:%Y-%m-%d %H:%M:%S.%f %Z} value {} severity {:.0f}')
 
     def __init__(self, pv, value, timestamp, severity):
         self._pv = pv
@@ -59,8 +59,8 @@ class ArchiveEvent(object):
 class ArchiveData(object):
 
     DESC = ('Archive data for PV {}: {} events'
-            ' first timestamp {:%Y-%m-%d %H:%M:%S.%f}'
-            ' last timestamp {:%Y-%m-%d %H:%M:%S.%f}')
+            ' first timestamp {:%Y-%m-%d %H:%M:%S.%f %Z}'
+            ' last timestamp {:%Y-%m-%d %H:%M:%S.%f %Z}')
 
     def __init__(self, pv, values, timestamps, severities):
         values = numpy.array(values)
