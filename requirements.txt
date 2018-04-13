@@ -3,6 +3,7 @@ numpy
 protobuf
 pytz
 requests
+tzlocal
 # Development
 pytest
 mock

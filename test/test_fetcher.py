@@ -3,6 +3,7 @@ from datetime import datetime
 import mock
 import pytest
 import pytz
+import tzlocal
 
 
 EARLY_DATE = datetime(2001, 1, 1, 1, 1)
@@ -54,9 +55,11 @@ def test_AaFetcher_creates_default_for_end_if_not_provided(dummy_pv, aa_fetcher)
     assert args[1] == dummy_datetime
     assert isinstance(args[2], datetime)
 
-def test_AaFetcher_converts_to_UTC_if_no_timezone(dummy_pv, aa_fetcher):
+
+def test_AaFetcher_converts_to_local_if_no_timezone(dummy_pv, aa_fetcher):
     dummy_datetime = datetime(2017, 1, 1)
-    utc_dummy_datetime = dummy_datetime.replace(tzinfo=pytz.UTC)
+    localtz = tzlocal.get_localzone()
+    utc_dummy_datetime = dummy_datetime.replace(tzinfo=localtz)
     dummy_get_values = mock.MagicMock()
     aa_fetcher._get_values = dummy_get_values
     aa_fetcher.get_values(dummy_pv, dummy_datetime, end=None)

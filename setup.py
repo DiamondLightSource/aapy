@@ -11,6 +11,7 @@ setup(
           'numpy',
           'protobuf',
           'pytz',
-          'requests'
+          'requests',
+          'tzlocal'
       ]
      )
