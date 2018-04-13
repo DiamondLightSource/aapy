@@ -1,6 +1,8 @@
 from __future__ import print_function
 from datetime import datetime
+import logging
 import pytz
+import tzlocal
 
 # string23 is used for type-checking for strings in both Python 2 and Python 3.
 try:
@@ -26,6 +28,13 @@ def datetime_to_epoch(dt):
 
 def epoch_to_datetime(secs):
     return datetime.fromtimestamp(secs, tz=pytz.UTC)
+
+
+def add_local_timezone(dt):
+    assert dt.tzinfo is None
+    localtz = tzlocal.get_localzone()
+    logging.warning('Assuming start datetime {} is {}'.format(dt, localtz))
+    return dt.replace(tzinfo=localtz)
 
 
 def year_timestamp(year):

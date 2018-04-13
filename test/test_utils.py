@@ -2,6 +2,7 @@ from aa import utils
 from datetime import datetime
 import pytz
 import pytest
+import tzlocal
 
 
 TZ_BST = pytz.timezone('Europe/London')
@@ -38,6 +39,12 @@ def test_epoch_to_datetime_works_for_short_difference():
 
 def test_epoch_to_datetime_works_for_current_datetime_utc():
     assert utils.epoch_to_datetime(UNIX_TIME) == DATETIME_UTC
+
+
+def test_add_local_timezone_adds_timezone():
+    dt = utils.add_local_timezone(datetime.now())
+    localtz = tzlocal.get_localzone()
+    assert dt.tzinfo == localtz
 
 
 @pytest.mark.parametrize('year,timestamp', ((1970, 0), (2001, TIMESTAMP_2001)))

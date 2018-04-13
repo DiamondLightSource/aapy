@@ -1,6 +1,8 @@
+from . import utils
 import logging
 import pytz
 import requests
+import tzlocal
 from datetime import datetime
 
 
@@ -29,12 +31,10 @@ class Fetcher(object):
 
         """
         if start.tzinfo is None:
-            logging.warning('Assuming start datetime {} is UTC'.format(start))
-            start = start.replace(tzinfo=pytz.UTC)
+            start = utils.add_local_timezone(start)
         if end is not None:
             if end.tzinfo is None:
-                logging.warning('Assuming end datetime {} is UTC'.format(end))
-                end = end.replace(tzinfo=pytz.UTC)
+                end = utils.add_local_timezone(end)
         else:
             end = pytz.utc.localize(datetime.now())
         return self._get_values(pv, start, end, count)
@@ -54,8 +54,7 @@ class Fetcher(object):
 
         """
         if instant.tzinfo is None:
-            logging.warning('Assuming datetime {} is UTC'.format(instant))
-            instant = instant.replace(tzinfo=pytz.UTC)
+            instant = utils.add_local_timezone(instant)
         try:
             return self.get_values(pv, instant, instant, 1).get_event(0)
         except IndexError:
