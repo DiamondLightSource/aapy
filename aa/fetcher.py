@@ -16,7 +16,7 @@ class Fetcher(object):
         """Retrieve archive data.
 
         start and end are datetime objects. If they are not timezone aware,
-        assume that they are in UTC.
+        assume that they are in the local timezone.
 
         Args:
             pv: PV to request data for
@@ -42,7 +42,8 @@ class Fetcher(object):
     def get_event_at(self, pv, instant):
         """Retrieve the event preceding the specified datetime.
 
-        If the datetime is not timezone aware, assume that it is in UTC.
+        If instant is not timezone aware, assume that it is in the local
+        timezone.
 
         Args:
             pv: PV to request event for
