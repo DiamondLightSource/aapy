@@ -55,7 +55,7 @@ class AaRestClient(object):
 
         """
         url = self._construct_url(command, **kwargs)
-        response = utils.urlpost(url, payload, headers)
+        response = requests.post(url, payload, headers=headers)
         return response.json()
 
     def get_all_pvs(self, limit=-1):
