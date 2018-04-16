@@ -43,6 +43,16 @@ def test_AaRestClient_simple_gets(mock_get, command, method, kwargs, aa_client):
     mock_get.assert_called_with(target_url)
 
 
+@mock.patch('requests.post')
+def test_AaRestClient_get_pv_statuses(mock_post, aa_client):
+    pv_names = ['dummy1', 'dummy2']
+    pv_name_payload = 'pv=dummy1,dummy2'
+    headers = {'Content-Type':'application/x-www-form-urlencoded'}
+    target_url = aa_client._construct_url('getPVStatus')
+    aa_client.get_pv_statuses(pv_names)
+    mock_post.assert_called_with(target_url, pv_name_payload, headers=headers)
+
+
 def test_AaRestClient_archive_pv_raises_ValueError_if_method_invalid(aa_client):
     with pytest.raises(ValueError):
         aa_client.archive_pv('dummy', 10, 'not-scan-or-monitor')

@@ -55,10 +55,14 @@ class AaRestClient(object):
 
         """
         url = self._construct_url(command, **kwargs)
-        response = utils.urlpost(url, payload, headers)
+        response = requests.post(url, payload, headers=headers)
         return response.json()
 
     def get_all_pvs(self, limit=-1):
+        # This includes PVs that have connected in the past but are now
+        # disconnected (those from get_currently_disconnnected_pvs()),
+        # but not those that have never connected (those from
+        # get_never_connected_pvs()).
         return self._rest_get('getAllPVs', limit=limit)
 
     def get_pv_type_info(self, pv):
@@ -79,7 +83,7 @@ class AaRestClient(object):
 
     def get_currently_disconnected_pvs(self):
         pv_info = self._rest_get('getCurrentlyDisconnectedPVs')
-        return [info['pvName'] for info in pv_info]
+        return set([info['pvName'] for info in pv_info])
 
     def archive_pv(self, pv, samplingperiod, samplingmethod=aa.SCAN):
         if samplingmethod not in [aa.SCAN, aa.MONITOR]:
