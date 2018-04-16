@@ -59,6 +59,10 @@ class AaRestClient(object):
         return response.json()
 
     def get_all_pvs(self, limit=-1):
+        # This includes PVs that have connected in the past but are now
+        # disconnected (those from get_currently_disconnnected_pvs()),
+        # but not those that have never connected (those from
+        # get_never_connected_pvs()).
         return self._rest_get('getAllPVs', limit=limit)
 
     def get_pv_type_info(self, pv):
