@@ -31,6 +31,16 @@ def epoch_to_datetime(secs):
 
 
 def add_local_timezone(dt):
+    """Add the local timezone to a naive datetime.
+
+    The tzlocal module is used to deduce the local timezone.
+
+    Args:
+        dt: naive datetime
+
+    Raises:
+        AssertionError if dt already has a timezone
+    """
     assert dt.tzinfo is None
     localtz = tzlocal.get_localzone()
     logging.warning('Assuming start datetime {} is {}'.format(dt, localtz))
