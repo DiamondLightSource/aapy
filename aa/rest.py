@@ -83,7 +83,7 @@ class AaRestClient(object):
 
     def get_currently_disconnected_pvs(self):
         pv_info = self._rest_get('getCurrentlyDisconnectedPVs')
-        return [info['pvName'] for info in pv_info]
+        return set([info['pvName'] for info in pv_info])
 
     def archive_pv(self, pv, samplingperiod, samplingmethod=aa.SCAN):
         if samplingmethod not in [aa.SCAN, aa.MONITOR]:
