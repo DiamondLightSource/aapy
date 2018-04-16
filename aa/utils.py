@@ -43,7 +43,7 @@ def add_local_timezone(dt):
     """
     assert dt.tzinfo is None
     localtz = tzlocal.get_localzone()
-    logging.warning('Assuming start datetime {} is {}'.format(dt, localtz))
+    logging.warning('Assuming timezone for {} is {}'.format(dt, localtz))
     return dt.replace(tzinfo=localtz)
 
 
