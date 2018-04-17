@@ -2,6 +2,7 @@
 Python client to the EPICS Archiver Appliance.
 """
 import logging
+import tzlocal
 
 
 LOG_FORMAT = '%(asctime)s %(levelname)-8s %(message)s'
@@ -16,3 +17,6 @@ def set_up_logging(format=LOG_FORMAT, level=LOG_LEVEL):
 
 SCAN = 'SCAN'
 MONITOR = 'MONITOR'
+
+# Make local timezone easy to get hold of.
+LOCALTZ = tzlocal.get_localzone()
