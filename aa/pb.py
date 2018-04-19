@@ -30,22 +30,22 @@ from . import epics_event_pb2 as ee
 # It is not clear to me why I can't extract this information
 # from the compiled protobuf file.
 TYPE_MAPPINGS = {
-        0: ee.ScalarString,
-        1: ee.ScalarShort,
-        2: ee.ScalarFloat,
-        3: ee.ScalarEnum,
-        4: ee.ScalarByte,
-        5: ee.ScalarInt,
-        6: ee.ScalarDouble,
-        7: ee.VectorString,
-        8: ee.VectorShort,
-        9: ee.VectorFloat,
-        10: ee.VectorEnum,
-        11: ee.VectorChar,
-        12: ee.VectorInt,
-        13: ee.VectorDouble,
-        14: ee.V4GenericBytes
-        }
+    0: ee.ScalarString,
+    1: ee.ScalarShort,
+    2: ee.ScalarFloat,
+    3: ee.ScalarEnum,
+    4: ee.ScalarByte,
+    5: ee.ScalarInt,
+    6: ee.ScalarDouble,
+    7: ee.VectorString,
+    8: ee.VectorShort,
+    9: ee.VectorFloat,
+    10: ee.VectorEnum,
+    11: ee.VectorChar,
+    12: ee.VectorInt,
+    13: ee.VectorDouble,
+    14: ee.V4GenericBytes
+}
 
 
 ESC_BYTE = b'\x1B'
