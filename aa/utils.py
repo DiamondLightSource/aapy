@@ -12,11 +12,11 @@ except NameError:
 
 
 def utc_datetime(*args):
-    return pytz.UTC.localize(datetime(*args))
+    return pytz.utc.localize(datetime(*args))
 
 
 def utc_now():
-    return pytz.UTC.localize(datetime.now())
+    return pytz.utc.localize(datetime.now())
 
 
 EPOCH = utc_datetime(1970, 1, 1)
@@ -27,7 +27,7 @@ def datetime_to_epoch(dt):
 
 
 def epoch_to_datetime(secs):
-    return datetime.fromtimestamp(secs, tz=pytz.UTC)
+    return datetime.fromtimestamp(secs, tz=pytz.utc)
 
 
 def add_local_timezone(dt):

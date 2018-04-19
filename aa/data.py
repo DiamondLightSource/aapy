@@ -30,7 +30,7 @@ class ArchiveEvent(object):
     def timestamp(self):
         return self._timestamp
 
-    def datetime(self, tz=pytz.UTC):
+    def datetime(self, tz=pytz.utc):
         return utils.epoch_to_datetime(self._timestamp).astimezone(tz)
 
     @property
@@ -96,11 +96,14 @@ class ArchiveData(object):
     def timestamps(self):
         return self._timestamps
 
-    def datetimes(self, tz=pytz.UTC):
+    def datetimes(self, tz=pytz.utc):
         """Returns a numpy array of datetimes for the events.
 
+        Args:
+            tz: the timezone for the datetime objects
+
         Returns:
-            numpy array of UTC datetime objects
+            numpy array of datetime objects
 
         """
         return numpy.array([
