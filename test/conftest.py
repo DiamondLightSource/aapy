@@ -76,11 +76,6 @@ def data_2d_2_events(dummy_pv):
 
 
 @pytest.fixture
-def event_1d(dummy_pv):
-    return data.ArchiveEvent(dummy_pv, 1, 100.1, 0)
-
-
-@pytest.fixture
 def data_2d(dummy_pv):
     return data.ArchiveData(dummy_pv,
                             numpy.array(((1.1, 2, 3),)),
