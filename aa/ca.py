@@ -1,3 +1,4 @@
+"""Simple client to the Channel Archiver using xmlrpc."""
 import logging as log
 try:
     from xmlrpc.client import ServerProxy

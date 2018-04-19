@@ -1,6 +1,4 @@
-"""
-Python client to the EPICS Archiver Appliance.
-"""
+"""Python client to the EPICS Archiver Appliance."""
 import logging
 
 

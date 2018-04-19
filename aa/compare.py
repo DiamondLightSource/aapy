@@ -1,3 +1,4 @@
+"""Utilities to compare ArchiveData objects."""
 import logging as log
 
 

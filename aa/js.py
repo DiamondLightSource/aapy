@@ -1,3 +1,4 @@
+"""Class for fetching data from the Archiver Appliance using JSON."""
 from aa import data, fetcher
 
 

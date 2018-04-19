@@ -1,3 +1,4 @@
+"""Objects representing data returned from the Archiver Appliance."""
 import numpy
 import pytz
 

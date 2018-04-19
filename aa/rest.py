@@ -1,3 +1,4 @@
+"""Class for making calls to the Archiver Appliance Rest API."""
 import requests
 
 import aa

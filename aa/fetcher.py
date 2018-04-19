@@ -1,3 +1,4 @@
+"""Base classes for use in fetching data from archivers."""
 from datetime import datetime
 
 import pytz
