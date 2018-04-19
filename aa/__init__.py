@@ -6,9 +6,9 @@ LOG_FORMAT = '%(asctime)s %(levelname)-8s %(message)s'
 LOG_LEVEL = logging.DEBUG
 
 
-def set_up_logging(format=LOG_FORMAT, level=LOG_LEVEL):
+def set_up_logging(fmt=LOG_FORMAT, level=LOG_LEVEL):
     logging.basicConfig(
-        format=format, level=level, datefmt='%Y-%m-%d %I:%M:%S'
+        format=fmt, level=level, datefmt='%Y-%m-%d %I:%M:%S'
     )
 
 
