@@ -1,5 +1,4 @@
 from aa import data, fetcher
-import json
 
 
 class JsonFetcher(fetcher.AaFetcher):

@@ -1,8 +1,6 @@
 from . import utils
-import logging
 import pytz
 import requests
-import tzlocal
 from datetime import datetime
 
 

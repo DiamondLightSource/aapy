@@ -1,5 +1,4 @@
 import aa
-from aa import utils
 import requests
 
 
