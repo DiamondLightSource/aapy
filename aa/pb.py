@@ -109,7 +109,7 @@ def break_up_chunks(raw_data):
         log.info('Year {}: {} events in chunk'.format(chunk_info.year,
                                                       len(lines) - 1))
         try:
-            ci, ls = year_chunks[chunk_info.year]
+            _, ls = year_chunks[chunk_info.year]
             ls.extend(lines[1:])
         except KeyError:
             year_chunks[chunk_info.year] = chunk_info, lines[1:]
