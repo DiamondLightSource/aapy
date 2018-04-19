@@ -1,7 +1,9 @@
-from . import utils
+from datetime import datetime
+
 import pytz
 import requests
-from datetime import datetime
+
+from . import utils
 
 
 class Fetcher(object):

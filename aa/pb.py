@@ -16,13 +16,15 @@ binary file using tools such as wc.
 The unescape_bytes() method handles unescaping these characters before
 handing the interpretation over to the Google Protobuf library.
 """
-from . import data, fetcher, utils
-from . import epics_event_pb2 as ee
 import os
 import re
 import collections
 import logging as log
+
 import requests
+
+from . import data, fetcher, utils
+from . import epics_event_pb2 as ee
 
 
 # It is not clear to me why I can't extract this information

@@ -1,5 +1,6 @@
-import aa
 import requests
+
+import aa
 
 
 class AaRestClient(object):

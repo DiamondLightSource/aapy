@@ -1,11 +1,13 @@
 import logging as log
-from aa import data, utils
-from aa.fetcher import Fetcher
-import numpy
 try:
     from xmlrpc.client import ServerProxy
 except ImportError:  # Python 2 compatibility
     from xmlrpclib import ServerProxy
+
+import numpy
+
+from aa import data, utils
+from aa.fetcher import Fetcher
 
 
 class CaClient(object):

@@ -1,6 +1,7 @@
-from . import utils
 import numpy
 import pytz
+
+from . import utils
 
 
 DIFFERENT_PV_ERROR = 'All concatenated ArchiveData objects must have the same PV name'

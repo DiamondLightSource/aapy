@@ -1,7 +1,9 @@
 import datetime
+
 import numpy
 import pytest
 from pytz import utc, timezone
+
 from aa import data
 
 

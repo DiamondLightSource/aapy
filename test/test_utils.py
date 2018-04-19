@@ -1,8 +1,10 @@
-from aa import utils
 from datetime import datetime
-import pytz
+
 import pytest
+import pytz
 import tzlocal
+
+from aa import utils
 
 
 TZ_BST = pytz.timezone('Europe/London')

@@ -1,6 +1,7 @@
-from aa import data, utils
 import pytest
 import numpy
+
+from aa import data, utils
 
 
 @pytest.fixture

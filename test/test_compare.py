@@ -1,5 +1,6 @@
-from aa import compare, data
 import numpy
+
+from aa import compare, data
 
 
 ONE_EVENT_DATA = data.ArchiveData('dummy',
