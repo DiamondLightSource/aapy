@@ -32,7 +32,7 @@ class ArchiveDataDiff(object):
     def summarise(self):
         for side in (self.LEFT, self.RIGHT):
             for event in self._extra[side]:
-                log.warn('Extra event on {}: {}'.format(side, event))
+                log.warning('Extra event on {}: {}'.format(side, event))
             for event in self._duplicates[side]:
                 log.info('Duplicate event on {}: {}'.format(side, event))
             for event in self._invalid[side]:
