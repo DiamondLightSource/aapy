@@ -15,35 +15,41 @@ binary file using tools such as wc.
 
 The unescape_bytes() method handles unescaping these characters before
 handing the interpretation over to the Google Protobuf library.
+
+Note: due to the way the protobuf objects are constructed, pylint can't
+correctly deduce some properties, so I have manually disabled some warnings.
+
 """
-from . import data, fetcher, utils
-from . import epics_event_pb2 as ee
 import os
 import re
 import collections
 import logging as log
+
 import requests
+
+from . import data, fetcher, utils
+from . import epics_event_pb2 as ee
 
 
 # It is not clear to me why I can't extract this information
 # from the compiled protobuf file.
 TYPE_MAPPINGS = {
-        0: ee.ScalarString,
-        1: ee.ScalarShort,
-        2: ee.ScalarFloat,
-        3: ee.ScalarEnum,
-        4: ee.ScalarByte,
-        5: ee.ScalarInt,
-        6: ee.ScalarDouble,
-        7: ee.VectorString,
-        8: ee.VectorShort,
-        9: ee.VectorFloat,
-        10: ee.VectorEnum,
-        11: ee.VectorChar,
-        12: ee.VectorInt,
-        13: ee.VectorDouble,
-        14: ee.V4GenericBytes
-        }
+    0: ee.ScalarString,
+    1: ee.ScalarShort,
+    2: ee.ScalarFloat,
+    3: ee.ScalarEnum,
+    4: ee.ScalarByte,
+    5: ee.ScalarInt,
+    6: ee.ScalarDouble,
+    7: ee.VectorString,
+    8: ee.VectorShort,
+    9: ee.VectorFloat,
+    10: ee.VectorEnum,
+    11: ee.VectorChar,
+    12: ee.VectorInt,
+    13: ee.VectorDouble,
+    14: ee.V4GenericBytes
+}
 
 
 ESC_BYTE = b'\x1B'
@@ -85,7 +91,10 @@ def get_timestamp_from_line_function(chunk_info):
     def timestamp_from_line(line):
         event = TYPE_MAPPINGS[chunk_info.type]()
         event.ParseFromString(unescape_bytes(line))
-        event_time = event_timestamp(chunk_info.year, event)
+        event_time = event_timestamp(
+            chunk_info.year,  # pylint: disable=no-member
+            event
+        )
         return event_time
     return timestamp_from_line
 
@@ -104,13 +113,15 @@ def break_up_chunks(raw_data):
         lines = chunk.split(b'\n')
         chunk_info = ee.PayloadInfo()
         chunk_info.ParseFromString(unescape_bytes(lines[0]))
-        log.info('Year {}: {} events in chunk'.format(chunk_info.year,
-                                                      len(lines) - 1))
+        chunk_year = chunk_info.year  # pylint: disable=no-member
+        log.info('Year {}: {} events in chunk'.format(
+            chunk_year, len(lines) - 1)
+        )
         try:
-            ci, ls = year_chunks[chunk_info.year]
+            _, ls = year_chunks[chunk_year]
             ls.extend(lines[1:])
         except KeyError:
-            year_chunks[chunk_info.year] = chunk_info, lines[1:]
+            year_chunks[chunk_year] = chunk_info, lines[1:]
     return year_chunks
 
 

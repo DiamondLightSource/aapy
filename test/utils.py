@@ -1,6 +1,7 @@
 import json
-import mock
 import os
+
+import mock
 
 
 def mock_response(json_str=None, raw=None):

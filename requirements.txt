@@ -8,6 +8,7 @@ tzlocal
 pytest
 mock
 pytest-cov
+pytest-pylint
 coveralls
 tox
 tox-travis

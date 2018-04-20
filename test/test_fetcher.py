@@ -1,9 +1,11 @@
-from aa import fetcher
 from datetime import datetime
+
 import mock
 import pytest
 import pytz
 import tzlocal
+
+from aa import fetcher
 
 
 EARLY_DATE = datetime(2001, 1, 1, 1, 1)

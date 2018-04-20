@@ -1,6 +1,8 @@
 from datetime import datetime
+
 import mock
 import pytest
+
 from aa import ca
 
 

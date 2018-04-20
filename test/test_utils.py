@@ -1,14 +1,16 @@
-from aa import utils
 from datetime import datetime
-import pytz
+
 import pytest
+import pytz
 import tzlocal
+
+from aa import utils
 
 
 TZ_BST = pytz.timezone('Europe/London')
 UNIX_TIME = 1504023969
 JUST_AFTER_EPOCH = datetime(1970, 1, 1, 0, 0, 15, tzinfo=pytz.UTC)
-DATETIME_UTC = pytz.UTC.localize(datetime(2017, 8, 29, 16, 26, 9))
+DATETIME_UTC = pytz.utc.localize(datetime(2017, 8, 29, 16, 26, 9))
 DATETIME_BST = TZ_BST.localize(datetime(2017, 8, 29, 17, 26, 9))
 TIMESTAMP_2001 = 978307200
 

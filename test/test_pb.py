@@ -1,10 +1,12 @@
+import os
+
+import mock
+import pytest
+import requests
+
 from aa import data, pb, utils
 from aa import epics_event_pb2 as ee
 import utils as testutils
-import pytest
-import mock
-import os
-import requests
 
 
 TIMESTAMP_2001 = 978307200

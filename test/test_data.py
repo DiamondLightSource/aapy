@@ -1,16 +1,18 @@
 import datetime
+
 import numpy
 import pytest
-from pytz import UTC, timezone
+from pytz import utc, timezone
+
 from aa import data
 
 
 @pytest.mark.parametrize('tz',
-    (UTC, timezone('Europe/Amsterdam'), timezone('US/Eastern'))
+    (utc, timezone('Europe/Amsterdam'), timezone('US/Eastern'))
 )
 def test_ArchiveEvent_datetime_returns_correct_datetime(event_1d, tz):
     dt = datetime.datetime(1970, 1, 1, 0, 1, 40, 100000)
-    utc_dt = UTC.localize(dt)
+    utc_dt = utc.localize(dt)
     local_dt = utc_dt.astimezone(tz)
     assert event_1d.datetime(tz) == local_dt
 
@@ -18,7 +20,7 @@ def test_ArchiveEvent_datetime_returns_correct_datetime(event_1d, tz):
 def test_ArchiveEvent_datetime_returns_numpy_array_of_datetimes(data_1d):
     assert isinstance(data_1d.datetimes(), numpy.ndarray)
     dt = datetime.datetime(1970, 1, 1, 0, 1, 40, 100000)
-    utc_dt = UTC.localize(dt)
+    utc_dt = utc.localize(dt)
     assert data_1d.datetimes()[0] == utc_dt
 
 

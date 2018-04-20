@@ -1,9 +1,10 @@
-from . import utils
-import logging
+"""Base classes for use in fetching data from archivers."""
+from datetime import datetime
+
 import pytz
 import requests
-import tzlocal
-from datetime import datetime
+
+from . import utils
 
 
 class Fetcher(object):

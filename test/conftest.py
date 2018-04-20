@@ -1,6 +1,7 @@
-from aa import data, utils
 import pytest
 import numpy
+
+from aa import data, utils
 
 
 @pytest.fixture
@@ -73,11 +74,6 @@ def data_2d_2_events(dummy_pv):
                             numpy.array(((1.1, 2, 3), (3, 4.5, 6))),
                             numpy.array((10.21, 11.01)),
                             numpy.array((1, 5)))
-
-
-@pytest.fixture
-def event_1d(dummy_pv):
-    return data.ArchiveEvent(dummy_pv, 1, 100.1, 0)
 
 
 @pytest.fixture

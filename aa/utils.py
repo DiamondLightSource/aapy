@@ -1,8 +1,11 @@
+"""Miscellaneous utility functions."""
 from __future__ import print_function
 from datetime import datetime
 import logging
+
 import pytz
 import tzlocal
+
 
 # string23 is used for type-checking for strings in both Python 2 and Python 3.
 try:
@@ -12,11 +15,12 @@ except NameError:
 
 
 def utc_datetime(*args):
-    return pytz.UTC.localize(datetime(*args))
+    # pylint: disable=no-value-for-parameter
+    return pytz.utc.localize(datetime(*args))
 
 
 def utc_now():
-    return pytz.UTC.localize(datetime.now())
+    return pytz.utc.localize(datetime.now())
 
 
 EPOCH = utc_datetime(1970, 1, 1)
@@ -27,7 +31,7 @@ def datetime_to_epoch(dt):
 
 
 def epoch_to_datetime(secs):
-    return datetime.fromtimestamp(secs, tz=pytz.UTC)
+    return datetime.fromtimestamp(secs, tz=pytz.utc)
 
 
 def add_local_timezone(dt):
@@ -74,7 +78,7 @@ def binary_search(seq, f, target):
 
     Returns: index of item in seq meeting search requirements
     """
-    if len(seq) == 0 or f(seq[0]) > target:
+    if not seq or f(seq[0]) > target:
         return 0
     elif f(seq[-1]) < target:
         return len(seq)

@@ -1,6 +1,8 @@
-from . import utils
+"""Objects representing data returned from the Archiver Appliance."""
 import numpy
 import pytz
+
+from . import utils
 
 
 DIFFERENT_PV_ERROR = 'All concatenated ArchiveData objects must have the same PV name'
@@ -30,7 +32,7 @@ class ArchiveEvent(object):
     def timestamp(self):
         return self._timestamp
 
-    def datetime(self, tz=pytz.UTC):
+    def datetime(self, tz=pytz.utc):
         return utils.epoch_to_datetime(self._timestamp).astimezone(tz)
 
     @property
@@ -96,11 +98,14 @@ class ArchiveData(object):
     def timestamps(self):
         return self._timestamps
 
-    def datetimes(self, tz=pytz.UTC):
+    def datetimes(self, tz=pytz.utc):
         """Returns a numpy array of datetimes for the events.
 
+        Args:
+            tz: the timezone for the datetime objects
+
         Returns:
-            numpy array of UTC datetime objects
+            numpy array of datetime objects
 
         """
         return numpy.array([
@@ -148,7 +153,7 @@ class ArchiveData(object):
         return ArchiveData(self.pv, new_values, timestamps, severities)
 
     def __str__(self):
-        if len(self.values) == 0:
+        if not self.values:
             return "Empty archive data for PV '{}'".format(self.pv)
         else:
             return ArchiveData.DESC.format(

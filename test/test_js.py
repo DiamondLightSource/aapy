@@ -1,11 +1,13 @@
-from aa import js
 from datetime import datetime
-import numpy
+import json
+
+import jsonschema
 import mock
+import numpy
 import pytest
 import utils
-import json
-import jsonschema
+
+from aa import js
 
 
 EARLY_DATE = datetime(2001, 1, 1, 1, 1)

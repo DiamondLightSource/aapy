@@ -1,6 +1,7 @@
-import aa
-from aa import utils
+"""Class for making calls to the Archiver Appliance Rest API."""
 import requests
+
+import aa
 
 
 class AaRestClient(object):
