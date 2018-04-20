@@ -15,6 +15,7 @@ except NameError:
 
 
 def utc_datetime(*args):
+    # pylint: disable=no-value-for-parameter
     return pytz.utc.localize(datetime(*args))
 
 
