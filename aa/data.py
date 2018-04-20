@@ -153,7 +153,7 @@ class ArchiveData(object):
         return ArchiveData(self.pv, new_values, timestamps, severities)
 
     def __str__(self):
-        if len(self.values) == 0:
+        if not self.values:
             return "Empty archive data for PV '{}'".format(self.pv)
         else:
             return ArchiveData.DESC.format(

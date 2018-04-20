@@ -79,7 +79,7 @@ class CaFetcher(Fetcher):
         done = False
         while done is not True and len(all_data) < count:
             requested = min(count - len(all_data), 10000)
-            if len(all_data.timestamps):
+            if all_data.timestamps.size:
                 last_timestamp = all_data.timestamps[-1]
                 start = utils.epoch_to_datetime(last_timestamp)
             log.info('Request PV {} for {} samples.'.format(pv, requested))

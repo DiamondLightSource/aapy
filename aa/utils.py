@@ -78,7 +78,7 @@ def binary_search(seq, f, target):
 
     Returns: index of item in seq meeting search requirements
     """
-    if len(seq) == 0 or f(seq[0]) > target:
+    if not seq or f(seq[0]) > target:
         return 0
     elif f(seq[-1]) < target:
         return len(seq)
