@@ -37,6 +37,10 @@ def test_ArchiveEvent_utc_datetimes_returns_numpy_array_of_datetimes(data_1d):
     assert data_1d.utc_datetimes[0] == utc_dt
 
 
+def test_ArchiveEvent_str(dummy_pv, event_1d):
+    assert dummy_pv in str(event_1d)
+
+
 def test_ArchiveData_concatenate_with_different_pv_names_raises_AssertionError():
     array = numpy.zeros((1,))
     data1 = data.ArchiveData('dummy1', array, array, array)
@@ -114,6 +118,14 @@ def test_empty_ArchiveData_iterates_zero_times(empty_data):
 def test_empty_ArchiveData_raises_IndexError_if_indexed(empty_data):
     with pytest.raises(IndexError):
         empty_data[0]
+
+
+def test_empty_ArchiveData_str(empty_data):
+    assert "Empty" in str(empty_data)
+
+
+def test_ArchiveData_str(dummy_pv, data_2d):
+    assert dummy_pv in str(data_2d)
 
 
 def test_indexing_ArchiveData(data_1d, event_1d):

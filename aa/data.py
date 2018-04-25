@@ -61,7 +61,7 @@ class ArchiveEvent(object):
     def __str__(self):
         return ArchiveEvent.DESC.format(
             self.pv,
-            self.datetime(),
+            self.utc_datetime,
             self.value,
             self.severity
         )
@@ -182,7 +182,7 @@ class ArchiveData(object):
         return ArchiveData(self.pv, new_values, timestamps, severities)
 
     def __str__(self):
-        if not self.values:
+        if not self.values.size:
             return "Empty archive data for PV '{}'".format(self.pv)
         else:
             return ArchiveData.DESC.format(
