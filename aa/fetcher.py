@@ -87,6 +87,7 @@ class AaFetcher(Fetcher):
             formatted datetime string
 
         """
+        assert dt.tzinfo is not None
         return dt.astimezone(pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def _construct_url(self, pv, start, end):

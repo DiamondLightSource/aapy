@@ -35,8 +35,8 @@ def test_AaFetcher_constructs_endpoint_correctly(aa_fetcher):
     assert aa_fetcher._endpoint == 'http://localhost:3003'
 
 
-def test_AaFetcher_format_datetime_raises_ValueError_if_datetime_naive(aa_fetcher):
-    with pytest.raises(ValueError):
+def test_AaFetcher_format_datetime_raises_AssertionError_if_datetime_naive(aa_fetcher):
+    with pytest.raises(AssertionError):
         aa_fetcher._format_datetime(EARLY_DATE)
 
 
