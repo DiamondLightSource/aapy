@@ -4,7 +4,7 @@ from datetime import datetime
 import pytz
 import requests
 
-from . import LOCALTZ, utils
+from . import utils
 
 
 class Fetcher(object):
