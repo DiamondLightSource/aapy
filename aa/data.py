@@ -32,8 +32,27 @@ class ArchiveEvent(object):
     def timestamp(self):
         return self._timestamp
 
-    def datetime(self, tz=pytz.utc):
+    def datetime(self, tz):
+        """Returns a timezone-aware datetime for the events.
+
+        Args:
+            tz: the timezone for the datetime object
+
+        Returns:
+            datetime object
+
+        """
         return utils.epoch_to_datetime(self._timestamp).astimezone(tz)
+
+    @property
+    def utc_datetime(self):
+        """Returns a UTC datetime for the events.
+
+        Returns:
+            datetime object
+
+        """
+        return self.datetime(pytz.utc)
 
     @property
     def severity(self):
@@ -42,7 +61,7 @@ class ArchiveEvent(object):
     def __str__(self):
         return ArchiveEvent.DESC.format(
             self.pv,
-            self.datetime(),
+            self.utc_datetime,
             self.value,
             self.severity
         )
@@ -98,8 +117,8 @@ class ArchiveData(object):
     def timestamps(self):
         return self._timestamps
 
-    def datetimes(self, tz=pytz.utc):
-        """Returns a numpy array of datetimes for the events.
+    def datetimes(self, tz):
+        """Returns a numpy array of timezone-aware datetimes for the events.
 
         Args:
             tz: the timezone for the datetime objects
@@ -111,6 +130,16 @@ class ArchiveData(object):
         return numpy.array([
             utils.epoch_to_datetime(ts).astimezone(tz) for ts in self._timestamps
         ])
+
+    @property
+    def utc_datetimes(self):
+        """Returns a numpy array of UTC datetimes for the events.
+
+        Returns:
+            numpy array of datetime objects
+
+        """
+        return self.datetimes(pytz.utc)
 
     @property
     def severities(self):
@@ -153,14 +182,14 @@ class ArchiveData(object):
         return ArchiveData(self.pv, new_values, timestamps, severities)
 
     def __str__(self):
-        if not self.values:
+        if not self.values.size:
             return "Empty archive data for PV '{}'".format(self.pv)
         else:
             return ArchiveData.DESC.format(
                 self.pv,
                 len(self.values),
-                self.datetimes()[0],
-                self.datetimes()[-1]
+                self.utc_datetimes[0],
+                self.utc_datetimes[-1]
             )
 
     __repr__ = __str__

@@ -18,6 +18,11 @@ LOG_LEVEL = logging.DEBUG
 
 
 def set_up_logging(fmt=LOG_FORMAT, level=LOG_LEVEL):
-    logging.basicConfig(
-        format=fmt, level=level, datefmt='%Y-%m-%d %I:%M:%S'
-    )
+    """Simple logging setup.
+
+    Args:
+        fmt: logging format to use
+        level: logging level to use
+
+    """
+    logging.basicConfig(format=fmt, level=level, datefmt='%Y-%m-%d %I:%M:%S')
