@@ -37,7 +37,7 @@ class Fetcher(object):
             if end.tzinfo is None:
                 end = utils.add_local_timezone(end)
         else:
-            end = pytz.utc.localize(datetime.now())
+            end = utils.add_local_timezone(datetime.now())
         return self._get_values(pv, start, end, count)
 
     def get_event_at(self, pv, instant):
