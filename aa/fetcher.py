@@ -76,7 +76,18 @@ class AaFetcher(Fetcher):
 
     @staticmethod
     def _format_datetime(dt):
-        return dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+        """Format datetime into string for use in AA URL.
+
+        Convert to UTC for simplicity in rendering.
+
+        Args:
+            dt: datetime to format
+
+        Returns:
+            formatted datetime string
+
+        """
+        return dt.astimezone(pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def _construct_url(self, pv, start, end):
         suffix = '?pv={}&from={}&to={}'.format(
