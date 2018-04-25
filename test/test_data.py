@@ -17,11 +17,24 @@ def test_ArchiveEvent_datetime_returns_correct_datetime(event_1d, tz):
     assert event_1d.datetime(tz) == local_dt
 
 
-def test_ArchiveEvent_datetime_returns_numpy_array_of_datetimes(data_1d):
-    assert isinstance(data_1d.datetimes(), numpy.ndarray)
+def test_ArchiveEvent_utc_datetime_returns_correct_datetime(event_1d):
     dt = datetime.datetime(1970, 1, 1, 0, 1, 40, 100000)
     utc_dt = utc.localize(dt)
-    assert data_1d.datetimes()[0] == utc_dt
+    assert event_1d.utc_datetime == utc_dt
+
+
+def test_ArchiveEvent_datetime_returns_numpy_array_of_datetimes(data_1d):
+    assert isinstance(data_1d.datetimes(utc), numpy.ndarray)
+    dt = datetime.datetime(1970, 1, 1, 0, 1, 40, 100000)
+    utc_dt = utc.localize(dt)
+    assert data_1d.datetimes(utc)[0] == utc_dt
+
+
+def test_ArchiveEvent_utc_datetimes_returns_numpy_array_of_datetimes(data_1d):
+    assert isinstance(data_1d.utc_datetimes, numpy.ndarray)
+    dt = datetime.datetime(1970, 1, 1, 0, 1, 40, 100000)
+    utc_dt = utc.localize(dt)
+    assert data_1d.utc_datetimes[0] == utc_dt
 
 
 def test_ArchiveData_concatenate_with_different_pv_names_raises_AssertionError():
