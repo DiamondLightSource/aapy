@@ -48,7 +48,7 @@ def add_local_timezone(dt):
     assert dt.tzinfo is None
     localtz = tzlocal.get_localzone()
     logging.warning('Assuming timezone for {} is {}'.format(dt, localtz))
-    return dt.replace(tzinfo=localtz)
+    return localtz.localize(dt)
 
 
 def year_timestamp(year):
