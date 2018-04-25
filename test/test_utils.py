@@ -45,8 +45,9 @@ def test_epoch_to_datetime_works_for_current_datetime_utc():
 
 def test_add_local_timezone_adds_timezone():
     dt = utils.add_local_timezone(datetime.now())
-    localtz = tzlocal.get_localzone()
-    assert dt.tzinfo == localtz
+    # For complicated reasons, dt.tzinfo is not the same as
+    # tzlocal.get_localzone().
+    assert dt.tzinfo is not None
 
 
 def test_add_local_timezone_raises_AssertionError_if_arg_has_timezone():

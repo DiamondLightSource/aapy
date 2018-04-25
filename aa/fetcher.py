@@ -37,7 +37,7 @@ class Fetcher(object):
             if end.tzinfo is None:
                 end = utils.add_local_timezone(end)
         else:
-            end = pytz.utc.localize(datetime.now())
+            end = utils.add_local_timezone(datetime.now())
         return self._get_values(pv, start, end, count)
 
     def get_event_at(self, pv, instant):
@@ -76,7 +76,19 @@ class AaFetcher(Fetcher):
 
     @staticmethod
     def _format_datetime(dt):
-        return dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+        """Format datetime into string for use in AA URL.
+
+        Convert to UTC for simplicity in rendering.
+
+        Args:
+            dt: datetime to format
+
+        Returns:
+            formatted datetime string
+
+        """
+        assert dt.tzinfo is not None
+        return dt.astimezone(pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def _construct_url(self, pv, start, end):
         suffix = '?pv={}&from={}&to={}'.format(
