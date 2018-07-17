@@ -1,5 +1,6 @@
 import datetime
 
+import mock
 import numpy
 import pytest
 from pytz import utc, timezone
@@ -96,11 +97,12 @@ def test_ArchiveData_constructor_raises_AssertionError_if_array_lengths_differen
         data.ArchiveData(dummy_pv, empty_10, empty_10, empty_11)
 
 
-def test_ArchiveData_constructor_raises_AssertionError_if_timestamps_descending(dummy_pv):
+@mock.patch('logging.warning')
+def test_warning_logged_by_ArchiveData_constructor_if_timestamps_descending(patched_warning, dummy_pv):
     empty_array = numpy.zeros((10,))
     desc = numpy.arange(2, 1, -0.1)
-    with pytest.raises(AssertionError):
-        data.ArchiveData(dummy_pv, empty_array, desc, empty_array)
+    data.ArchiveData(dummy_pv, empty_array, desc, empty_array)
+    assert patched_warning.called
 
 
 # Test both ascending array and constant array.

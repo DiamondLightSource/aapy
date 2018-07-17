@@ -1,4 +1,5 @@
 """Objects representing data returned from the Archiver Appliance."""
+import logging
 import numpy
 import pytz
 
@@ -6,7 +7,7 @@ from . import utils
 
 
 DIFFERENT_PV_ERROR = 'All concatenated ArchiveData objects must have the same PV name'
-TIMESTAMP_ERROR = 'Concatenated ArchiveData objects must have increasing timestamps'
+TIMESTAMP_WARNING = 'Timestamps not monotonically increasing: {} -> {}'
 
 
 class ArchiveEvent(object):
@@ -90,7 +91,7 @@ class ArchiveData(object):
         assert len(values) == len(timestamps) == len(severities)
         if values.ndim == 1:
             values = values.reshape((-1, 1))
-        assert self._check_timestamps(timestamps), TIMESTAMP_ERROR
+        self._check_timestamps(timestamps)
         self._pv = pv
         self._values = values
         self._timestamps = timestamps
@@ -98,7 +99,15 @@ class ArchiveData(object):
 
     @staticmethod
     def _check_timestamps(ts_array):
-        return numpy.all(numpy.diff(ts_array) >= 0)
+        back_steps = numpy.diff(ts_array) < 0
+        if numpy.any(back_steps):
+            for nonzero_index in numpy.nditer(numpy.nonzero(back_steps)):
+                logging.warning(
+                    TIMESTAMP_WARNING.format(
+                        utils.epoch_to_datetime(ts_array[nonzero_index]),
+                        utils.epoch_to_datetime(ts_array[nonzero_index + 1])
+                    )
+                )
 
     @staticmethod
     def empty(pv):
@@ -166,7 +175,7 @@ class ArchiveData(object):
         """
         assert other.pv == self.pv, DIFFERENT_PV_ERROR
         timestamps = numpy.concatenate([self.timestamps, other.timestamps])
-        assert self._check_timestamps(timestamps), TIMESTAMP_ERROR
+        self._check_timestamps(timestamps)
         if zero_pad:
             first_length, first_size = self.values.shape
             second_length, second_size = other.values.shape
