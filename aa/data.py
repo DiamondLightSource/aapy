@@ -197,8 +197,8 @@ class ArchiveData(object):
             return ArchiveData.DESC.format(
                 self.pv,
                 len(self.values),
-                self.utc_datetimes[0],
-                self.utc_datetimes[-1]
+                utils.epoch_to_datetime(self._timestamps[0]),
+                utils.epoch_to_datetime(self._timestamps[-1])
             )
 
     __repr__ = __str__
