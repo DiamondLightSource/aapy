@@ -167,7 +167,7 @@ class PbFetcher(fetcher.AaFetcher):
         super(PbFetcher, self).__init__(hostname, port, binary=True)
         self._url = '{}/retrieval/data/getData.raw'.format(self._endpoint)
 
-    def _get_values(self, pv, start, end, count, request_params=None):
+    def _get_values(self, pv, start, end, count, request_params):
         try:
             return super(PbFetcher, self)._get_values(pv, start, end, count,
                                                       request_params)

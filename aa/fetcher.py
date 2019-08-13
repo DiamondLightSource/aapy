@@ -112,7 +112,7 @@ class AaFetcher(Fetcher):
         url = self._construct_url(pv, start, end, request_params)
         return requests.get(url, stream=self._binary)
 
-    def _get_values(self, pv, start, end, count, request_params=None):
+    def _get_values(self, pv, start, end, count, request_params):
         response = self._fetch_data(pv, start, end, request_params)
         response.raise_for_status()
         return self._parse_raw_data(response, pv, start, end, count)
