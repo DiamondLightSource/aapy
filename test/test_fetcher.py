@@ -48,11 +48,20 @@ def test_AaFetcher_format_datetime(aa_fetcher):
 
 def test_AaFetcher_constructs_url_correctly(dummy_pv, aa_fetcher):
     aa_fetcher._url = 'dummy-url'
+    aa_fetcher._parse_raw_data = mock.MagicMock()
     early = pytz.utc.localize(EARLY_DATE)
     late = pytz.utc.localize(LATE_DATE)
-    constructed = aa_fetcher._construct_url(dummy_pv, early, late)
-    expected = 'dummy-url?pv=dummy&from=2001-01-01T01:01:00Z&to=2010-02-03T04:05:00Z'
-    assert constructed == expected
+
+    with mock.patch('requests.get') as mock_get:
+        aa_fetcher.get_values(dummy_pv, early, late, None)
+        expected = 'dummy-url?pv=dummy&from=2001-01-01T01:01:00Z&to=2010-02-03T04:05:00Z'
+        assert mock_get.call_args[0][0] == expected
+        mock_get.reset_mock()
+
+        request_params = {"param1Name": "param1Value", "param2Name": "param2Value"}
+        aa_fetcher.get_values(dummy_pv, early, late, None, request_params)
+        expected += '&param1Name=param1Value&param2Name=param2Value'
+        assert mock_get.call_args[0][0] == expected
 
 
 def test_AaFetcher_creates_default_for_end_if_not_provided(dummy_pv, aa_fetcher):

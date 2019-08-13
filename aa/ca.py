@@ -69,7 +69,7 @@ class CaFetcher(Fetcher):
         """
         self._client = CaClient(url)
 
-    def _get_values(self, pv, start, end=None, count=None):
+    def _get_values(self, pv, start, end=None, count=None, request_params=None):
         # Make count a large number if not specified to ensure we get all
         # data.
         count = 2**31 if count is None else count
