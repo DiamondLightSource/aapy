@@ -10,10 +10,10 @@ from . import utils
 class Fetcher(object):
     """Abstract base class for fetching data from an archiver."""
 
-    def _get_values(self, pv, start, end, count):
+    def _get_values(self, pv, start, end, count, request_params):
         raise NotImplementedError()
 
-    def get_values(self, pv, start, end=None, count=None):
+    def get_values(self, pv, start, end=None, count=None, request_params=None):
         """Retrieve archive data.
 
         start and end are datetime objects. If they are not timezone aware,
@@ -26,6 +26,7 @@ class Fetcher(object):
                 events to the current time
             count: maximum number of events to return. If None, return all
                 events
+            request_params: Settings dictionary used for archiver request
 
         Returns:
             ArchiveData object representing all events
@@ -38,9 +39,9 @@ class Fetcher(object):
                 end = utils.add_local_timezone(end)
         else:
             end = utils.add_local_timezone(datetime.now())
-        return self._get_values(pv, start, end, count)
+        return self._get_values(pv, start, end, count, request_params)
 
-    def get_event_at(self, pv, instant):
+    def get_event_at(self, pv, instant, request_params=None):
         """Retrieve the event preceding the specified datetime.
 
         If instant is not timezone aware, assume that it is in the local
@@ -49,6 +50,7 @@ class Fetcher(object):
         Args:
             pv: PV to request event for
             instant: datetime of the requested event
+            request_params: Settings dictionary used for archiver request
 
         Returns:
             ArchiveEvent representing the event preceding the requested
@@ -58,7 +60,8 @@ class Fetcher(object):
         if instant.tzinfo is None:
             instant = utils.add_local_timezone(instant)
         try:
-            return self.get_values(pv, instant, instant, 1).get_event(0)
+            return self.get_values(pv, instant, instant, 1,
+                                   request_params).get_event(0)
         except IndexError:
             error_msg = 'No data found for pv {} at timestamp {}'
             raise ValueError(error_msg.format(pv, instant))
@@ -90,20 +93,27 @@ class AaFetcher(Fetcher):
         assert dt.tzinfo is not None
         return dt.astimezone(pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
-    def _construct_url(self, pv, start, end):
+    def _construct_url(self, pv, start, end, request_params):
+        if request_params is None:
+            request_params = {}
+
         suffix = '?pv={}&from={}&to={}'.format(
             pv,
             self._format_datetime(start),
             self._format_datetime(end)
         )
+
+        for key, value in request_params.items():
+            suffix += "&{}={}".format(key, value)
+
         return '{}{}'.format(self._url, suffix)
 
-    def _fetch_data(self, pv, start, end):
-        url = self._construct_url(pv, start, end)
+    def _fetch_data(self, pv, start, end, request_params):
+        url = self._construct_url(pv, start, end, request_params)
         return requests.get(url, stream=self._binary)
 
-    def _get_values(self, pv, start, end, count):
-        response = self._fetch_data(pv, start, end)
+    def _get_values(self, pv, start, end, count, request_params):
+        response = self._fetch_data(pv, start, end, request_params)
         response.raise_for_status()
         return self._parse_raw_data(response, pv, start, end, count)
 

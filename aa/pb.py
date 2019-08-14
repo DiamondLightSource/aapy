@@ -167,9 +167,10 @@ class PbFetcher(fetcher.AaFetcher):
         super(PbFetcher, self).__init__(hostname, port, binary=True)
         self._url = '{}/retrieval/data/getData.raw'.format(self._endpoint)
 
-    def _get_values(self, pv, start, end, count):
+    def _get_values(self, pv, start, end, count, request_params):
         try:
-            return super(PbFetcher, self)._get_values(pv, start, end, count)
+            return super(PbFetcher, self)._get_values(pv, start, end, count,
+                                                      request_params)
         except requests.exceptions.HTTPError as e:
             # Not found typically means no data for the PV in this time range.
             if e.response.status_code == 404:
@@ -209,7 +210,7 @@ class PbFileFetcher(fetcher.Fetcher):
                 log.warning('No pb file {} found')
         return parse_pb_data(bytes(raw_data), pv, start, end, count)
 
-    def _get_values(self, pv, start, end=None, count=None):
+    def _get_values(self, pv, start, end=None, count=None, request_params=None):
         pb_files = []
         for year in range(start.year, end.year + 1):
             pb_files.append(self._get_pb_file(pv, year))
