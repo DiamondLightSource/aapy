@@ -103,7 +103,7 @@ class AaFetcher(Fetcher):
             self._format_datetime(end)
         )
 
-        for key, value in request_params.iteritems():
+        for key, value in request_params.items():
             suffix += "&{}={}".format(key, value)
 
         return '{}{}'.format(self._url, suffix)
