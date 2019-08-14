@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import datetime
 
 import mock
@@ -58,7 +59,9 @@ def test_AaFetcher_constructs_url_correctly(dummy_pv, aa_fetcher):
         assert mock_get.call_args[0][0] == expected
         mock_get.reset_mock()
 
-        request_params = {"param1Name": "param1Value", "param2Name": "param2Value"}
+        request_params = OrderedDict()
+        request_params["param1Name"] = "param1Value"
+        request_params["param2Name"] = "param2Value"
         aa_fetcher.get_values(dummy_pv, early, late, None, request_params)
         expected += '&param1Name=param1Value&param2Name=param2Value'
         assert mock_get.call_args[0][0] == expected
