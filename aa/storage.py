@@ -1,8 +1,3 @@
-import re
-
-STORAGE_PATHS = {"LTS": "/dls/science/users/tdq39642/aa/mock_lts"}
-
-
 class ParsingError(Exception):
     pass
 

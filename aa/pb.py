@@ -20,15 +20,18 @@ Note: due to the way the protobuf objects are constructed, pylint can't
 correctly deduce some properties, so I have manually disabled some warnings.
 
 """
+import datetime
 import os
 import re
 import collections
 import logging as log
 
+import pytz
 import requests
 
 from . import data, fetcher, utils
 from . import epics_event_pb2 as ee
+
 
 
 # It is not clear to me why I can't extract this information
@@ -52,15 +55,18 @@ TYPE_MAPPINGS = {
 }
 
 
+INVERSE_TYPE_MAPPINGS={cls:numeric for numeric, cls in TYPE_MAPPINGS.items()}
+
+
 ESC_BYTE = b'\x1B'
 NL_BYTE = b'\x0A'
 CR_BYTE = b'\x0D'
 
 # The characters sequences required to unescape AA pb file format.
 PB_REPLACEMENTS = {
-    ESC_BYTE + b'\x01': ESC_BYTE,
-    ESC_BYTE + b'\x02': NL_BYTE,
-    ESC_BYTE + b'\x03': CR_BYTE
+    bytes(ESC_BYTE + b'\x01'): ESC_BYTE,
+    bytes(ESC_BYTE + b'\x02'): NL_BYTE,
+    bytes(ESC_BYTE + b'\x03'): CR_BYTE
 }
 
 
@@ -77,6 +83,22 @@ def unescape_bytes(byte_seq):
     """
     for r in PB_REPLACEMENTS:
         byte_seq = byte_seq.replace(r, PB_REPLACEMENTS[r])
+    return byte_seq
+
+
+def escape_bytes(byte_seq):
+    """Replace specific sub-sequences in a bytes sequence.
+
+    This escaping is defined as part of the Archiver Appliance raw file
+    format: https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html
+
+    Args:
+        byte_seq: any byte sequence
+    Returns:
+        the byte sequence escaped according to the AA file format rules
+    """
+    for r in PB_REPLACEMENTS:
+        byte_seq = byte_seq.replace(PB_REPLACEMENTS[r], r)
     return byte_seq
 
 
@@ -106,6 +128,15 @@ def search_events(dt, chunk_info, lines):
 
 
 def break_up_chunks(raw_data):
+    """
+    Break up raw data into chunks by year
+
+    Args:
+        raw_data: Raw data from file
+
+    Returns:
+        OrderedDict: keys are years; values are lists of chunks
+    """
     chunks = [chunk.strip() for chunk in raw_data.split(b'\n\n')]
     log.info('{} chunks in pb file'.format(len(chunks)))
     year_chunks = collections.OrderedDict()
@@ -126,6 +157,18 @@ def break_up_chunks(raw_data):
 
 
 def event_from_line(line, pv, year, event_type):
+    """
+    Get an ArchiveEvent from this line
+
+    Args:
+        line: A line of chunks of data
+        pv: Name of th  e PV
+        year: Year of interest
+        event_type: Need to know the type of the event as key of TYPE_MAPPINGS
+
+    Returns:
+        ArchiveEvent
+    """
     unescaped = unescape_bytes(line)
     event = TYPE_MAPPINGS[event_type]()
     event.ParseFromString(unescaped)
@@ -135,16 +178,33 @@ def event_from_line(line, pv, year, event_type):
                              event.severity)
 
 
+
 def parse_pb_data(raw_data, pv, start, end, count=None):
+    """
+    Turn raw PB data into an ArchiveData object
+
+    Args:
+        raw_data: The raw data
+        pv: name of PV
+        start: datetime.datetime for start of window
+        end: datetime.datetime for end of window
+        count: return up to this many events
+
+    Returns:
+        An ArchiveData object
+    """
     year_chunks = break_up_chunks(raw_data)
     events = []
+    # Iterate over years
     for year, (chunk_info, lines) in year_chunks.items():
+        # Find the index of the start event
         if start.year == year:  # search for the start
             s = search_events(start, chunk_info, lines)
         elif start.year > year:  # ignore this chunk
             s = len(lines) - 1
         else:  # start.year < year: all events from the start of the year
             s = 0
+        # Find the index of the end event
         if end.year == year:  # search for the end
             e = search_events(end, chunk_info, lines)
         elif end.year < year:  # ignore this chunk
@@ -216,3 +276,14 @@ class PbFileFetcher(fetcher.Fetcher):
             pb_files.append(self._get_pb_file(pv, year))
         log.info('Parsing pb files {}'.format(pb_files))
         return self._read_pb_files(pb_files, pv, start, end, count)
+
+
+def get_iso_timestamp_for_event(year, event):
+    """Returns an ISO-formatted timestamp string for the given event
+    and year."""
+    timestamp = event_timestamp(year, event)
+    timezone = pytz.timezone("Europe/London")
+    return datetime.datetime.fromtimestamp(
+        timestamp,
+        timezone
+    ).isoformat()
