@@ -26,9 +26,11 @@ import collections
 import logging as log
 
 import requests
+from google.protobuf.message import DecodeError
 
 from . import data, fetcher, utils
 from . import epics_event_pb2 as ee
+
 
 
 # It is not clear to me why I can't extract this information
@@ -106,6 +108,15 @@ def search_events(dt, chunk_info, lines):
 
 
 def break_up_chunks(raw_data):
+    """
+    Break up raw data into chunks by year
+
+    Args:
+        raw_data: Raw data from file
+
+    Returns:
+        OrderedDict: keys are years; values are lists of chunks
+    """
     chunks = [chunk.strip() for chunk in raw_data.split(b'\n\n')]
     log.info('{} chunks in pb file'.format(len(chunks)))
     year_chunks = collections.OrderedDict()
@@ -126,6 +137,18 @@ def break_up_chunks(raw_data):
 
 
 def event_from_line(line, pv, year, event_type):
+    """
+    Get an ArchiveEvent from this line
+
+    Args:
+        line: A line of chunks of data
+        pv: Name of th  e PV
+        year: Year of interest
+        event_type: Need to know the type of the event as key of TYPE_MAPPINGS
+
+    Returns:
+        ArchiveEvent
+    """
     unescaped = unescape_bytes(line)
     event = TYPE_MAPPINGS[event_type]()
     event.ParseFromString(unescaped)
@@ -135,16 +158,54 @@ def event_from_line(line, pv, year, event_type):
                              event.severity)
 
 
+def raw_event_from_line(line, event_type):
+    """
+    Get a protocol buffer event object for the raw data from the given line
+
+    Args:
+        line: (str) raw data from one line
+        event_type: (int) a key for a type from TYPE_MAPPINGS
+
+    Returns:
+        A protocol buffer event object
+    """
+    unescaped = unescape_bytes(line)
+    event = TYPE_MAPPINGS[event_type]()
+    try:
+        event.ParseFromString(unescaped)
+    except DecodeError:
+        # Decode failed
+        event = None
+
+    return event
+
+
 def parse_pb_data(raw_data, pv, start, end, count=None):
+    """
+    Turn raw PB data into an ArchiveData object
+
+    Args:
+        raw_data: The raw data
+        pv: name of PV
+        start: datetime.datetime for start of window
+        end: datetime.datetime for end of window
+        count: return up to this many events
+
+    Returns:
+        An ArchiveData object
+    """
     year_chunks = break_up_chunks(raw_data)
     events = []
+    # Iterate over years
     for year, (chunk_info, lines) in year_chunks.items():
+        # Find the index of the start event
         if start.year == year:  # search for the start
             s = search_events(start, chunk_info, lines)
         elif start.year > year:  # ignore this chunk
             s = len(lines) - 1
         else:  # start.year < year: all events from the start of the year
             s = 0
+        # Find the index of the end event
         if end.year == year:  # search for the end
             e = search_events(end, chunk_info, lines)
         elif end.year < year:  # ignore this chunk
@@ -156,7 +217,7 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
         if s > 0:
             s -= 1
         log.info('Year {} start {} end {}'.format(year, s, e))
-        for line in lines[s:e]:
+        for line in lines:
             events.append(event_from_line(line, pv, year, chunk_info.type))
     return data.data_from_events(pv, events, count)
 
