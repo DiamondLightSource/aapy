@@ -82,13 +82,33 @@ class PbError(Enum):
     EVENT_DUPLICATED = 5
 
 
+def encode_events_to_chunk(header, events):
+    pass
+
+
 class PbFile:
+    """
+    Hold all the data associated with a PB file and its interpretation.
+    Methods are mostly wrappers for static functions in this file that act
+    on member variables.
+    """
+
     def __init__(self):
+        self.empty()
+
+    def empty(self):
         self.raw_chunk = None
         self.raw_events = None
         self.header = None
         self.year = None
         self.archive_events = None
+        self.errors = None
+
+    def raw_events_from_chunk(self, requested_type=None):
+        """Interpret the raw chunk into raw events, optionally specifying a type to use"""
+        self.year, self.header, self.raw_events = raw_events_from_chunk(
+            self.raw_chunk, requested_type
+        )
 
     def populate_from_file(self, full_path):
         # Read raw data from file
@@ -96,11 +116,19 @@ class PbFile:
             self.raw_data = raw_file.read()
         # Extract a chunk from the raw data
         self.raw_chunk = one_chunk_from_raw(self.raw_data)
-        print(self.raw_chunk)
         # Interpret this to get year, header, and protobuf event objects
-        self.year, self.header, self.raw_events = raw_events_from_chunk(
-            self.raw_chunk
-        )
+        self.raw_events_from_chunk()
+
+    def do_checks(self):
+        """Run checks on data and populate list of errors"""
+        self.errors = basic_data_checks(self.raw_events, self.header)
+
+    def encode_chunk(self):
+        pass
+
+    def write_chunk_to_file(self, output_file_path):
+
+        pass
 
 
 def basic_data_checks(raw_events, header):
@@ -112,18 +140,27 @@ def basic_data_checks(raw_events, header):
     prev_timestamp = 0
     errors = []
     for event in list_of_events:
-        #print(event)
+        # Check event has been decoded; if not, indicates e.g. corruption
         if event is None:
             log.warning("No event at index {}".format(index))
             errors.append((index, PbError.EVENT_NOT_DECODED))
         else:
+            # Check val field was populated
+            # If not, indicates e.g. wrong type
             if not event.HasField("val"):
-                log.warning("No value on event {}".format(index))
+                log.warning("No value on event at index {}".format(index))
                 errors.append((index, PbError.EVENT_MISSING_VALUE))
             timestamp = pb.event_timestamp(year, event)
-            if timestamp <= prev_timestamp:
-                log.warning("Timestamp out of order at {}".format(index))
+
+            # Check timestamps monotonically increasing
+            if timestamp < prev_timestamp:
+                log.warning("Timestamp out of order at index {}".format(index))
                 errors.append((index, PbError.EVENT_OUT_OF_ORDER))
+            elif timestamp == prev_timestamp:
+                log.warning("Duplicated timestamp at index {}".format(index))
+                errors.append((index, PbError.EVENT_DUPLICATED))
+            else:
+                prev_timestamp = timestamp
 
         index += 1
     return errors
