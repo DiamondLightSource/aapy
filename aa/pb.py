@@ -26,7 +26,6 @@ import collections
 import logging as log
 
 import requests
-from google.protobuf.message import DecodeError
 
 from . import data, fetcher, utils
 from . import epics_event_pb2 as ee
@@ -157,27 +156,6 @@ def event_from_line(line, pv, year, event_type):
                              event_timestamp(year, event),
                              event.severity)
 
-
-def raw_event_from_line(line, event_type):
-    """
-    Get a protocol buffer event object for the raw data from the given line
-
-    Args:
-        line: (str) raw data from one line
-        event_type: (int) a key for a type from TYPE_MAPPINGS
-
-    Returns:
-        A protocol buffer event object
-    """
-    unescaped = unescape_bytes(line)
-    event = TYPE_MAPPINGS[event_type]()
-    try:
-        event.ParseFromString(unescaped)
-    except DecodeError:
-        # Decode failed
-        event = None
-
-    return event
 
 
 def parse_pb_data(raw_data, pv, start, end, count=None):
