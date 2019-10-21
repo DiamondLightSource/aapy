@@ -195,7 +195,7 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
         if s > 0:
             s -= 1
         log.info('Year {} start {} end {}'.format(year, s, e))
-        for line in lines:
+        for line in lines[s:e]:
             events.append(event_from_line(line, pv, year, chunk_info.type))
     return data.data_from_events(pv, events, count)
 
