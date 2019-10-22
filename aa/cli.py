@@ -17,3 +17,15 @@ def report_pb_file_errors():
     else:
         print(f"{error_count} errors found.")
         return 1
+
+
+def rewrite_pb_header_type():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("in_path", help="Input PB file path", type=str)
+    parser.add_argument("out_path", help="Output PB file path", type=str)
+    parser.add_argument("new_type", help="Index of new type to write", type=int)
+    args = parser.parse_args()
+
+    pb_file = pb_validation.PbFile(args.in_path)
+    pb_file.payload_info.type = int(args.new_type)
+    pb_file.write_raw_lines_to_file(args.out_path)
