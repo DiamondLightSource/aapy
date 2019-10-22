@@ -34,7 +34,7 @@ def raw_event_from_line(line, event_type):
     return event
 
 
-def raw_events_from_chunk(raw_chunk, requested_type=None):
+def pb_events_from_raw_lines(raw_chunk, requested_type=None):
     """
     Get a list of protocol buffer event objects from the supplied raw data
 
@@ -48,7 +48,6 @@ def raw_events_from_chunk(raw_chunk, requested_type=None):
         List of protocol buffer event objects
     """
     chunk_info, lines = raw_chunk
-    year = chunk_info.year
     raw_events = []
     if requested_type is not None:
         # Use the requested type if given
@@ -58,7 +57,7 @@ def raw_events_from_chunk(raw_chunk, requested_type=None):
         decode_type = chunk_info.type
     for line in lines:
         raw_events.append(raw_event_from_line(line, decode_type))
-    return year, chunk_info, raw_events
+    return chunk_info, raw_events
 
 
 def event_has_value(event):
@@ -119,17 +118,17 @@ class PbFile:
             self.populate_from_file(filename)
 
     def empty(self):
-        self.raw_chunk = None
-        self.raw_events = None
-        self.header = None
-        self.year = None
+        """Initialize with an empty state"""
+        self.raw_lines = None
+        self.pb_events = None
+        self.payload_info = None
         self.archive_events = None
         self.errors = None
 
-    def raw_events_from_chunk(self, requested_type=None):
+    def pb_events_from_raw_lines(self, requested_type=None):
         """Interpret the raw chunk into raw events, optionally specifying a type to use"""
-        self.year, self.header, self.raw_events = raw_events_from_chunk(
-            self.raw_chunk, requested_type
+        self.payload_info, self.pb_events = pb_events_from_raw_lines(
+            self.raw_lines, requested_type
         )
 
     def populate_from_file(self, full_path):
@@ -137,20 +136,20 @@ class PbFile:
         with open(full_path, "rb") as raw_file:
             self.raw_data = raw_file.read()
         # Extract a chunk from the raw data
-        self.raw_chunk = one_chunk_from_raw(self.raw_data)
+        self.raw_lines = one_chunk_from_raw(self.raw_data)
         # Interpret this to get year, header, and protobuf event objects
-        self.raw_events_from_chunk()
+        self.pb_events_from_raw_lines()
 
-    def do_checks(self):
+    def check_data_for_errors(self):
         """Run checks on data and populate list of errors"""
-        self.errors = basic_data_checks(self.raw_events, self.header)
+        self.errors = basic_data_checks(self.pb_events, self.payload_info)
 
     def encode_chunk(self):
         pass
-
+    
     def write_chunk_to_file(self, output_file_path):
 
-        lines_to_write = encode_events_to_chunk(self.header, self.raw_events)
+        lines_to_write = encode_events_to_chunk(self.payload_info, self.pb_events)
 
         with open(output_file_path, "wb") as output_file:
             output_file.writelines(lines_to_write)
