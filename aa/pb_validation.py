@@ -84,17 +84,16 @@ class PbError(Enum):
     EVENT_DUPLICATED = 5
 
 
-def encode_events_to_chunk(header: ee.PayloadInfo, events: list):
+def serialize_to_raw_lines(payload_info, pb_events):
+
+    # Make one big list as we can treat them the same
+    objects_to_serialize = [payload_info] + pb_events
+
     unescaped_lines = []
 
-    # Encode header
-    unescaped_lines.append(
-        header.SerializeToString()
-    )
-
-    for event in events:
+    for obj in objects_to_serialize:
         unescaped_lines.append(
-            event.SerializeToString()
+            obj.SerializeToString()
         )
 
     escaped_lines = []
@@ -113,46 +112,55 @@ class PbFile:
     def __init__(self, filename=None):
         self.empty()
 
-        # Initialize if we are given a filename
+        # Read raw data if we are given a filename
         if filename:
-            self.populate_from_file(filename)
+            self.read_raw_lines_from_file(filename)
 
     def empty(self):
         """Initialize with an empty state"""
         self.raw_lines = None
-        self.pb_events = None
         self.payload_info = None
-        self.archive_events = None
-        self.errors = None
+        self.pb_events = None
+        self.decoding_errors = None
 
-    def pb_events_from_raw_lines(self, requested_type=None):
-        """Interpret the raw chunk into raw events, optionally specifying a type to use"""
+    def decode_raw_lines(self, requested_type=None):
+        """
+        Decode raw lines into payload info and PB events.
+
+        Args:
+            requested_type: A key of pb.TYPE_MAPPINGS if a type other than
+                            the one from the payload_info is to be used for
+                            decoding the events. Otherwise the type from
+                            payload_info is used.
+        """
         self.payload_info, self.pb_events = pb_events_from_raw_lines(
             self.raw_lines, requested_type
         )
 
-    def populate_from_file(self, full_path):
+    def read_raw_lines_from_file(self, full_path):
         # Read raw data from file
         with open(full_path, "rb") as raw_file:
-            self.raw_data = raw_file.read()
+            raw_data = raw_file.read()
         # Extract a chunk from the raw data
-        self.raw_lines = one_chunk_from_raw(self.raw_data)
-        # Interpret this to get year, header, and protobuf event objects
-        self.pb_events_from_raw_lines()
+        self.raw_lines = one_chunk_from_raw(raw_data)
 
     def check_data_for_errors(self):
         """Run checks on data and populate list of errors"""
-        self.errors = basic_data_checks(self.pb_events, self.payload_info)
+        self.decoding_errors = basic_data_checks(
+            self.pb_events,
+            self.payload_info
+        )
 
-    def encode_chunk(self):
-        pass
-    
-    def write_chunk_to_file(self, output_file_path):
+    def serialize_to_raw_lines(self):
+        self.raw_lines = serialize_to_raw_lines(
+            self.payload_info,
+            self.pb_events
+        )
 
-        lines_to_write = encode_events_to_chunk(self.payload_info, self.pb_events)
+    def write_raw_lines_to_file(self, output_file_path):
 
         with open(output_file_path, "wb") as output_file:
-            output_file.writelines(lines_to_write)
+            output_file.writelines(self.raw_lines)
 
 
 def basic_data_checks(raw_events, header):
