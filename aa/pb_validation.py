@@ -76,6 +76,7 @@ def one_chunk_from_raw(raw_data):
 
     
 class PbError(Enum):
+    """Different error conditions that can occur in a PB file"""
     HEADER_NOT_DECODED = 0
     EVENT_NOT_DECODED = 1
     EVENT_MISSING_VALUE = 2
@@ -156,7 +157,6 @@ class PbFile:
 
 
 def basic_data_checks(raw_events, header):
-
 
     if not type(header) is ee.PayloadInfo:
         errors = [(None, PbError.HEADER_NOT_DECODED)]

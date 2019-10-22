@@ -57,6 +57,18 @@ def test_unescape_bytes_handles_example_escaped_bytes():
     assert pb.unescape_bytes(test_bytes) == b'hello' + pb.NL_BYTE + b'bye'
 
 
+def test_escape_bytes_does_not_change_regular_bytes():
+    test_bytes = b'hello:-1|bye'
+    assert pb.escape_bytes(test_bytes) == test_bytes
+
+
+def test_escape_bytes_handles_example_unescaped_bytes():
+    test_bytes = b'hello' + b'\x0A' + b'bye' + b'\x1B'
+    expected = b'hello' + pb.ESC_BYTE + b'\x02' + b'bye' + \
+               pb.ESC_BYTE + b'\x01'
+    assert pb.escape_bytes(test_bytes) == expected
+
+
 def test_event_timestamp_gives_correct_answer_1970():
     event = mock.MagicMock()
     event.secondsintoyear = 10
