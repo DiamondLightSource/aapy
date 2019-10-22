@@ -150,24 +150,24 @@ def basic_data_checks(raw_events, header):
         if event is None:
             log.warning("No event at index {}".format(index))
             errors.append((index, PbError.EVENT_NOT_DECODED))
-            continue
-
-        # Check val field was populated
-        # If not, indicates e.g. wrong type
-        if not event.HasField("val"):
-            log.warning("No value on event at index {}".format(index))
-            errors.append((index, PbError.EVENT_MISSING_VALUE))
-        timestamp = pb.event_timestamp(year, event)
-
-        # Check timestamps monotonically increasing
-        if timestamp < prev_timestamp:
-            log.warning("Timestamp out of order at index {}".format(index))
-            errors.append((index, PbError.EVENT_OUT_OF_ORDER))
-        elif timestamp == prev_timestamp:
-            log.warning("Duplicated timestamp at index {}".format(index))
-            errors.append((index, PbError.EVENT_DUPLICATED))
         else:
-            prev_timestamp = timestamp
+
+            # Check val field was populated
+            # If not, indicates e.g. wrong type
+            if not event.HasField("val"):
+                log.warning("No value on event at index {}".format(index))
+                errors.append((index, PbError.EVENT_MISSING_VALUE))
+            timestamp = pb.event_timestamp(year, event)
+
+            # Check timestamps monotonically increasing
+            if timestamp < prev_timestamp:
+                log.warning("Timestamp out of order at index {}".format(index))
+                errors.append((index, PbError.EVENT_OUT_OF_ORDER))
+            elif timestamp == prev_timestamp:
+                log.warning("Duplicated timestamp at index {}".format(index))
+                errors.append((index, PbError.EVENT_DUPLICATED))
+            else:
+                prev_timestamp = timestamp
 
         index += 1
     return errors
