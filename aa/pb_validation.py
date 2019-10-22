@@ -3,7 +3,8 @@ from enum import Enum
 
 from google.protobuf.message import DecodeError
 
-import pb
+from . import pb
+from . import epics_event_pb2 as ee
 
 
 # A logger for this module
@@ -65,14 +66,14 @@ def event_has_value(event):
 
 def one_chunk_from_raw(raw_data):
     chunks = pb.break_up_chunks(raw_data)
-    if len(chunks) > 0:
+    if len(chunks) > 1:
         log.warning(
             "This data has multiple chunks, can only handle "
             "the first one at the moment."
         )
-    return chunks.items()[0][1]
+    return list(chunks.items())[0][1]
 
-
+    
 class PbError(Enum):
     HEADER_NOT_DECODED = 0
     EVENT_NOT_DECODED = 1
@@ -133,6 +134,11 @@ class PbFile:
 
 def basic_data_checks(raw_events, header):
 
+
+    if not type(header) is ee.PayloadInfo:
+        errors = [(None, PbError.HEADER_NOT_DECODED)]
+        return errors
+
     year = header.year
     list_of_events = raw_events
 
@@ -144,23 +150,24 @@ def basic_data_checks(raw_events, header):
         if event is None:
             log.warning("No event at index {}".format(index))
             errors.append((index, PbError.EVENT_NOT_DECODED))
-        else:
-            # Check val field was populated
-            # If not, indicates e.g. wrong type
-            if not event.HasField("val"):
-                log.warning("No value on event at index {}".format(index))
-                errors.append((index, PbError.EVENT_MISSING_VALUE))
-            timestamp = pb.event_timestamp(year, event)
+            continue
 
-            # Check timestamps monotonically increasing
-            if timestamp < prev_timestamp:
-                log.warning("Timestamp out of order at index {}".format(index))
-                errors.append((index, PbError.EVENT_OUT_OF_ORDER))
-            elif timestamp == prev_timestamp:
-                log.warning("Duplicated timestamp at index {}".format(index))
-                errors.append((index, PbError.EVENT_DUPLICATED))
-            else:
-                prev_timestamp = timestamp
+        # Check val field was populated
+        # If not, indicates e.g. wrong type
+        if not event.HasField("val"):
+            log.warning("No value on event at index {}".format(index))
+            errors.append((index, PbError.EVENT_MISSING_VALUE))
+        timestamp = pb.event_timestamp(year, event)
+
+        # Check timestamps monotonically increasing
+        if timestamp < prev_timestamp:
+            log.warning("Timestamp out of order at index {}".format(index))
+            errors.append((index, PbError.EVENT_OUT_OF_ORDER))
+        elif timestamp == prev_timestamp:
+            log.warning("Duplicated timestamp at index {}".format(index))
+            errors.append((index, PbError.EVENT_DUPLICATED))
+        else:
+            prev_timestamp = timestamp
 
         index += 1
     return errors
