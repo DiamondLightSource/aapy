@@ -1,5 +1,7 @@
+"""
+Tools for validating and fixing protobuf files
+"""
 import logging
-import typing
 from enum import Enum
 
 from google.protobuf.message import DecodeError
@@ -9,7 +11,7 @@ from . import epics_event_pb2 as ee
 
 
 # A logger for this module
-log = logging.getLogger("{}".format(__name__))
+LOG = logging.getLogger("{}".format(__name__))
 
 
 def raw_event_from_line(line, event_type):
@@ -54,20 +56,24 @@ def pb_events_from_raw_lines(raw_chunk, requested_type=None):
     return raw_events
 
 
-def event_has_value(event):
-    return event.HasField("val")
-
-
 def one_chunk_from_raw(raw_data):
+    """
+    Get one chunk only from raw data bytes
+    Args:
+        raw_data: Raw bytes
+
+    Returns:
+
+    """
     chunks = pb.break_up_chunks(raw_data)
     if len(chunks) > 1:
-        log.warning(
+        LOG.warning(
             "This data has multiple chunks, can only handle "
             "the first one at the moment."
         )
     return list(chunks.items())[0][1]
 
-    
+
 class PbError(Enum):
     """Different error conditions that can occur in a PB file"""
     HEADER_NOT_DECODED = 0
@@ -78,7 +84,15 @@ class PbError(Enum):
     EVENT_DUPLICATED = 5
 
 
-def serialize_payload_info_to_raw_line(payload_info: ee.PayloadInfo):
+def serialize_payload_info_to_raw(payload_info: ee.PayloadInfo):
+    """
+    Serialize a PayloadInfo into a raw line (without terminating newline
+    Args:
+        payload_info: a PayloadInfo object e.g. from a PbFile
+
+    Returns:
+        Raw line of serialized data
+    """
     unescaped_bytes = payload_info.SerializeToString()
     escaped_bytes = pb.escape_bytes(unescaped_bytes)
     line = escaped_bytes
@@ -86,6 +100,14 @@ def serialize_payload_info_to_raw_line(payload_info: ee.PayloadInfo):
 
 
 def serialize_events_to_raw_lines(pb_events):
+    """
+    Serialize a list of PB events into a list of raw lines
+    Args:
+        pb_events: List of PB event objects
+
+    Returns:
+        list of raw lines without terminators
+    """
 
     # Serialize to unescaped bytes
     unescaped_lines = []
@@ -99,6 +121,56 @@ def serialize_events_to_raw_lines(pb_events):
     for line in unescaped_lines:
         escaped_lines.append(pb.escape_bytes(line))
     return escaped_lines
+
+
+def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list):
+    """
+    Run some basic checks on PB events
+
+    Args:
+        payload_info: PayloadInfo for the events
+        pb_events: List of PB event objects
+
+    Returns:
+        List of tuples giving index and error type
+    """
+
+    if not isinstance(payload_info, ee.PayloadInfo):
+        errors = [(None, PbError.HEADER_NOT_DECODED)]
+        return errors
+
+    year = payload_info.year
+    list_of_events = pb_events
+
+    index = 0
+    prev_timestamp = 0
+    errors = []
+    for event in list_of_events:
+        # Check event has been decoded; if not, indicates e.g. corruption
+        if event is None:
+            LOG.warning("No event at index {}".format(index))
+            errors.append((index, PbError.EVENT_NOT_DECODED))
+        else:
+
+            # Check val field was populated
+            # If not, indicates e.g. wrong type
+            if not event.HasField("val"):
+                LOG.warning("No value on event at index {}".format(index))
+                errors.append((index, PbError.EVENT_MISSING_VALUE))
+            timestamp = pb.event_timestamp(year, event)
+
+            # Check timestamps monotonically increasing
+            if timestamp < prev_timestamp:
+                LOG.warning("Timestamp out of order at index {}".format(index))
+                errors.append((index, PbError.EVENT_OUT_OF_ORDER))
+            elif timestamp == prev_timestamp:
+                LOG.warning("Duplicated timestamp at index {}".format(index))
+                errors.append((index, PbError.EVENT_DUPLICATED))
+            else:
+                prev_timestamp = timestamp
+
+        index += 1
+    return errors
 
 
 class PbFile:
@@ -144,7 +216,7 @@ class PbFile:
         )
 
     def read_raw_lines_from_file(self, full_path):
-        # Read raw data from file
+        """Read raw data from file"""
         with open(full_path, "rb") as raw_file:
             raw_data = raw_file.read()
         # Extract a chunk from the raw data
@@ -164,7 +236,8 @@ class PbFile:
         )
 
     def write_raw_lines_to_file(self, output_file_path):
-        raw_header = serialize_payload_info_to_raw_line(self.payload_info)
+        """Write payload info and raw data to file"""
+        raw_header = serialize_payload_info_to_raw(self.payload_info)
         bytes_to_write = raw_header + b"\n"
 
         for line in self.raw_lines:
@@ -172,43 +245,3 @@ class PbFile:
 
         with open(output_file_path, "wb") as output_file:
             output_file.write(bytes_to_write)
-
-
-def basic_data_checks(payload_info: ee.PayloadInfo, raw_events: list):
-
-    if not type(payload_info) is ee.PayloadInfo:
-        errors = [(None, PbError.HEADER_NOT_DECODED)]
-        return errors
-
-    year = payload_info.year
-    list_of_events = raw_events
-
-    index = 0
-    prev_timestamp = 0
-    errors = []
-    for event in list_of_events:
-        # Check event has been decoded; if not, indicates e.g. corruption
-        if event is None:
-            log.warning("No event at index {}".format(index))
-            errors.append((index, PbError.EVENT_NOT_DECODED))
-        else:
-
-            # Check val field was populated
-            # If not, indicates e.g. wrong type
-            if not event.HasField("val"):
-                log.warning("No value on event at index {}".format(index))
-                errors.append((index, PbError.EVENT_MISSING_VALUE))
-            timestamp = pb.event_timestamp(year, event)
-
-            # Check timestamps monotonically increasing
-            if timestamp < prev_timestamp:
-                log.warning("Timestamp out of order at index {}".format(index))
-                errors.append((index, PbError.EVENT_OUT_OF_ORDER))
-            elif timestamp == prev_timestamp:
-                log.warning("Duplicated timestamp at index {}".format(index))
-                errors.append((index, PbError.EVENT_DUPLICATED))
-            else:
-                prev_timestamp = timestamp
-
-        index += 1
-    return errors

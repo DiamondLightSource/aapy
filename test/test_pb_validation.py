@@ -69,14 +69,14 @@ def test_basic_data_checks():
         (3, pb_validation.PbError.EVENT_OUT_OF_ORDER),
     ]
 
-    header = ee.PayloadInfo(
+    payload_info = ee.PayloadInfo(
         year=2017,
-        type=6,
+        type=5,
         pvname="BL14J-PS-SHTR-03:OPS",
         elementCount=1,
     )
 
-    result = pb_validation.basic_data_checks(header, events)
+    result = pb_validation.basic_data_checks(payload_info, events)
 
     assert result == expected_errors
 
