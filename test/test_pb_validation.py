@@ -75,12 +75,12 @@ def test_basic_data_checks():
         elementCount=1,
     )
 
-    result = pb_validation.basic_data_checks(events, header)
+    result = pb_validation.basic_data_checks(header, events)
 
     assert result == expected_errors
 
     # With no header attached
 
-    result = pb_validation.basic_data_checks(events, None)
+    result = pb_validation.basic_data_checks(None, events)
 
     assert result == [(None, pb_validation.PbError.HEADER_NOT_DECODED)]

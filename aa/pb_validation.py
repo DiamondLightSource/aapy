@@ -147,11 +147,12 @@ class PbFile:
     def check_data_for_errors(self):
         """Run checks on data and populate list of errors"""
         self.decoding_errors = basic_data_checks(
-            self.pb_events,
-            self.payload_info
+            self.payload_info,
+            self.pb_events
         )
 
     def serialize_to_raw_lines(self):
+        """Serialize payload info and events to raw lines"""
         self.raw_lines = serialize_to_raw_lines(
             self.payload_info,
             self.pb_events
@@ -163,13 +164,13 @@ class PbFile:
             output_file.writelines(self.raw_lines)
 
 
-def basic_data_checks(raw_events, header):
+def basic_data_checks(payload_info: ee.PayloadInfo, raw_events: list):
 
-    if not type(header) is ee.PayloadInfo:
+    if not type(payload_info) is ee.PayloadInfo:
         errors = [(None, PbError.HEADER_NOT_DECODED)]
         return errors
 
-    year = header.year
+    year = payload_info.year
     list_of_events = raw_events
 
     index = 0
