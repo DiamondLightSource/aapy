@@ -81,6 +81,12 @@ def unescape_bytes(byte_seq):
     return byte_seq
 
 
+def escape_bytes(byte_seq):
+    for r in PB_REPLACEMENTS:
+        byte_seq = byte_seq.replace(PB_REPLACEMENTS[r], r)
+    return byte_seq
+
+
 def event_timestamp(year, event):
     year_start = utils.year_timestamp(year)
     # This will lose information (the last few decimal places) since

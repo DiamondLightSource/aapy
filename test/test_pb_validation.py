@@ -3,6 +3,7 @@ from aa import epics_event_pb2 as ee
 
 import utils as testutils
 
+
 def test_one_chunk_from_raw():
     full_path = testutils.get_data_filepath('wrong_type.pb')
     with open(full_path, "rb") as raw_file:
@@ -43,6 +44,7 @@ def test_raw_event_from_line():
     result = pb_validation.raw_event_from_line(line, 5)
 
     assert result == expected
+
 
 def test_basic_data_checks():
 

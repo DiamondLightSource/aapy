@@ -1,4 +1,5 @@
 import logging
+import typing
 from enum import Enum
 
 from google.protobuf.message import DecodeError
@@ -83,8 +84,23 @@ class PbError(Enum):
     EVENT_DUPLICATED = 5
 
 
-def encode_events_to_chunk(header, events):
-    pass
+def encode_events_to_chunk(header: ee.PayloadInfo, events: list):
+    unescaped_lines = []
+
+    # Encode header
+    unescaped_lines.append(
+        header.SerializeToString()
+    )
+
+    for event in events:
+        unescaped_lines.append(
+            event.SerializeToString()
+        )
+
+    escaped_lines = []
+    for line in unescaped_lines:
+        escaped_lines.append(pb.escape_bytes(line) + b"\n")
+    return escaped_lines
 
 
 class PbFile:
@@ -94,8 +110,12 @@ class PbFile:
     on member variables.
     """
 
-    def __init__(self):
+    def __init__(self, filename=None):
         self.empty()
+
+        # Initialize if we are given a filename
+        if filename:
+            self.populate_from_file(filename)
 
     def empty(self):
         self.raw_chunk = None
@@ -129,7 +149,10 @@ class PbFile:
 
     def write_chunk_to_file(self, output_file_path):
 
-        pass
+        lines_to_write = encode_events_to_chunk(self.header, self.raw_events)
+
+        with open(output_file_path, "wb") as output_file:
+            output_file.writelines(lines_to_write)
 
 
 def basic_data_checks(raw_events, header):
