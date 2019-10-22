@@ -1,6 +1,7 @@
+import os
+
 from aa import pb_validation
 from aa import epics_event_pb2 as ee
-
 import utils as testutils
 
 
@@ -84,3 +85,36 @@ def test_basic_data_checks():
     result = pb_validation.basic_data_checks(None, events)
 
     assert result == [(None, pb_validation.PbError.HEADER_NOT_DECODED)]
+
+
+def test_writing_then_reading_file_gives_same_data():
+
+    f = pb_validation.PbFile()
+
+    f.payload_info = ee.PayloadInfo(
+        year=2017,
+        type=5,
+        pvname="BL14J-PS-SHTR-03:OPS",
+        elementCount=1,
+    )
+
+    f.pb_events = [
+        ee.ScalarInt(secondsintoyear=123, nano=4, val=123),
+        ee.ScalarInt(secondsintoyear=123, nano=4, val=1),
+        ee.ScalarInt(secondsintoyear=456, nano=3, val=56)
+    ]
+
+    filepath = testutils.get_data_filepath("tmp.pb")
+
+    f.serialize_to_raw_lines()
+    f.write_raw_lines_to_file(filepath)
+
+    g = pb_validation.PbFile(filepath)
+
+    assert g.payload_info == f.payload_info
+    assert g.raw_lines == f.raw_lines
+
+    g.decode_raw_lines()
+    assert g.pb_events == f.pb_events
+
+    os.remove(filepath)

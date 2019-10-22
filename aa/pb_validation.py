@@ -47,17 +47,11 @@ def pb_events_from_raw_lines(raw_chunk, requested_type=None):
     Returns:
         List of protocol buffer event objects
     """
-    chunk_info, lines = raw_chunk
     raw_events = []
-    if requested_type is not None:
-        # Use the requested type if given
-        decode_type = requested_type
-    else:
-        # Use the type from the header
-        decode_type = chunk_info.type
-    for line in lines:
-        raw_events.append(raw_event_from_line(line, decode_type))
-    return chunk_info, raw_events
+
+    for line in raw_chunk:
+        raw_events.append(raw_event_from_line(line, requested_type))
+    return raw_events
 
 
 def event_has_value(event):
@@ -84,21 +78,26 @@ class PbError(Enum):
     EVENT_DUPLICATED = 5
 
 
-def serialize_to_raw_lines(payload_info, pb_events):
+def serialize_payload_info_to_raw_line(payload_info: ee.PayloadInfo):
+    unescaped_bytes = payload_info.SerializeToString()
+    escaped_bytes = pb.escape_bytes(unescaped_bytes)
+    line = escaped_bytes
+    return line
 
-    # Make one big list as we can treat them the same
-    objects_to_serialize = [payload_info] + pb_events
 
+def serialize_events_to_raw_lines(pb_events):
+
+    # Serialize to unescaped bytes
     unescaped_lines = []
-
-    for obj in objects_to_serialize:
+    for obj in pb_events:
         unescaped_lines.append(
             obj.SerializeToString()
         )
 
+    # Escape each line
     escaped_lines = []
     for line in unescaped_lines:
-        escaped_lines.append(pb.escape_bytes(line) + b"\n")
+        escaped_lines.append(pb.escape_bytes(line))
     return escaped_lines
 
 
@@ -133,8 +132,15 @@ class PbFile:
                             decoding the events. Otherwise the type from
                             payload_info is used.
         """
-        self.payload_info, self.pb_events = pb_events_from_raw_lines(
-            self.raw_lines, requested_type
+        if requested_type is not None:
+            # Use the requested type if given
+            decode_type = requested_type
+        else:
+            # Use the type from the header
+            decode_type = self.payload_info.type
+
+        self.pb_events = pb_events_from_raw_lines(
+            self.raw_lines, decode_type
         )
 
     def read_raw_lines_from_file(self, full_path):
@@ -142,7 +148,7 @@ class PbFile:
         with open(full_path, "rb") as raw_file:
             raw_data = raw_file.read()
         # Extract a chunk from the raw data
-        self.raw_lines = one_chunk_from_raw(raw_data)
+        self.payload_info, self.raw_lines = one_chunk_from_raw(raw_data)
 
     def check_data_for_errors(self):
         """Run checks on data and populate list of errors"""
@@ -152,16 +158,20 @@ class PbFile:
         )
 
     def serialize_to_raw_lines(self):
-        """Serialize payload info and events to raw lines"""
-        self.raw_lines = serialize_to_raw_lines(
-            self.payload_info,
+        """Serialize events to raw lines"""
+        self.raw_lines = serialize_events_to_raw_lines(
             self.pb_events
         )
 
     def write_raw_lines_to_file(self, output_file_path):
+        raw_header = serialize_payload_info_to_raw_line(self.payload_info)
+        bytes_to_write = raw_header + b"\n"
+
+        for line in self.raw_lines:
+            bytes_to_write += line + b"\n"
 
         with open(output_file_path, "wb") as output_file:
-            output_file.writelines(self.raw_lines)
+            output_file.write(bytes_to_write)
 
 
 def basic_data_checks(payload_info: ee.PayloadInfo, raw_events: list):
