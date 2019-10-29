@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1114</width>
-    <height>960</height>
+    <height>1027</height>
    </rect>
   </property>
   <property name="font">
@@ -25,7 +25,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>781</width>
+      <width>1041</width>
       <height>51</height>
      </rect>
     </property>
@@ -35,6 +35,8 @@
        <property name="font">
         <font>
          <family>Courier New</family>
+         <weight>75</weight>
+         <bold>true</bold>
         </font>
        </property>
       </widget>
@@ -49,7 +51,7 @@
      <item row="0" column="2">
       <widget class="QPushButton" name="read_file_button">
        <property name="text">
-        <string>Read</string>
+        <string>Read header</string>
        </property>
       </widget>
      </item>
@@ -61,7 +63,7 @@
       <x>10</x>
       <y>80</y>
       <width>551</width>
-      <height>211</height>
+      <height>201</height>
      </rect>
     </property>
     <property name="title">
@@ -73,7 +75,7 @@
        <x>10</x>
        <y>20</y>
        <width>541</width>
-       <height>171</height>
+       <height>131</height>
       </rect>
      </property>
      <layout class="QFormLayout" name="formLayout">
@@ -199,14 +201,27 @@
       </item>
      </layout>
     </widget>
+    <widget class="QPushButton" name="decode_button">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>160</y>
+       <width>301</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Decode events and check errors</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>350</y>
+      <x>10</x>
+      <y>290</y>
       <width>1071</width>
-      <height>431</height>
+      <height>411</height>
      </rect>
     </property>
     <property name="title">
@@ -220,6 +235,9 @@
        <width>1021</width>
        <height>341</height>
       </rect>
+     </property>
+     <property name="textElideMode">
+      <enum>Qt::ElideNone</enum>
      </property>
      <property name="columnCount">
       <number>4</number>
@@ -285,19 +303,6 @@
      </property>
     </widget>
    </widget>
-   <widget class="QPushButton" name="decode_button">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>290</y>
-      <width>301</width>
-      <height>36</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Decode events and check errors</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="gridLayoutWidget_2">
     <property name="geometry">
      <rect>
@@ -350,8 +355,14 @@
       <x>580</x>
       <y>100</y>
       <width>471</width>
-      <height>221</height>
+      <height>131</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -360,8 +371,8 @@
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>800</y>
+      <x>10</x>
+      <y>710</y>
       <width>661</width>
       <height>171</height>
      </rect>

@@ -3,6 +3,7 @@ import os
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem
 from PyQt5 import uic
 from PyQt5.QtGui import QColor
+from PyQt5.QtCore import QSize
 from pathlib import Path
 import datetime
 import pytz
@@ -118,10 +119,21 @@ class PbFileBrowser(object):
         self.ui.events_table.setRowCount(rows)
 
         # Arrange errors by row
-        error_list = [[]] * rows
+        self.error_list = [[]] * rows
+        self.populate_errors_list()
+
+        self.populate_events_table()
+        error_count = len(self.pb_file.decoding_errors)
+        event_count = len(self.pb_file.pb_events)
+
+        self.set_status(f"Decoded {event_count} events "
+                        f"with {error_count} errors")
+
+    def populate_errors_list(self):
+        """Display the list of parsing errors in the Errors widget"""
         self.ui.errors_list.clear()
         for index, error in self.pb_file.decoding_errors:
-            error_list[index].append(error)
+            self.error_list[index].append(error)
             error_string = pb_validation.PB_ERROR_STRINGS[error]
             self.ui.errors_list.addItem(
                 f"{error_string} at {index}"
@@ -129,14 +141,14 @@ class PbFileBrowser(object):
         if len(self.pb_file.decoding_errors) <= 1:
             self.ui.errors_list.addItem("No errors found")
 
-        # Display events and errors
+    def populate_events_table(self):
+        """Populate the events table and errors widget from stored info"""
         row = 0
         for event in self.pb_file.pb_events:
-            timestamp = pb.event_timestamp(self.pb_file.payload_info.year,
-                                           event)
-            timezone = pytz.timezone("Europe/London")
-            legible_timestamp = datetime.datetime.fromtimestamp(timestamp,
-                                                                    timezone).isoformat()
+            legible_timestamp = get_iso_timestamp_for_event(
+                self.pb_file.payload_info.year,
+                event
+            )
 
             timestamp_cell = QTableWidgetItem(str(
                 legible_timestamp
@@ -146,12 +158,38 @@ class PbFileBrowser(object):
                 event.val
             ))
 
-            if len(error_list[row]) > 0:
+            if len(self.error_list[row]) > 0:
                 value_cell.setBackground(QColor(255, 200, 200))
 
             self.ui.events_table.setItem(row, 1, value_cell)
+
+            extra_fields_cell = QTableWidgetItem(
+                repr(event.fieldvalues)
+            )
+            extra_fields_cell.setSizeHint(QSize(500, 10))
+            self.ui.events_table.setItem(row, 2, extra_fields_cell)
+
+            if len(self.error_list[row]) > 0:
+                error_string = pb_validation.PB_ERROR_STRINGS[
+                    self.error_list[row][0]]
+                if len(self.error_list[row]) > 1:
+                    error_string += " ..."
+                error_cell = QTableWidgetItem(
+                    error_string
+                )
+                self.ui.events_table.setItem(row, 3, error_cell)
+
             row += 1
         self.ui.events_table.resizeColumnsToContents()
+
+
+def get_iso_timestamp_for_event(year, event):
+    timestamp = pb.event_timestamp(year, event)
+    timezone = pytz.timezone("Europe/London")
+    return datetime.datetime.fromtimestamp(
+        timestamp,
+        timezone
+    ).isoformat()
 
 
 if __name__ == "__main__":
