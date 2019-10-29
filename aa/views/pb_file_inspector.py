@@ -40,6 +40,9 @@ class PbFileBrowser(object):
         form = self.ui
         form.read_file_button.clicked.connect(self.load_pb_file)
         form.decode_button.clicked.connect(self.decode_events_and_check)
+        form.input_file_path.editingFinished.connect(self.update_save_dir)
+        form.same_dir_as_input.stateChanged.connect(self.update_save_dir)
+        form.save_button.clicked.connect(self.save_pb_file)
         self.ui.show()
         self.pb_file = pb_validation.PbFile()
         self.reset()
@@ -93,6 +96,14 @@ class PbFileBrowser(object):
 
     def set_status(self, status_string):
         self.ui.status_box.setText(status_string)
+
+    def update_save_dir(self):
+        if self.ui.same_dir_as_input.isChecked():
+            self.ui.save_dir.setText(
+                os.path.dirname(
+                    self.ui.input_file_path.text()
+                )
+            )
 
     def decode_events_and_check(self):
         if self.pb_file.payload_info is None:
@@ -181,6 +192,22 @@ class PbFileBrowser(object):
 
             row += 1
         self.ui.events_table.resizeColumnsToContents()
+
+    def save_pb_file(self):
+        self.pb_file.serialize_to_raw_lines()
+        save_dir = self.ui.save_dir.text().strip()
+        if not os.path.isdir(save_dir):
+            self.set_status(f"Save directory does not exist: {save_dir}")
+            return
+
+        orig_filename = self.ui.input_file_path.text()
+        orig_stem = orig_filename.split(".")[0]
+        new_filename = orig_stem + self.ui.save_suffix.text().strip() + ".pb"
+        save_path = os.path.join(
+            save_dir,
+            new_filename
+        )
+        self.pb_file.write_raw_lines_to_file(save_path)
 
 
 def get_iso_timestamp_for_event(year, event):
