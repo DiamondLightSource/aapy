@@ -222,13 +222,8 @@
       </rect>
      </property>
      <property name="columnCount">
-      <number>9</number>
+      <number>4</number>
      </property>
-     <column>
-      <property name="text">
-       <string>Line</string>
-      </property>
-     </column>
      <column>
       <property name="text">
        <string>Timestamp</string>
@@ -249,10 +244,6 @@
        <string>Errors</string>
       </property>
      </column>
-     <column/>
-     <column/>
-     <column/>
-     <column/>
     </widget>
     <widget class="QPushButton" name="move_event_up_button">
      <property name="geometry">

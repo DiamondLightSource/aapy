@@ -1,10 +1,13 @@
 import sys
 import os
-from PyQt5.QtWidgets import QMainWindow, QApplication
+from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem
 from PyQt5 import uic
+from PyQt5.QtGui import QColor
 from pathlib import Path
+import datetime
+import pytz
 
-from aa import pb_validation
+from aa import pb_validation, pb
 
 UIC_DIRECTORY = "ui"
 
@@ -34,8 +37,21 @@ class PbFileBrowser(object):
         self.ui = get_uic_obj("pb_file_inspector.ui")
         form = self.ui
         form.read_file_button.clicked.connect(self.load_pb_file)
+        form.decode_button.clicked.connect(self.decode_events_and_check)
         self.ui.show()
         self.pb_file = pb_validation.PbFile()
+        self.reset()
+
+    def reset(self):
+        """Restore empty / default values on all form widgets"""
+        self.ui.input_file_path.setText("")
+        self.ui.events_table.setRowCount(0)
+        self.ui.events_table.setColumnCount(4)
+        self.ui.pv_name_control.setText("")
+        self.ui.year_control.setText("")
+        self.ui.data_type_control.setCurrentIndex(0)
+        self.ui.element_count_control.setValue(1)
+        self.ui.status_box.setText("")
 
     def load_pb_file(self):
         input_path = self.ui.input_file_path.text()
@@ -66,9 +82,61 @@ class PbFileBrowser(object):
         else:
             self.ui.status_box.setText("Loaded header")
 
+    def set_header_from_form(self):
+        # Populate header info on GUI
+        self.pb_file.payload_info.pvname = self.ui.pv_name_control.text()
+        self.pb_file.payload_info.year = int(self.ui.year_control.text())
+        self.pb_file.payload_info.type = self.ui.data_type_control.currentIndex()
+        self.pb_file.payload_info.elementCount = self.ui.element_count_control.value()
+
     def decode_events_and_check(self):
         if self.pb_file.payload_info is None:
             self.ui.status_box.setText(f"Need to load a file first")
+            return
+
+        # Apply settings from modified header
+        self.set_header_from_form()
+
+        # Remove any existing cells from table
+        self.ui.events_table.setRowCount(0)
+
+        # Decode events using updated header
+        self.pb_file.decode_raw_lines()
+
+        # Check for errors
+        self.pb_file.check_data_for_errors()
+
+        # Update table cells
+        rows = len(self.pb_file.pb_events)
+        self.ui.events_table.setRowCount(rows)
+
+        # Arrange errors by row 
+        error_list = [[]] * rows
+        for index, error in self.pb_file.decoding_errors:
+            error_list[index].append(error)
+
+        row = 0
+        for event in self.pb_file.pb_events:
+            timestamp = pb.event_timestamp(self.pb_file.payload_info.year,
+                                           event)
+            timezone = pytz.timezone("Europe/London")
+            legible_timestamp = datetime.datetime.fromtimestamp(timestamp,
+                                                                    timezone).isoformat()
+
+            timestamp_cell = QTableWidgetItem(str(
+                legible_timestamp
+            ))
+            self.ui.events_table.setItem(row, 0, timestamp_cell)
+            value_cell = QTableWidgetItem(str(
+                event.val
+            ))
+
+            if len(error_list[row]) > 0:
+                value_cell.setBackground(QColor(255, 200, 200))
+
+            self.ui.events_table.setItem(row, 1, value_cell)
+            row += 1
+        self.ui.events_table.resizeColumnsToContents()
 
 
 if __name__ == "__main__":
