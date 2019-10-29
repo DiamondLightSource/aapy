@@ -84,6 +84,16 @@ class PbError(Enum):
     EVENT_DUPLICATED = 5
 
 
+PB_ERROR_STRINGS = {
+    PbError.HEADER_NOT_DECODED: "Header not decoded",
+    PbError.EVENT_NOT_DECODED: "Event not decoded",
+    PbError.EVENT_MISSING_VALUE: "Event missing value",
+    PbError.EVENT_MISSING_TIMESTAMP: "Event missing timestamp",
+    PbError.EVENT_OUT_OF_ORDER: "Event out of order",
+    PbError.EVENT_DUPLICATED: "Event duplicated",
+}
+
+
 def serialize_payload_info_to_raw(payload_info: ee.PayloadInfo):
     """
     Serialize a PayloadInfo into a raw line (without terminating newline
@@ -123,6 +133,11 @@ def serialize_events_to_raw_lines(pb_events):
     return escaped_lines
 
 
+def log_parsing_error(index, error_type):
+    error_string = PB_ERROR_STRINGS[error_type]
+    LOG.info(f"{error_string} at index {index}")
+
+
 def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list):
     """
     Run some basic checks on PB events
@@ -148,23 +163,23 @@ def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list):
     for event in list_of_events:
         # Check event has been decoded; if not, indicates e.g. corruption
         if event is None:
-            LOG.info("No event at index {}".format(index))
+            log_parsing_error(index, PbError.EVENT_NOT_DECODED)
             errors.append((index, PbError.EVENT_NOT_DECODED))
         else:
 
             # Check val field was populated
             # If not, indicates e.g. wrong type
             if not event.HasField("val"):
-                LOG.info("No value on event at index {}".format(index))
+                log_parsing_error(index, PbError.EVENT_MISSING_VALUE)
                 errors.append((index, PbError.EVENT_MISSING_VALUE))
             timestamp = pb.event_timestamp(year, event)
 
             # Check timestamps monotonically increasing
             if timestamp < prev_timestamp:
-                LOG.info("Timestamp out of order at index {}".format(index))
+                log_parsing_error(index, PbError.EVENT_OUT_OF_ORDER)
                 errors.append((index, PbError.EVENT_OUT_OF_ORDER))
             elif timestamp == prev_timestamp:
-                LOG.info("Duplicated timestamp at index {}".format(index))
+                log_parsing_error(index, PbError.EVENT_DUPLICATED)
                 errors.append((index, PbError.EVENT_DUPLICATED))
             else:
                 prev_timestamp = timestamp
