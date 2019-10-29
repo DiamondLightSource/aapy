@@ -56,11 +56,11 @@ class PbFileBrowser(object):
 
     def load_pb_file(self):
         input_path = self.ui.input_file_path.text()
-        self.ui.status_box.setText(f"Loading file {input_path}")
+        self.set_status(f"Loading file {input_path}")
         try:
             # Check file exists
             if not os.path.exists(input_path):
-                self.ui.status_box.setText(f"No such file: {input_path}")
+                self.set_status(f"No such file: {input_path}")
                 return False
             # Read file, getting payload_info
             self.pb_file.read_raw_lines_from_file(input_path)
@@ -78,10 +78,10 @@ class PbFileBrowser(object):
                 self.pb_file.payload_info.elementCount
             )
         except Exception as e:
-            self.ui.status_box.setText(f"Exception reading header: {e}")
+            self.set_status(f"Exception reading header: {e}")
             return False
         else:
-            self.ui.status_box.setText("Loaded header")
+            self.set_status("Loaded header")
 
     def set_header_from_form(self):
         # Populate header info on GUI
@@ -90,21 +90,27 @@ class PbFileBrowser(object):
         self.pb_file.payload_info.type = self.ui.data_type_control.currentIndex()
         self.pb_file.payload_info.elementCount = self.ui.element_count_control.value()
 
+    def set_status(self, status_string):
+        self.ui.status_box.setText(status_string)
+
     def decode_events_and_check(self):
         if self.pb_file.payload_info is None:
-            self.ui.status_box.setText(f"Need to load a file first")
+            self.set_status(f"Need to load a file first")
             return
 
         # Apply settings from modified header
+        self.set_status("Applying updated payload info")
         self.set_header_from_form()
 
         # Remove any existing cells from table
         self.ui.events_table.setRowCount(0)
 
         # Decode events using updated header
+        self.set_status("Decoding events")
         self.pb_file.decode_raw_lines()
 
         # Check for errors
+        self.set_status("Checking for errors")
         self.pb_file.check_data_for_errors()
 
         # Update table cells
@@ -113,9 +119,17 @@ class PbFileBrowser(object):
 
         # Arrange errors by row
         error_list = [[]] * rows
+        self.ui.errors_list.clear()
         for index, error in self.pb_file.decoding_errors:
             error_list[index].append(error)
+            error_string = pb_validation.PB_ERROR_STRINGS[error]
+            self.ui.errors_list.addItem(
+                f"{error_string} at {index}"
+            )
+        if len(self.pb_file.decoding_errors) <= 1:
+            self.ui.errors_list.addItem("No errors found")
 
+        # Display events and errors
         row = 0
         for event in self.pb_file.pb_events:
             timestamp = pb.event_timestamp(self.pb_file.payload_info.year,
@@ -141,7 +155,7 @@ class PbFileBrowser(object):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.WARNING)
+    logging.basicConfig(level=logging.WARNING   )
     app = QApplication(sys.argv)
     _ = PbFileBrowser()
     sys.exit(app.exec_())

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>835</width>
-    <height>883</height>
+    <width>1114</width>
+    <height>960</height>
    </rect>
   </property>
   <property name="font">
@@ -58,7 +58,7 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>10</x>
       <y>80</y>
       <width>551</width>
       <height>211</height>
@@ -204,8 +204,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>370</y>
-      <width>521</width>
+      <y>350</y>
+      <width>1071</width>
       <height>431</height>
      </rect>
     </property>
@@ -217,7 +217,7 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>501</width>
+       <width>1021</width>
        <height>341</height>
       </rect>
      </property>
@@ -288,7 +288,7 @@
    <widget class="QPushButton" name="decode_button">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>20</x>
       <y>290</y>
       <width>301</width>
       <height>36</height>
@@ -301,8 +301,8 @@
    <widget class="QWidget" name="gridLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>790</y>
+      <x>730</x>
+      <y>800</y>
       <width>321</width>
       <height>51</height>
      </rect>
@@ -331,33 +331,10 @@
      </item>
     </layout>
    </widget>
-   <widget class="QGroupBox" name="groupBox_3">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>370</y>
-      <width>281</width>
-      <height>371</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Errors</string>
-    </property>
-    <widget class="QListWidget" name="errors_list">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>20</y>
-       <width>261</width>
-       <height>341</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
    <widget class="QLabel" name="label_9">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>580</x>
       <y>70</y>
       <width>199</width>
       <height>31</height>
@@ -370,22 +347,38 @@
    <widget class="QTextEdit" name="status_box">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>580</x>
       <y>100</y>
-      <width>211</width>
+      <width>471</width>
       <height>221</height>
      </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Courier New</family>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
     </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>800</y>
+      <width>661</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Errors</string>
+    </property>
+    <widget class="QListWidget" name="errors_list">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>20</y>
+       <width>611</width>
+       <height>151</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -393,7 +386,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>835</width>
+     <width>1114</width>
      <height>28</height>
     </rect>
    </property>
