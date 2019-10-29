@@ -148,23 +148,23 @@ def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list):
     for event in list_of_events:
         # Check event has been decoded; if not, indicates e.g. corruption
         if event is None:
-            LOG.warning("No event at index {}".format(index))
+            LOG.info("No event at index {}".format(index))
             errors.append((index, PbError.EVENT_NOT_DECODED))
         else:
 
             # Check val field was populated
             # If not, indicates e.g. wrong type
             if not event.HasField("val"):
-                LOG.warning("No value on event at index {}".format(index))
+                LOG.info("No value on event at index {}".format(index))
                 errors.append((index, PbError.EVENT_MISSING_VALUE))
             timestamp = pb.event_timestamp(year, event)
 
             # Check timestamps monotonically increasing
             if timestamp < prev_timestamp:
-                LOG.warning("Timestamp out of order at index {}".format(index))
+                LOG.info("Timestamp out of order at index {}".format(index))
                 errors.append((index, PbError.EVENT_OUT_OF_ORDER))
             elif timestamp == prev_timestamp:
-                LOG.warning("Duplicated timestamp at index {}".format(index))
+                LOG.info("Duplicated timestamp at index {}".format(index))
                 errors.append((index, PbError.EVENT_DUPLICATED))
             else:
                 prev_timestamp = timestamp

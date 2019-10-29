@@ -6,6 +6,7 @@ from PyQt5.QtGui import QColor
 from pathlib import Path
 import datetime
 import pytz
+import logging
 
 from aa import pb_validation, pb
 
@@ -110,7 +111,7 @@ class PbFileBrowser(object):
         rows = len(self.pb_file.pb_events)
         self.ui.events_table.setRowCount(rows)
 
-        # Arrange errors by row 
+        # Arrange errors by row
         error_list = [[]] * rows
         for index, error in self.pb_file.decoding_errors:
             error_list[index].append(error)
@@ -140,6 +141,7 @@ class PbFileBrowser(object):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.WARNING)
     app = QApplication(sys.argv)
     _ = PbFileBrowser()
     sys.exit(app.exec_())
