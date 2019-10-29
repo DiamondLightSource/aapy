@@ -2,7 +2,7 @@ import sys
 import os
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem
 from PyQt5 import uic
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QPalette
 from PyQt5.QtCore import QSize
 from pathlib import Path
 import datetime
@@ -43,6 +43,7 @@ class PbFileBrowser(object):
         form.input_file_path.editingFinished.connect(self.update_save_dir)
         form.same_dir_as_input.stateChanged.connect(self.update_save_dir)
         form.save_button.clicked.connect(self.save_pb_file)
+        form.delete_event_button.clicked.connect(self.delete_selected_events)
         self.ui.show()
         self.pb_file = pb_validation.PbFile()
         self.reset()
@@ -64,7 +65,7 @@ class PbFileBrowser(object):
         try:
             # Check file exists
             if not os.path.exists(input_path):
-                self.set_status(f"No such file: {input_path}")
+                self.set_status(f"No such file: {input_path}", is_bad=True)
                 return False
             # Read file, getting payload_info
             self.pb_file.read_raw_lines_from_file(input_path)
@@ -94,8 +95,12 @@ class PbFileBrowser(object):
         self.pb_file.payload_info.type = self.ui.data_type_control.currentIndex()
         self.pb_file.payload_info.elementCount = self.ui.element_count_control.value()
 
-    def set_status(self, status_string):
+    def set_status(self, status_string, is_bad=False):
         self.ui.status_box.setText(status_string)
+        palette = QPalette()
+        # Red message text for an error
+        palette.setColor(QPalette.Text, QColor(120 if is_bad else 0, 0, 0))
+        self.ui.status_box.setPalette(palette)
 
     def update_save_dir(self):
         if self.ui.same_dir_as_input.isChecked():
@@ -107,7 +112,7 @@ class PbFileBrowser(object):
 
     def decode_events_and_check(self):
         if self.pb_file.payload_info is None:
-            self.set_status(f"Need to load a file first")
+            self.set_status(f"Need to load a file first", is_bad=True)
             return
 
         # Apply settings from modified header
@@ -193,12 +198,35 @@ class PbFileBrowser(object):
             row += 1
         self.ui.events_table.resizeColumnsToContents()
 
+    def delete_selected_events(self):
+        # Build a list of indices to delete
+        # Get the row indices from selection
+        selected_indices = self.ui.events_table.selectedIndexes()
+        selected_rows = []
+        for q_model_index in selected_indices:
+            if not q_model_index.row() in selected_rows:
+                selected_rows.append(q_model_index.row())
+
+        # We take descending order so we can delete several events in one go
+        selected_rows = sorted(selected_rows, reverse=True)
+
+        for event_index in selected_rows:
+            self.pb_file.raw_lines.pop(event_index)
+        self.decode_events_and_check()
+        self.set_status(f"Deleted events: {str(selected_rows)}")
+
     def save_pb_file(self):
-        self.pb_file.serialize_to_raw_lines()
+        try:
+            self.pb_file.serialize_to_raw_lines()
+        except Exception as e:
+            self.set_status(f"Exception encoding events: {e}", is_bad=True)
+            return False
+
         save_dir = self.ui.save_dir.text().strip()
         if not os.path.isdir(save_dir):
-            self.set_status(f"Save directory does not exist: {save_dir}")
-            return
+            self.set_status(f"Save directory does not exist: {save_dir}",
+                            is_bad=True)
+            return False
 
         orig_filename = self.ui.input_file_path.text()
         orig_stem = orig_filename.split(".")[0]
@@ -207,7 +235,17 @@ class PbFileBrowser(object):
             save_dir,
             new_filename
         )
-        self.pb_file.write_raw_lines_to_file(save_path)
+        if os.path.exists(save_path):
+            self.set_status(f"Won't save: A file already "
+                            f"exists here: {save_path}", is_bad=True)
+            return False
+        try:
+            self.pb_file.write_raw_lines_to_file(save_path)
+        except Exception as e:
+            self.set_status(f"Exception saving file: {e}, is_bad=True")
+            return False
+        else:
+            self.set_status(f"Saved file to {save_path}")
 
 
 def get_iso_timestamp_for_event(year, event):
@@ -220,7 +258,7 @@ def get_iso_timestamp_for_event(year, event):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.WARNING   )
+    logging.basicConfig(level=logging.WARNING)
     app = QApplication(sys.argv)
     _ = PbFileBrowser()
     sys.exit(app.exec_())
