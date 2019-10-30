@@ -88,6 +88,8 @@ class PbFileBrowser(object):
             return False
         else:
             self.set_status("Loaded header")
+            
+            self.decode_events_and_check()
 
     def set_header_from_form(self):
         """Update the payload info in the model from info on GUI"""
