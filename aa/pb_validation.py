@@ -166,7 +166,6 @@ def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list):
             log_parsing_error(index, PbError.EVENT_NOT_DECODED)
             errors.append((index, PbError.EVENT_NOT_DECODED))
         else:
-
             # Check val field was populated
             # If not, indicates e.g. wrong type
             if not event.HasField("val"):

@@ -60,6 +60,7 @@ class PbFileBrowser(object):
         self.ui.status_box.setText("")
 
     def load_pb_file(self):
+        """Open the file at the given path, load the header and raw data"""
         input_path = self.ui.input_file_path.text()
         self.set_status(f"Loading file {input_path}")
         try:
@@ -89,20 +90,24 @@ class PbFileBrowser(object):
             self.set_status("Loaded header")
 
     def set_header_from_form(self):
-        # Populate header info on GUI
+        """Update the payload info in the model from info on GUI"""
         self.pb_file.payload_info.pvname = self.ui.pv_name_control.text()
         self.pb_file.payload_info.year = int(self.ui.year_control.text())
         self.pb_file.payload_info.type = self.ui.data_type_control.currentIndex()
         self.pb_file.payload_info.elementCount = self.ui.element_count_control.value()
 
-    def set_status(self, status_string, is_bad=False):
-        self.ui.status_box.setText(status_string)
+    def set_status(self, message, is_bad=False):
+        """Display a message in the Status widget"""
+        self.ui.status_box.setText(message)
         palette = QPalette()
-        # Red message text for an error
+        # Use red message text for an error
         palette.setColor(QPalette.Text, QColor(120 if is_bad else 0, 0, 0))
         self.ui.status_box.setPalette(palette)
 
     def update_save_dir(self):
+        """Callback when the input path is changed; causes the
+        save directory widget to be updated to match the input directory
+        if this is selected."""
         if self.ui.same_dir_as_input.isChecked():
             self.ui.save_dir.setText(
                 os.path.dirname(
@@ -111,6 +116,9 @@ class PbFileBrowser(object):
             )
 
     def decode_events_and_check(self):
+        """Decode the raw data into events using the payload info which might
+        from the GUI. Run error checks. Populate widgets with events and errors
+        """
         if self.pb_file.payload_info is None:
             self.set_status(f"Need to load a file first", is_bad=True)
             return
@@ -146,7 +154,7 @@ class PbFileBrowser(object):
                         f"with {error_count} errors")
 
     def populate_errors_list(self):
-        """Display the list of parsing errors in the Errors widget"""
+        """Update the list of parsing errors in the Errors widget"""
         self.ui.errors_list.clear()
         for index, error in self.pb_file.decoding_errors:
             self.error_list[index].append(error)
@@ -158,7 +166,7 @@ class PbFileBrowser(object):
             self.ui.errors_list.addItem("No errors found")
 
     def populate_events_table(self):
-        """Populate the events table and errors widget from stored info"""
+        """Populate the events table from stored info"""
         row = 0
         for event in self.pb_file.pb_events:
             # Populate the cells for this row
@@ -179,6 +187,10 @@ class PbFileBrowser(object):
         self.ui.events_table.resizeColumnsToContents()
 
     def delete_selected_events(self):
+        """Callback from the "Delete selected events" button.
+        Delete the selected events from the model and then update the
+        table and error list"""
+
         # Build a list of indices to delete
         # Get the row indices from selection
         selected_indices = self.ui.events_table.selectedIndexes()
@@ -196,6 +208,10 @@ class PbFileBrowser(object):
         self.set_status(f"Deleted events: {str(selected_rows)}")
 
     def save_pb_file(self):
+        """Callback from the "save" button.
+        Serialize the events using the payload info from the GUI. Write
+        this data to a file at the chosen location.
+        """
         try:
             self.pb_file.serialize_to_raw_lines()
         except Exception as e:
@@ -228,6 +244,8 @@ class PbFileBrowser(object):
             self.set_status(f"Saved file to {save_path}")
 
     def get_timestamp_cell(self, event):
+        """Returns a QTableWidgetItem containing the timestamp for the
+        given event"""
         legible_timestamp = get_iso_timestamp_for_event(
             self.pb_file.payload_info.year,
             event
@@ -237,6 +255,8 @@ class PbFileBrowser(object):
         ))
 
     def get_value_cell(self, event, row):
+        """Returns a QTableWidgetItem containing the value for the given
+        event; the colour is red if this event has an error."""
         value_cell = QTableWidgetItem(str(
             event.val
         ))
@@ -245,6 +265,8 @@ class PbFileBrowser(object):
         return value_cell
 
     def get_extra_fields_cell(self, event):
+        """Returns a QTAbleWidgetItem shwoing the "extra fields" on the given
+        event"""
         extra_fields_cell = QTableWidgetItem(
             repr(event.fieldvalues)
         )
@@ -252,6 +274,8 @@ class PbFileBrowser(object):
         return extra_fields_cell
 
     def get_error_cell(self, row):
+        """Returns a QTableWidgetItem showing the parsing errors for the
+        event at the given row index."""
         error_string = ""
         if len(self.error_list[row]) > 0:
             error_string = pb_validation.PB_ERROR_STRINGS[
@@ -263,6 +287,8 @@ class PbFileBrowser(object):
         )
 
 def get_iso_timestamp_for_event(year, event):
+    """Returns an ISO-formatted timestamp string for the given event
+    and year."""
     timestamp = pb.event_timestamp(year, event)
     timezone = pytz.timezone("Europe/London")
     return datetime.datetime.fromtimestamp(
