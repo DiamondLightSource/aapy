@@ -161,39 +161,19 @@ class PbFileBrowser(object):
         """Populate the events table and errors widget from stored info"""
         row = 0
         for event in self.pb_file.pb_events:
-            legible_timestamp = get_iso_timestamp_for_event(
-                self.pb_file.payload_info.year,
-                event
+            # Populate the cells for this row
+            self.ui.events_table.setItem(
+                row, 0, self.get_timestamp_cell(event)
             )
-
-            timestamp_cell = QTableWidgetItem(str(
-                legible_timestamp
-            ))
-            self.ui.events_table.setItem(row, 0, timestamp_cell)
-            value_cell = QTableWidgetItem(str(
-                event.val
-            ))
-
-            if len(self.error_list[row]) > 0:
-                value_cell.setBackground(QColor(255, 200, 200))
-
-            self.ui.events_table.setItem(row, 1, value_cell)
-
-            extra_fields_cell = QTableWidgetItem(
-                repr(event.fieldvalues)
+            self.ui.events_table.setItem(
+                row, 1, self.get_value_cell(event, row)
             )
-            extra_fields_cell.setSizeHint(QSize(500, 10))
-            self.ui.events_table.setItem(row, 2, extra_fields_cell)
-
-            if len(self.error_list[row]) > 0:
-                error_string = pb_validation.PB_ERROR_STRINGS[
-                    self.error_list[row][0]]
-                if len(self.error_list[row]) > 1:
-                    error_string += " ..."
-                error_cell = QTableWidgetItem(
-                    error_string
-                )
-                self.ui.events_table.setItem(row, 3, error_cell)
+            self.ui.events_table.setItem(
+                row, 2, self.get_extra_fields_cell(event)
+            )
+            self.ui.events_table.setItem(
+                row, 3, self.get_error_cell(row)
+            )
 
             row += 1
         self.ui.events_table.resizeColumnsToContents()
@@ -247,6 +227,40 @@ class PbFileBrowser(object):
         else:
             self.set_status(f"Saved file to {save_path}")
 
+    def get_timestamp_cell(self, event):
+        legible_timestamp = get_iso_timestamp_for_event(
+            self.pb_file.payload_info.year,
+            event
+        )
+        return QTableWidgetItem(str(
+            legible_timestamp
+        ))
+
+    def get_value_cell(self, event, row):
+        value_cell = QTableWidgetItem(str(
+            event.val
+        ))
+        if len(self.error_list[row]) > 0:
+            value_cell.setBackground(QColor(255, 200, 200))
+        return value_cell
+
+    def get_extra_fields_cell(self, event):
+        extra_fields_cell = QTableWidgetItem(
+            repr(event.fieldvalues)
+        )
+        extra_fields_cell.setSizeHint(QSize(500, 10))
+        return extra_fields_cell
+
+    def get_error_cell(self, row):
+        error_string = ""
+        if len(self.error_list[row]) > 0:
+            error_string = pb_validation.PB_ERROR_STRINGS[
+                self.error_list[row][0]]
+            if len(self.error_list[row]) > 1:
+                error_string += " ..."
+        return QTableWidgetItem(
+            error_string
+        )
 
 def get_iso_timestamp_for_event(year, event):
     timestamp = pb.event_timestamp(year, event)
