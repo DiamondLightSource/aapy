@@ -1,0 +1,6 @@
+Unit tests:
+    tags:
+    - rhel7
+    script:
+    - pipenv run python -m pytest test
+
