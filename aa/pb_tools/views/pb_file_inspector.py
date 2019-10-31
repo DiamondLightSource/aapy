@@ -9,7 +9,8 @@ import datetime
 import pytz
 import logging
 
-from aa import pb_validation, pb
+from aa import pb
+from aa.pb_tools import validation
 
 UIC_DIRECTORY = "ui"
 
@@ -45,7 +46,7 @@ class PbFileBrowser(object):
         form.save_button.clicked.connect(self.save_pb_file)
         form.delete_event_button.clicked.connect(self.delete_selected_events)
         self.ui.show()
-        self.pb_file = pb_validation.PbFile()
+        self.pb_file = validation.PbFile()
         self.reset()
 
     def reset(self):
@@ -160,7 +161,7 @@ class PbFileBrowser(object):
         self.ui.errors_list.clear()
         for index, error in self.pb_file.decoding_errors:
             self.error_list[index].append(error)
-            error_string = pb_validation.PB_ERROR_STRINGS[error]
+            error_string = validation.PB_ERROR_STRINGS[error]
             self.ui.errors_list.addItem(
                 f"{error_string} at {index}"
             )
@@ -280,7 +281,7 @@ class PbFileBrowser(object):
         event at the given row index."""
         error_string = ""
         if len(self.error_list[row]) > 0:
-            error_string = pb_validation.PB_ERROR_STRINGS[
+            error_string = validation.PB_ERROR_STRINGS[
                 self.error_list[row][0]]
             if len(self.error_list[row]) > 1:
                 error_string += " ..."

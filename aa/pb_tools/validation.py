@@ -6,8 +6,8 @@ from enum import Enum
 
 from google.protobuf.message import DecodeError
 
-from . import pb
-from . import epics_event_pb2 as ee
+from aa import pb
+from aa import epics_event_pb2 as ee
 
 
 # A logger for this module
