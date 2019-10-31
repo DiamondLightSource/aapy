@@ -10,10 +10,12 @@ import pytz
 import logging
 
 from aa import pb
+from aa.pb import get_iso_timestamp_for_event
 from aa.pb_tools import pb_file, validation
 
 UIC_DIRECTORY = "ui"
-
+# A logger for this module
+MODULE_LOGGER = logging.getLogger("{}".format(__name__))
 
 def get_uic_obj(ui_file_name):
     """Return a reference to a UIC object from a qt designer *.ui generated file.
@@ -48,13 +50,16 @@ class PbFileBrowser(object):
         self.ui.show()
         self.pb_file = pb_file.PbFile()
         self.reset()
+        self.logger = logging.getLogger("{}".format(__name__))
 
         if load_path:
+            self.logger.debug(f"Proceed to load file from {load_path}")
             form.input_file_path.setText(load_path)
             self.load_pb_file()
 
     def reset(self):
         """Restore empty / default values on all form widgets"""
+        self.logger.debug("Reset UI state")
         self.ui.input_file_path.setText("")
         self.ui.events_table.setRowCount(0)
         self.ui.events_table.setColumnCount(4)
@@ -292,17 +297,6 @@ class PbFileBrowser(object):
         return QTableWidgetItem(
             error_string
         )
-
-
-def get_iso_timestamp_for_event(year, event):
-    """Returns an ISO-formatted timestamp string for the given event
-    and year."""
-    timestamp = pb.event_timestamp(year, event)
-    timezone = pytz.timezone("Europe/London")
-    return datetime.datetime.fromtimestamp(
-        timestamp,
-        timezone
-    ).isoformat()
 
 
 def invoke(load_path):

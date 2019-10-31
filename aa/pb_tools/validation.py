@@ -8,7 +8,7 @@ from aa import pb
 from aa import epics_event_pb2 as ee
 
 # A logger for this module
-LOG = logging.getLogger("{}".format(__name__))
+MODULE_LOGGER = logging.getLogger("{}".format(__name__))
 
 
 class PbError(Enum):
@@ -36,7 +36,7 @@ def log_parsing_error(index, error_type):
     """Lookup a parsing error by type and issue a log message with the
     corresponding string"""
     error_string = PB_ERROR_STRINGS[error_type]
-    LOG.info(f"{error_string} at index {index}")
+    MODULE_LOGGER.info(f"{error_string} at index {index}")
 
 
 def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list):

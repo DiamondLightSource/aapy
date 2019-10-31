@@ -20,11 +20,13 @@ Note: due to the way the protobuf objects are constructed, pylint can't
 correctly deduce some properties, so I have manually disabled some warnings.
 
 """
+import datetime
 import os
 import re
 import collections
 import logging as log
 
+import pytz
 import requests
 
 from . import data, fetcher, utils
@@ -261,3 +263,14 @@ class PbFileFetcher(fetcher.Fetcher):
             pb_files.append(self._get_pb_file(pv, year))
         log.info('Parsing pb files {}'.format(pb_files))
         return self._read_pb_files(pb_files, pv, start, end, count)
+
+
+def get_iso_timestamp_for_event(year, event):
+    """Returns an ISO-formatted timestamp string for the given event
+    and year."""
+    timestamp = event_timestamp(year, event)
+    timezone = pytz.timezone("Europe/London")
+    return datetime.datetime.fromtimestamp(
+        timestamp,
+        timezone
+    ).isoformat()
