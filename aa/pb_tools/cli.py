@@ -1,12 +1,13 @@
 import argparse
+import click
 from aa.pb_tools import validation
 
-def report_pb_file_errors():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("path", help="PB file path", type=str)
-    args = parser.parse_args()
 
-    pb_file = validation.PbFile(args.path)
+@click.command()
+@click.argument("input_path", type=click.Path(exists=True))
+@click.help_option('--help', '-h')
+def report_pb_file_errors(input_path):
+    pb_file = validation.PbFile(input_path)
     pb_file.decode_raw_lines()
     pb_file.check_data_for_errors()
 
@@ -19,13 +20,12 @@ def report_pb_file_errors():
         return 1
 
 
-def rewrite_pb_header_type():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("in_path", help="Input PB file path", type=str)
-    parser.add_argument("out_path", help="Output PB file path", type=str)
-    parser.add_argument("new_type", help="Index of new type to write", type=int)
-    args = parser.parse_args()
-
-    pb_file = validation.PbFile(args.in_path)
-    pb_file.payload_info.type = int(args.new_type)
-    pb_file.write_raw_lines_to_file(args.out_path)
+@click.command()
+@click.argument("in_path", type=click.Path(exists=True))
+@click.argument("out_path", type=click.Path(exists=False))
+@click.argument("new_type", type=click.IntRange(min=0, max=15, clamp=False))
+@click.help_option('--help', '-h')
+def rewrite_pb_header_type(in_path, out_path, new_type):
+    pb_file = validation.PbFile(in_path)
+    pb_file.payload_info.type = int(new_type)
+    pb_file.write_raw_lines_to_file(out_path)
