@@ -41,7 +41,7 @@ def rewrite_pb_header_type(in_path, out_path, new_type):
 
 @click.command(help="A graphical application to browse and "
                     "fix protocol buffer files.")
-@click.option("--input_file",
+@click.option("--input-file",
               type=click.Path(exists=True),
               help="Load this file on startup",
               default=None)

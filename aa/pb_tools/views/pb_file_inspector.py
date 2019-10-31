@@ -37,6 +37,8 @@ def get_uic_obj(ui_file_name):
 class PbFileBrowser(object):
 
     def __init__(self, load_path = None):
+        self.logger = logging.getLogger("{}".format(__name__))
+
         self.window = QMainWindow(None)
 
         self.ui = get_uic_obj("pb_file_inspector.ui")
@@ -50,11 +52,11 @@ class PbFileBrowser(object):
         self.ui.show()
         self.pb_file = pb_file.PbFile()
         self.reset()
-        self.logger = logging.getLogger("{}".format(__name__))
 
         if load_path:
             self.logger.debug(f"Proceed to load file from {load_path}")
             form.input_file_path.setText(load_path)
+            self.normalize_input_path()
             self.load_pb_file()
 
     def reset(self):
@@ -69,8 +71,14 @@ class PbFileBrowser(object):
         self.ui.element_count_control.setValue(1)
         self.ui.status_box.setText("")
 
+    def normalize_input_path(self):
+        """Make an absolute path from any relative components   """
+        input_path = self.ui.input_file_path.text()
+        self.ui.input_file_path.setText(os.path.realpath(input_path))
+
     def load_pb_file(self):
         """Open the file at the given path, load the header and raw data"""
+        self.normalize_input_path()
         input_path = self.ui.input_file_path.text()
         self.set_status(f"Loading file {input_path}")
         try:
@@ -120,6 +128,7 @@ class PbFileBrowser(object):
         """Callback when the input path is changed; causes the
         save directory widget to be updated to match the input directory
         if this is selected."""
+        self.normalize_input_path()
         if self.ui.same_dir_as_input.isChecked():
             self.ui.save_dir.setText(
                 os.path.dirname(
@@ -236,12 +245,10 @@ class PbFileBrowser(object):
                             is_bad=True)
             return False
 
-        orig_filename = self.ui.input_file_path.text()
-        orig_stem = orig_filename.split(".")[0]
-        new_filename = orig_stem + self.ui.save_suffix.text().strip() + ".pb"
-        save_path = os.path.join(
-            save_dir,
-            new_filename
+        save_path = generate_save_path(
+            self.ui.input_file_path.text(),
+            self.ui.save_dir.text(),
+            self.ui.save_suffix.text()
         )
         if os.path.exists(save_path):
             self.set_status(f"Won't save: A file already "
@@ -297,6 +304,15 @@ class PbFileBrowser(object):
         return QTableWidgetItem(
             error_string
         )
+
+def generate_save_path(orig_path, save_dir, save_suffix):
+    orig_basename = os.path.basename(orig_path)
+    orig_stem = os.path.basename(orig_path).split(".")[0]
+    new_filename = orig_stem + save_suffix.strip() + ".pb"
+    return os.path.join(
+        save_dir,
+        new_filename
+    )
 
 
 def invoke(load_path):
