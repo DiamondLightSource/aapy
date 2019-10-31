@@ -1,6 +1,6 @@
 import argparse
 import click
-from aa.pb_tools import validation
+from aa.pb_tools import validation, dump
 from aa.pb_tools.views import pb_file_inspector
 
 @click.command()
@@ -41,3 +41,24 @@ def rewrite_pb_header_type(in_path, out_path, new_type):
 @click.help_option('--help', '-h')
 def invoke_pb_file_inspector(input_file):
     pb_file_inspector.invoke(input_file)
+
+
+@click.command(help="Print a plain text representation of the data in the "
+                    "protocol buffer file INPUT_FILE to standard output. "
+                    "By default, the payload info and interpreted events "
+                    "are shown. A representation of the raw bytes may be "
+                    "given using --binary. The output may be passed to "
+                    "programs such as diff for further processing.")
+@click.argument("input_file", type=click.Path(exists=True))
+@click.option("--payload-info/--no-payload-info", default=True,
+              show_default=True,
+              help="Show payload info.")
+@click.option("--events/--no-events", default=True,
+              show_default=True,
+              help="Show decoded events.")
+@click.option("--binary/--no-binary", default=False,
+              show_default=True,
+              help="Show representation of raw bytes")
+@click.help_option('--help', '-h')
+def dump_pb_data(payload_info, input_file, events, binary):
+    dump.dump_pb_data(input_file, payload_info, binary, events)

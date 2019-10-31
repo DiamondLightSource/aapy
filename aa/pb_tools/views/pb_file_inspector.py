@@ -293,6 +293,7 @@ class PbFileBrowser(object):
             error_string
         )
 
+
 def get_iso_timestamp_for_event(year, event):
     """Returns an ISO-formatted timestamp string for the given event
     and year."""
