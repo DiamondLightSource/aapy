@@ -14,66 +14,6 @@ from aa import epics_event_pb2 as ee
 LOG = logging.getLogger("{}".format(__name__))
 
 
-def raw_event_from_line(line, event_type):
-    """
-    Get a protocol buffer event object for the raw data from the given line
-
-    Args:
-        line: (str) raw data from one line
-        event_type: (int) a key for a type from TYPE_MAPPINGS
-
-    Returns:
-        A protocol buffer event object
-    """
-    unescaped = pb.unescape_bytes(line)
-    event = pb.TYPE_MAPPINGS[event_type]()
-    try:
-        event.ParseFromString(unescaped)
-    except DecodeError:
-        # Decode failed
-        event = None
-
-    return event
-
-
-def pb_events_from_raw_lines(raw_chunk, requested_type=None):
-    """
-    Get a list of protocol buffer event objects from the supplied raw data
-
-    Args:
-        raw_data: Raw data from a PB file
-        requested_type: A key from TYPE_MAPPINGS to use for the data type
-                        in decoding events; if None, we try to use the
-                        one from the header
-
-    Returns:
-        List of protocol buffer event objects
-    """
-    raw_events = []
-
-    for line in raw_chunk:
-        raw_events.append(raw_event_from_line(line, requested_type))
-    return raw_events
-
-
-def one_chunk_from_raw(raw_data):
-    """
-    Get one chunk only from raw data bytes
-    Args:
-        raw_data: Raw bytes
-
-    Returns:
-
-    """
-    chunks = pb.break_up_chunks(raw_data)
-    if len(chunks) > 1:
-        LOG.warning(
-            "This data has multiple chunks, can only handle "
-            "the first one at the moment."
-        )
-    return list(chunks.items())[0][1]
-
-
 class PbError(Enum):
     """Different error conditions that can occur in a PB file"""
     HEADER_NOT_DECODED = 0
@@ -92,99 +32,6 @@ PB_ERROR_STRINGS = {
     PbError.EVENT_OUT_OF_ORDER: "Event out of order",
     PbError.EVENT_DUPLICATED: "Event duplicated",
 }
-
-
-def serialize_payload_info_to_raw(payload_info: ee.PayloadInfo):
-    """
-    Serialize a PayloadInfo into a raw line (without terminating newline
-    Args:
-        payload_info: a PayloadInfo object e.g. from a PbFile
-
-    Returns:
-        Raw line of serialized data
-    """
-    unescaped_bytes = payload_info.SerializeToString()
-    escaped_bytes = pb.escape_bytes(unescaped_bytes)
-    line = escaped_bytes
-    return line
-
-
-def serialize_events_to_raw_lines(pb_events):
-    """
-    Serialize a list of PB events into a list of raw lines
-    Args:
-        pb_events: List of PB event objects
-
-    Returns:
-        list of raw lines without terminators
-    """
-
-    # Serialize to unescaped bytes
-    unescaped_lines = []
-    for obj in pb_events:
-        unescaped_lines.append(
-            obj.SerializeToString()
-        )
-
-    # Escape each line
-    escaped_lines = []
-    for line in unescaped_lines:
-        escaped_lines.append(pb.escape_bytes(line))
-    return escaped_lines
-
-
-def log_parsing_error(index, error_type):
-    error_string = PB_ERROR_STRINGS[error_type]
-    LOG.info(f"{error_string} at index {index}")
-
-
-def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list):
-    """
-    Run some basic checks on PB events
-
-    Args:
-        payload_info: PayloadInfo for the events
-        pb_events: List of PB event objects
-
-    Returns:
-        List of tuples giving index and error type
-    """
-
-    if not isinstance(payload_info, ee.PayloadInfo):
-        errors = [(None, PbError.HEADER_NOT_DECODED)]
-        return errors
-
-    year = payload_info.year
-    list_of_events = pb_events
-
-    index = 0
-    prev_timestamp = 0
-    errors = []
-    for event in list_of_events:
-        # Check event has been decoded; if not, indicates e.g. corruption
-        if event is None:
-            log_parsing_error(index, PbError.EVENT_NOT_DECODED)
-            errors.append((index, PbError.EVENT_NOT_DECODED))
-        else:
-            # Check val field was populated
-            # If not, indicates e.g. wrong type
-            if not event.HasField("val"):
-                log_parsing_error(index, PbError.EVENT_MISSING_VALUE)
-                errors.append((index, PbError.EVENT_MISSING_VALUE))
-            timestamp = pb.event_timestamp(year, event)
-
-            # Check timestamps monotonically increasing
-            if timestamp < prev_timestamp:
-                log_parsing_error(index, PbError.EVENT_OUT_OF_ORDER)
-                errors.append((index, PbError.EVENT_OUT_OF_ORDER))
-            elif timestamp == prev_timestamp:
-                log_parsing_error(index, PbError.EVENT_DUPLICATED)
-                errors.append((index, PbError.EVENT_DUPLICATED))
-            else:
-                prev_timestamp = timestamp
-
-        index += 1
-    return errors
 
 
 class PbFile:
@@ -259,3 +106,159 @@ class PbFile:
 
         with open(output_file_path, "wb") as output_file:
             output_file.write(bytes_to_write)
+
+def raw_event_from_line(line, event_type):
+    """
+    Get a protocol buffer event object for the raw data from the given line
+
+    Args:
+        line: (str) raw data from one line
+        event_type: (int) a key for a type from TYPE_MAPPINGS
+
+    Returns:
+        A protocol buffer event object
+    """
+    unescaped = pb.unescape_bytes(line)
+    event = pb.TYPE_MAPPINGS[event_type]()
+    try:
+        event.ParseFromString(unescaped)
+    except DecodeError:
+        # Decode failed
+        event = None
+
+    return event
+
+
+def pb_events_from_raw_lines(raw_chunk, requested_type=None):
+    """
+    Get a list of protocol buffer event objects from the supplied raw data
+
+    Args:
+        raw_data: Raw data from a PB file
+        requested_type: A key from TYPE_MAPPINGS to use for the data type
+                        in decoding events; if None, we try to use the
+                        one from the header
+
+    Returns:
+        List of protocol buffer event objects
+    """
+    raw_events = []
+
+    for line in raw_chunk:
+        raw_events.append(raw_event_from_line(line, requested_type))
+    return raw_events
+
+
+def one_chunk_from_raw(raw_data):
+    """
+    Get one chunk only from raw data bytes
+    Args:
+        raw_data: Raw bytes
+
+    Returns:
+
+    """
+    chunks = pb.break_up_chunks(raw_data)
+    if len(chunks) > 1:
+        LOG.warning(
+            "This data has multiple chunks, can only handle "
+            "the first one at the moment."
+        )
+    return list(chunks.items())[0][1]
+
+
+def serialize_payload_info_to_raw(payload_info: ee.PayloadInfo):
+    """
+    Serialize a PayloadInfo into a raw line (without terminating newline)
+
+    Args:
+        payload_info: a PayloadInfo object e.g. from a PbFile
+
+    Returns:
+        Raw line of serialized data
+    """
+    unescaped_bytes = payload_info.SerializeToString()
+    escaped_bytes = pb.escape_bytes(unescaped_bytes)
+    line = escaped_bytes
+    return line
+
+
+def serialize_events_to_raw_lines(pb_events):
+    """
+    Serialize a list of PB events into a list of raw lines
+
+    Args:
+        pb_events: List of PB event objects
+
+    Returns:
+        list of raw lines without terminators
+    """
+
+    # Serialize to unescaped bytes
+    unescaped_lines = []
+    for obj in pb_events:
+        unescaped_lines.append(
+            obj.SerializeToString()
+        )
+
+    # Escape each line
+    escaped_lines = []
+    for line in unescaped_lines:
+        escaped_lines.append(pb.escape_bytes(line))
+    return escaped_lines
+
+
+def log_parsing_error(index, error_type):
+    """Lookup a parsing error by type and issue a log message with the
+    corresponding string"""
+    error_string = PB_ERROR_STRINGS[error_type]
+    LOG.info(f"{error_string} at index {index}")
+
+
+def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list):
+    """
+    Run some basic checks on PB file events
+
+    Args:
+        payload_info: PayloadInfo for the events
+        pb_events: List of PB event objects
+
+    Returns:
+        List of tuples giving index and error type
+    """
+
+    if not isinstance(payload_info, ee.PayloadInfo):
+        errors = [(None, PbError.HEADER_NOT_DECODED)]
+        return errors
+
+    year = payload_info.year
+    list_of_events = pb_events
+
+    index = 0
+    prev_timestamp = 0
+    errors = []
+    for event in list_of_events:
+        # Check event has been decoded; if not, indicates e.g. corruption
+        if event is None:
+            log_parsing_error(index, PbError.EVENT_NOT_DECODED)
+            errors.append((index, PbError.EVENT_NOT_DECODED))
+        else:
+            # Check val field was populated
+            # If not, indicates e.g. wrong type
+            if not event.HasField("val"):
+                log_parsing_error(index, PbError.EVENT_MISSING_VALUE)
+                errors.append((index, PbError.EVENT_MISSING_VALUE))
+            timestamp = pb.event_timestamp(year, event)
+
+            # Check timestamps monotonically increasing
+            if timestamp < prev_timestamp:
+                log_parsing_error(index, PbError.EVENT_OUT_OF_ORDER)
+                errors.append((index, PbError.EVENT_OUT_OF_ORDER))
+            elif timestamp == prev_timestamp:
+                log_parsing_error(index, PbError.EVENT_DUPLICATED)
+                errors.append((index, PbError.EVENT_DUPLICATED))
+            else:
+                prev_timestamp = timestamp
+
+        index += 1
+    return errors
