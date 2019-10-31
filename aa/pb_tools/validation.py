@@ -194,17 +194,13 @@ def serialize_events_to_raw_lines(pb_events):
         list of raw lines without terminators
     """
 
-    # Serialize to unescaped bytes
-    unescaped_lines = []
-    for obj in pb_events:
-        unescaped_lines.append(
-            obj.SerializeToString()
-        )
-
-    # Escape each line
     escaped_lines = []
-    for line in unescaped_lines:
-        escaped_lines.append(pb.escape_bytes(line))
+    for obj in pb_events:
+        escaped_lines.append(
+            pb.escape_bytes(
+                obj.SerializeToString()
+            )
+        )
     return escaped_lines
 
 
