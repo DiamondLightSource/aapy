@@ -1,6 +1,6 @@
 import os
 
-from aa.pb_tools import validation
+from aa.pb_tools import pb_file
 from aa import epics_event_pb2 as ee
 import utils as testutils
 
@@ -10,7 +10,7 @@ def test_one_chunk_from_raw():
     with open(full_path, "rb") as raw_file:
         raw_data = raw_file.read()
 
-    result = validation.one_chunk_from_raw(raw_data)
+    result = pb_file.one_chunk_from_raw(raw_data)
 
     comparison_header = ee.PayloadInfo(
         year=2017,
@@ -42,54 +42,15 @@ def test_raw_event_from_line():
     expected.fieldvalues.add(name="cnxregainedepsecs", val="1509557270")
     expected.fieldvalues.add(name="startup", val="true")
 
-    result = validation.raw_event_from_line(line, 5)
+    result = pb_file.raw_event_from_line(line, 5)
 
     assert result == expected
 
 
-def test_basic_data_checks():
-
-    events = [
-        None,
-        ee.ScalarInt(secondsintoyear=123, nano=4),
-        ee.ScalarInt(secondsintoyear=123, nano=4, val=1),
-        ee.ScalarInt(secondsintoyear=122, nano=3, val=2)
-    ]
-
-    # Expect:
-    # No event at 0
-    # No value at 1
-    # Timestamp duplicated at 2
-    # Event out of order at 3
-
-    expected_errors = [
-        (0, validation.PbError.EVENT_NOT_DECODED),
-        (1, validation.PbError.EVENT_MISSING_VALUE),
-        (2, validation.PbError.EVENT_DUPLICATED),
-        (3, validation.PbError.EVENT_OUT_OF_ORDER),
-    ]
-
-    payload_info = ee.PayloadInfo(
-        year=2017,
-        type=5,
-        pvname="BL14J-PS-SHTR-03:OPS",
-        elementCount=1,
-    )
-
-    result = validation.basic_data_checks(payload_info, events)
-
-    assert result == expected_errors
-
-    # With no header attached
-
-    result = validation.basic_data_checks(None, events)
-
-    assert result == [(None, validation.PbError.HEADER_NOT_DECODED)]
-
 
 def test_writing_then_reading_file_gives_same_data():
 
-    f = validation.PbFile()
+    f = pb_file.PbFile()
 
     f.payload_info = ee.PayloadInfo(
         year=2017,
@@ -109,7 +70,7 @@ def test_writing_then_reading_file_gives_same_data():
     f.serialize_to_raw_lines()
     f.write_raw_lines_to_file(filepath)
 
-    g = validation.PbFile(filepath)
+    g = pb_file.PbFile(filepath)
 
     assert g.payload_info == f.payload_info
     assert g.raw_lines == f.raw_lines

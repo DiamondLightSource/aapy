@@ -1,7 +1,7 @@
 import argparse
 import click
 from aa.pb_tools import validation
-
+from aa.pb_tools.views import pb_file_inspector
 
 @click.command()
 @click.argument("input_path", type=click.Path(exists=True))
@@ -14,6 +14,7 @@ def report_pb_file_errors(input_path):
     error_count = len(pb_file.decoding_errors)
 
     if error_count == 0:
+        print(f"No errors found.")
         return 0
     else:
         print(f"{error_count} errors found.")
@@ -29,3 +30,14 @@ def rewrite_pb_header_type(in_path, out_path, new_type):
     pb_file = validation.PbFile(in_path)
     pb_file.payload_info.type = int(new_type)
     pb_file.write_raw_lines_to_file(out_path)
+
+
+@click.command(help="A graphical application to browse and "
+                    "fix protocol buffer files.")
+@click.option("--input_file",
+              type=click.Path(exists=True),
+              help="Load this file on startup",
+              default=None)
+@click.help_option('--help', '-h')
+def invoke_pb_file_inspector(input_file):
+    pb_file_inspector.invoke(input_file)

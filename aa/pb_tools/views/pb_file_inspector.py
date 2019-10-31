@@ -10,7 +10,7 @@ import pytz
 import logging
 
 from aa import pb
-from aa.pb_tools import validation
+from aa.pb_tools import pb_file, validation
 
 UIC_DIRECTORY = "ui"
 
@@ -34,7 +34,7 @@ def get_uic_obj(ui_file_name):
 
 class PbFileBrowser(object):
 
-    def __init__(self):
+    def __init__(self, load_path = None):
         self.window = QMainWindow(None)
 
         self.ui = get_uic_obj("pb_file_inspector.ui")
@@ -46,8 +46,12 @@ class PbFileBrowser(object):
         form.save_button.clicked.connect(self.save_pb_file)
         form.delete_event_button.clicked.connect(self.delete_selected_events)
         self.ui.show()
-        self.pb_file = validation.PbFile()
+        self.pb_file = pb_file.PbFile()
         self.reset()
+
+        if load_path:
+            form.input_file_path.setText(load_path)
+            self.load_pb_file()
 
     def reset(self):
         """Restore empty / default values on all form widgets"""
@@ -300,8 +304,8 @@ def get_iso_timestamp_for_event(year, event):
     ).isoformat()
 
 
-if __name__ == "__main__":
+def invoke(load_path):
     logging.basicConfig(level=logging.WARNING)
     app = QApplication(sys.argv)
-    _ = PbFileBrowser()
+    _ = PbFileBrowser(load_path)
     sys.exit(app.exec_())
