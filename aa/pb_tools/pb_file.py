@@ -1,3 +1,5 @@
+"""A representation of a PB file allowing ease of loading, saving and
+manipulating data."""
 import logging
 
 from google.protobuf.message import DecodeError
@@ -5,6 +7,10 @@ from google.protobuf.message import DecodeError
 from aa import pb
 from aa import epics_event_pb2 as ee
 from aa.pb_tools import validation
+
+
+module_logger = logging.getLogger(f"{__name__}")
+
 
 class PbFile:
     """
@@ -14,6 +20,7 @@ class PbFile:
     """
 
     def __init__(self, filename=None):
+        self.logger = logging.getLogger(f"{__name__}")
         self.empty()
 
         # Read raw data if we are given a filename
@@ -133,7 +140,7 @@ def one_chunk_from_raw(raw_data):
     """
     chunks = pb.break_up_chunks(raw_data)
     if len(chunks) > 1:
-        LOG.warning(
+        module_logger.warning(
             "This data has multiple chunks, can only handle "
             "the first one at the moment."
         )
@@ -175,4 +182,3 @@ def serialize_events_to_raw_lines(pb_events):
             )
         )
     return escaped_lines
-

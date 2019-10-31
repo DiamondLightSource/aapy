@@ -1,13 +1,19 @@
+"""
+Graphical tool to inspect Archiver Appliance protocol buffer files and
+perform some simple fixes.
+"""
 import sys
 import os
+import logging
+import datetime
+from pathlib import Path
+import pytz
+
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem
 from PyQt5 import uic
 from PyQt5.QtGui import QColor, QPalette
 from PyQt5.QtCore import QSize
-from pathlib import Path
-import datetime
-import pytz
-import logging
+
 
 from aa import pb
 from aa.pb import get_iso_timestamp_for_event
@@ -18,13 +24,14 @@ UIC_DIRECTORY = "ui"
 MODULE_LOGGER = logging.getLogger("{}".format(__name__))
 
 def get_uic_obj(ui_file_name):
-    """Return a reference to a UIC object from a qt designer *.ui generated file.
+    """Return a reference to a UIC object from a qt designer *.ui generated
+    file.
 
     Args:
         ui_file_name: The name of the .ui file
 
     Returns:
-        QtObject: Usually a QtDialog reference from the .ui file for burtinter.
+        QtObject: Usually a QtDialog reference from the .ui file.
     """
     # Root directory of burtinter application
     aapy_root = Path(__file__).resolve().parents[1]
@@ -34,10 +41,13 @@ def get_uic_obj(ui_file_name):
     return uic.loadUi(ui_file_reference)
 
 
-class PbFileBrowser(object):
+class PbFileInspector():
+    """
+    Main class for the PB File Inspector application
+    """
 
-    def __init__(self, load_path = None):
-        self.logger = logging.getLogger("{}".format(__name__))
+    def __init__(self, load_path=None):
+        self.logger = logging.getLogger(f"{__name__}")
 
         self.window = QMainWindow(None)
 
@@ -108,13 +118,16 @@ class PbFileBrowser(object):
             self.set_status("Loaded header")
 
             self.decode_events_and_check()
+            return True
 
     def set_header_from_form(self):
         """Update the payload info in the model from info on GUI"""
         self.pb_file.payload_info.pvname = self.ui.pv_name_control.text()
         self.pb_file.payload_info.year = int(self.ui.year_control.text())
-        self.pb_file.payload_info.type = self.ui.data_type_control.currentIndex()
-        self.pb_file.payload_info.elementCount = self.ui.element_count_control.value()
+        self.pb_file.payload_info.type = \
+            self.ui.data_type_control.currentIndex()
+        self.pb_file.payload_info.elementCount = \
+            self.ui.element_count_control.value()
 
     def set_status(self, message, is_bad=False):
         """Display a message in the Status widget"""
@@ -318,5 +331,5 @@ def generate_save_path(orig_path, save_dir, save_suffix):
 def invoke(load_path):
     logging.basicConfig(level=logging.WARNING)
     app = QApplication(sys.argv)
-    _ = PbFileBrowser(load_path)
+    _ = PbFileInspector(load_path)
     sys.exit(app.exec_())

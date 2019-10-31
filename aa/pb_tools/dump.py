@@ -1,4 +1,6 @@
-from aa.pb_tools import pb_file
+"""
+Tools to format protobuf file data in a human readable format.
+"""
 
 
 def raw_lines_to_readable_hex(input_lines, max_lines=None):
