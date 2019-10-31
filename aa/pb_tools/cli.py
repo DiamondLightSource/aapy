@@ -51,12 +51,12 @@ def invoke_pb_file_inspector(input_file):
 
 
 @click.command(help="Print a plain text representation of the data in the "
-                    "protocol buffer file INPUT_FILE to standard output. "
+                    "protocol buffer file at INPUT_PATH to standard output. "
                     "By default, the payload info and interpreted events "
                     "are shown. A representation of the raw bytes may be "
                     "given using --binary. The output may be passed to "
                     "programs such as diff for further processing.")
-@click.argument("input_file", type=click.Path(exists=True))
+@click.argument("input_path", type=click.Path(exists=True))
 @click.option("--payload-info/--no-payload-info", default=True,
               show_default=True,
               help="Show payload info.")
@@ -67,5 +67,18 @@ def invoke_pb_file_inspector(input_file):
               show_default=True,
               help="Show representation of raw bytes")
 @click.help_option('--help', '-h')
-def dump_pb_data(payload_info, input_file, events, binary):
-    dump.dump_pb_data(input_file, payload_info, binary, events)
+def dump_pb_data(payload_info, input_path, events, binary):
+    file = pb_file.PbFile(input_path)
+
+    if payload_info:
+        print(repr(file.payload_info))
+
+    if binary:
+        output_lines = dump.raw_lines_to_readable_hex(file.raw_lines)
+        for line in output_lines:
+            print(line)
+
+    if events:
+        file.decode_raw_lines()
+        for event in file.pb_events:
+            print(repr(event))

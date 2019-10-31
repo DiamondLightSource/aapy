@@ -1,25 +1,6 @@
 from aa.pb_tools import pb_file
 
 
-def dump_pb_data(input_path, show_payload_info=True, show_binary=True, show_events=False):
-
-    file = pb_file.PbFile(input_path)
-
-    if show_payload_info:
-        print(repr(file.payload_info))
-
-    if show_binary:
-        output_lines = raw_lines_to_readable_hex(file.raw_lines)
-        for line in output_lines:
-            print(line)
-
-    if show_events:
-        file.decode_raw_lines()
-        for event in file.pb_events:
-            print(repr(event))
-
-
-
 def raw_lines_to_readable_hex(input_lines, max_lines=None):
     """
     Format a list of lines of binary data into 2-digit hex that can be read
