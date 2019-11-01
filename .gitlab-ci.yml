@@ -1,8 +1,0 @@
-Unit tests:
-    tags:
-    - rhel7
-    before_script:
-    - pipenv install --dev
-    script:
-    - pipenv run python -m pytest --cov aa test
-
