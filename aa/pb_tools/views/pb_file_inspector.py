@@ -177,7 +177,10 @@ class PbFileInspector():
         self.ui.events_table.setRowCount(rows)
 
         # Arrange errors by row
-        self.error_list = [[]] * rows
+        # NB "[[]] * rows" has unexpected effects because
+        #    in this case the list in each element is the same object
+        #    so appending to one appends to all the others!
+        self.error_list = [[] for _ in range(rows) ]
         self.populate_errors_list()
 
         self.populate_events_table()
@@ -196,7 +199,7 @@ class PbFileInspector():
             self.ui.errors_list.addItem(
                 f"{error_string} at {index}"
             )
-        if len(self.pb_file.decoding_errors) <= 1:
+        if len(self.pb_file.decoding_errors) < 1:
             self.ui.errors_list.addItem("No errors found")
 
     def populate_events_table(self):
@@ -218,6 +221,11 @@ class PbFileInspector():
             )
 
             row += 1
+        # Re-label rows starting at 0 for consistency with
+        # line number reporting in error list.
+        self.ui.events_table.setVerticalHeaderLabels(
+            [str(idx) for idx in range(len(self.pb_file.pb_events))]
+        )
         self.ui.events_table.resizeColumnsToContents()
 
     def delete_selected_events(self):
