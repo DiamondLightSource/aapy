@@ -4,32 +4,47 @@ from aa.pb_tools import validation, pb_file, dump
 from aa.pb_tools.views import pb_file_inspector
 
 @click.command()
-@click.argument("input_path", type=click.Path(exists=True))
+@click.argument("input_paths", type=click.Path(exists=True), nargs=-1,
+                required=True)
+@click.option("-v", "--verbose", is_flag=True)
+@click.option("-t", "--terse", is_flag=True)
 @click.help_option('--help', '-h')
-def report_pb_file_errors(input_path):
+def report_pb_file_errors(input_paths, verbose, terse):
     """
     Check for known types of errors in the protocol buffer
-    file at INPUT_PATH. Returns 0 if there are no errors,
-    otherwise prints a list of errors to standard out
-    and returns 1.
+    file(s) at INPUT_PATHS. Prints how many errors in each
+    file. In verbose mode, also prints a list of errors.
+    In terse mode, prints only files with errors
+    Returns 0 if no errors in any file, else 1.
     """
-    file = pb_file.PbFile(input_path)
-    file.decode_raw_lines()
-    file.check_data_for_errors()
 
-    error_count = len(file.decoding_errors)
+    if verbose and terse:
+        click.echo("Can't be both --verbose and --terse", err=True)
+        return 2
 
-    if error_count == 0:
-        print(f"No errors found.")
-        return_value = 0
-    else:
-        for index, error_type in file.decoding_errors:
-            error_string = validation.PB_ERROR_STRINGS[error_type]
-            print(f"{error_string} at index {index}")
+    return_value = 0
+    for input_path in input_paths:
+        pb_data = pb_file.PbFile(input_path)
+        pb_data.decode_raw_lines()
+        pb_data.check_data_for_errors()
 
-        print(f"Total: {error_count} errors.")
+        error_count = len(pb_data.decoding_errors)
 
-        return_value = 1
+        # Print results to stdout. Skip in terse mode if no errors
+        if error_count > 0 or not terse:
+            print(f"{input_path}: "
+                  f"{error_count} error{'' if error_count == 1 else 's'}")
+
+        if error_count == 0:
+            return_value = return_value | 0
+        else:
+            # Print list of errors in verbose mode
+            if verbose:
+                for index, error_type in pb_data.decoding_errors:
+                    error_string = validation.PB_ERROR_STRINGS[error_type]
+                    print(f"{error_string} at index {index}")
+
+            return_value = return_value | 1
     return return_value
 
 
@@ -72,10 +87,10 @@ def rewrite_pb_header_type(in_path, out_path, new_type):
 
 
 @click.command()
-@click.option("--input-file",
-              type=click.Path(exists=True),
-              help="Load this file on startup",
-              default=None)
+@click.argument("input-file",
+                type=click.Path(exists=True),
+                required=False,
+                nargs=1)
 @click.help_option('--help', '-h')
 def invoke_pb_file_inspector(input_file):
     """
@@ -90,7 +105,7 @@ def invoke_pb_file_inspector(input_file):
 @click.option("--payload-info/--no-payload-info", default=True,
               show_default=True,
               help="Show payload info.")
-@click.option("--events/--no-events", default=True,
+@click.option("--events/--no-events", default=False,
               show_default=True,
               help="Show decoded events.")
 @click.option("--binary/--no-binary", default=False,
@@ -101,22 +116,25 @@ def dump_pb_data(payload_info, input_path, events, binary):
     """
     Print a plain text representation of the data in the
     protocol buffer file at INPUT_PATH to standard output.
-    By default, the payload info and interpreted events
+    By default, the payload info and number of events
     are shown. A representation of the raw bytes may be
-    given using --binary. The output may be passed to
+    given using --binary. The interpreted events may be
+    listed using --events. The output may be passed to
     programs such as diff for further processing.
     """
-    file = pb_file.PbFile(input_path)
+    pb_data = pb_file.PbFile(input_path)
 
     if payload_info:
-        print(repr(file.payload_info))
+        print(repr(pb_data.payload_info))
+        event_count = len(pb_data.raw_lines)
+        print(f"File contains {event_count} events")
 
     if binary:
-        output_lines = dump.raw_lines_to_readable_hex(file.raw_lines)
+        output_lines = dump.raw_lines_to_readable_hex(pb_data.raw_lines)
         for line in output_lines:
             print(line)
 
     if events:
-        file.decode_raw_lines()
-        for event in file.pb_events:
+        pb_data.decode_raw_lines()
+        for event in pb_data.pb_events:
             print(repr(event))
