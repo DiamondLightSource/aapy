@@ -63,12 +63,12 @@ def rewrite_pb_header_type(in_path, out_path, new_type):
         14: ee.V4GenericBytes
     """
     # Load raw lines
-    file = pb_file.PbFile(in_path)
+    pb_data = pb_file.PbFile(in_path)
     # Modify the type in the payload info
-    file.payload_info.type = int(new_type)
+    pb_data.payload_info.type = int(new_type)
     # Write the raw lines to the file with the updated payload info,
     # wihtout trying to decode / encode the events
-    file.write_raw_lines_to_file(out_path)
+    pb_data.write_raw_lines_to_file(out_path)
 
 
 @click.command()
