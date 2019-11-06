@@ -22,6 +22,8 @@ from aa.pb_tools import pb_file, validation
 UIC_DIRECTORY = "ui"
 # A logger for this module
 MODULE_LOGGER = logging.getLogger("{}".format(__name__))
+LIGHT_GREEN = QColor(200, 255, 200)
+LIGHT_RED = QColor(255, 200, 200)
 
 def get_uic_obj(ui_file_name):
     """Return a reference to a UIC object from a qt designer *.ui generated
@@ -59,6 +61,7 @@ class PbFileInspector():
         form.same_dir_as_input.stateChanged.connect(self.update_save_dir)
         form.save_button.clicked.connect(self.save_pb_file)
         form.delete_event_button.clicked.connect(self.delete_selected_events)
+        form.errors_list.currentRowChanged.connect(self.scroll_to_event)
         self.ui.show()
         self.pb_file = pb_file.PbFile()
         self.reset()
@@ -68,6 +71,11 @@ class PbFileInspector():
             form.input_file_path.setText(load_path)
             self.normalize_input_path()
             self.load_pb_file()
+
+    def scroll_to_event(self, row):
+        if row >= 0 and row < len(self.pb_file.decoding_errors):
+            event_index, _ = self.pb_file.decoding_errors[row]
+            self.ui.events_table.setCurrentCell(event_index, 0)
 
     def reset(self):
         """Restore empty / default values on all form widgets"""
@@ -201,6 +209,12 @@ class PbFileInspector():
             )
         if len(self.pb_file.decoding_errors) < 1:
             self.ui.errors_list.addItem("No errors found")
+            self.ui.errors_list.item(0).setBackground(
+                LIGHT_GREEN
+            )
+        else:
+            [make_cell_red(self.ui.errors_list.item(idx))
+             for idx in range(self.ui.errors_list.count())]
 
     def populate_events_table(self):
         """Populate the events table from stored info"""
@@ -208,13 +222,13 @@ class PbFileInspector():
         for event in self.pb_file.pb_events:
             # Populate the cells for this row
             self.ui.events_table.setItem(
-                row, 0, self.get_timestamp_cell(event)
+                row, 0, self.get_timestamp_cell(event, row)
             )
             self.ui.events_table.setItem(
                 row, 1, self.get_value_cell(event, row)
             )
             self.ui.events_table.setItem(
-                row, 2, self.get_extra_fields_cell(event)
+                row, 2, self.get_extra_fields_cell(event, row)
             )
             self.ui.events_table.setItem(
                 row, 3, self.get_error_cell(row)
@@ -283,16 +297,21 @@ class PbFileInspector():
         else:
             self.set_status(f"Saved file to {save_path}")
 
-    def get_timestamp_cell(self, event):
+    def get_timestamp_cell(self, event, row):
         """Returns a QTableWidgetItem containing the timestamp for the
         given event"""
         legible_timestamp = get_iso_timestamp_for_event(
             self.pb_file.payload_info.year,
             event
         )
-        return QTableWidgetItem(str(
+
+        timestamp_cell = QTableWidgetItem(str(
             legible_timestamp
         ))
+
+        if len(self.error_list[row]) > 0:
+            make_cell_red(timestamp_cell)
+        return timestamp_cell
 
     def get_value_cell(self, event, row):
         """Returns a QTableWidgetItem containing the value for the given
@@ -301,16 +320,18 @@ class PbFileInspector():
             event.val
         ))
         if len(self.error_list[row]) > 0:
-            value_cell.setBackground(QColor(255, 200, 200))
+            make_cell_red(value_cell)
         return value_cell
 
-    def get_extra_fields_cell(self, event):
+    def get_extra_fields_cell(self, event, row):
         """Returns a QTAbleWidgetItem shwoing the "extra fields" on the given
         event"""
         extra_fields_cell = QTableWidgetItem(
             repr(event.fieldvalues)
         )
         extra_fields_cell.setSizeHint(QSize(500, 10))
+        if len(self.error_list[row]) > 0:
+            make_cell_red(extra_fields_cell)
         return extra_fields_cell
 
     def get_error_cell(self, row):
@@ -322,9 +343,17 @@ class PbFileInspector():
                 self.error_list[row][0]]
             if len(self.error_list[row]) > 1:
                 error_string += " ..."
-        return QTableWidgetItem(
+        error_cell =  QTableWidgetItem(
             error_string
         )
+        if len(self.error_list[row]) > 0:
+            make_cell_red(error_cell)
+        return error_cell
+
+
+def make_cell_red(cell_obj):
+    cell_obj.setBackground(LIGHT_RED)
+
 
 def generate_save_path(orig_path, save_dir, save_suffix):
     orig_basename = os.path.basename(orig_path)
