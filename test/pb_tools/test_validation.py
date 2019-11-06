@@ -7,7 +7,8 @@ def test_basic_data_checks():
         None,
         ee.ScalarInt(secondsintoyear=123, nano=4),
         ee.ScalarInt(secondsintoyear=123, nano=4, val=1),
-        ee.ScalarInt(secondsintoyear=122, nano=3, val=2)
+        ee.ScalarInt(secondsintoyear=122, nano=3, val=2),
+        ee.ScalarInt(secondsintoyear=122, nano=3, val=2),
     ]
 
     # Expect:
@@ -19,8 +20,9 @@ def test_basic_data_checks():
     expected_errors = [
         (0, validation.PbError.EVENT_NOT_DECODED),
         (1, validation.PbError.EVENT_MISSING_VALUE),
-        (2, validation.PbError.EVENT_DUPLICATED),
+        (2, validation.PbError.EVENTS_SHARE_TIMESTAMP),
         (3, validation.PbError.EVENT_OUT_OF_ORDER),
+        (4, validation.PbError.EVENT_DUPLICATED),
     ]
 
     payload_info = ee.PayloadInfo(

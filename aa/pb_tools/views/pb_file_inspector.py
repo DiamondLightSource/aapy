@@ -61,7 +61,7 @@ class PbFileInspector():
         form.same_dir_as_input.stateChanged.connect(self.update_save_dir)
         form.save_button.clicked.connect(self.save_pb_file)
         form.delete_event_button.clicked.connect(self.delete_selected_events)
-        form.errors_list.currentRowChanged.connect(self.scroll_to_event)
+        form.errors_list.currentRowChanged.connect(self.scroll_table_to_event)
         self.ui.show()
         self.pb_file = pb_file.PbFile()
         self.reset()
@@ -72,9 +72,13 @@ class PbFileInspector():
             self.normalize_input_path()
             self.load_pb_file()
 
-    def scroll_to_event(self, row):
-        if row >= 0 and row < len(self.pb_file.decoding_errors):
-            event_index, _ = self.pb_file.decoding_errors[row]
+    def scroll_table_to_event(self, row_in_error_list):
+        """Callback from selecting an item in the errors list
+        Scrolls the events table and selects the row for the
+        selected error"""
+        if row_in_error_list >= 0 and \
+                row_in_error_list < len(self.pb_file.decoding_errors):
+            event_index, _ = self.pb_file.decoding_errors[row_in_error_list]
             self.ui.events_table.setCurrentCell(event_index, 0)
 
     def reset(self):
@@ -128,7 +132,7 @@ class PbFileInspector():
             self.decode_events_and_check()
             return True
 
-    def set_header_from_form(self):
+    def set_payload_info_from_form(self):
         """Update the payload info in the model from info on GUI"""
         self.pb_file.payload_info.pvname = self.ui.pv_name_control.text()
         self.pb_file.payload_info.year = int(self.ui.year_control.text())
@@ -167,7 +171,7 @@ class PbFileInspector():
 
         # Apply settings from modified header
         self.set_status("Applying updated payload info")
-        self.set_header_from_form()
+        self.set_payload_info_from_form()
 
         # Remove any existing cells from table
         self.ui.events_table.setRowCount(0)
