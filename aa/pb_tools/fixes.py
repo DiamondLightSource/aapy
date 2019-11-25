@@ -1,4 +1,5 @@
 import os
+import logging
 from aa.pb_tools import pb_file
 
 def main():
@@ -90,6 +91,7 @@ def find_all_files_in_tree(root_dir):
         dict of Dir objects containing a list of the filenames in each
     """
     pb_files = {}
+    total_count = 0
     for this_dir, subdirs, filenames in os.walk(root_dir):
         if len(filenames) > 0:
             for prefix, filenames_per_pv in separate_by_prefix(filenames).items():
@@ -102,8 +104,9 @@ def find_all_files_in_tree(root_dir):
                 key = os.path.join(this_dir, prefix)
                 pb_files[key] = PbGroup(dir_path=this_dir,
                                         file_paths=full_paths)
+                total_count += len(full_paths)
 
-    return pb_files
+    return pb_files, total_count
 
 
 def separate_by_prefix(list_of_filenames):
@@ -137,13 +140,22 @@ class PbGroup():
         self.pb_files = []
 
     def read_files(self):
+        count_files = 0
         for file_path in self.file_paths:
             self.pb_files.append(pb_file.PbFile(file_path))
+            count_files += 1
+        return count_files
 
     def check_files_for_errors(self):
-        for this_file in self.pb_files:
+        count_files_with_errors = 0
+        for this_file, its_path in zip(self.pb_files, self.file_paths):
             this_file.decode_raw_lines()
             this_file.check_data_for_errors()
+            if len(this_file.decoding_errors) > 0:
+                report(f"{its_path} has "
+                       f"{len(this_file.decoding_errors)} errors")
+                count_files_with_errors += 1
+        return count_files_with_errors
 
     def __eq__(self, other):
         """TODO: Decide whether comparing pb_files is a valid check"""
@@ -153,3 +165,20 @@ class PbGroup():
 
     def __repr__(self):
         return f"PbGroup for dir {self.dir_path} containing {self.file_paths}"
+
+
+def demo(search_path = None):
+    if search_path is None:
+        search_path = "/dls/science/users/tdq39642/aa/lts_one_device/"
+    logging.basicConfig(level=logging.WARN)
+    data, total_files = find_all_files_in_tree(
+        search_path
+    )
+    total_with_errors = 0
+    report(f"Founf {total_files} files in this directory.")
+    for key, group in data.items():
+        group.read_files()
+        total_with_errors += group.check_files_for_errors()
+
+    report(f"Read {total_files} total files, "
+           f"found {total_with_errors} have errors")
