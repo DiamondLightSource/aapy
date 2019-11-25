@@ -34,7 +34,7 @@ def test_find_all_files_in_tree_gives_expected_output():
             "mock_lts"
         )
     )
-    output = fixes.find_all_files_in_tree(test_dir)
+    output, count_found = fixes.find_all_files_in_tree(test_dir)
 
     base_path = os.path.join(test_dir, "BL13I", "OP", "MIRR", "01")
     expect = {
@@ -52,4 +52,6 @@ def test_find_all_files_in_tree_gives_expected_output():
             ]),
 
     }
+    expect_count = 4
     assert output == expect
+    assert count_found == expect_count

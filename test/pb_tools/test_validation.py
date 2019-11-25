@@ -42,3 +42,26 @@ def test_basic_data_checks():
 
     assert result == [(None, validation.PbError.HEADER_NOT_DECODED)]
 
+
+def test_basic_data_checks_with_lazy_returns_after_first():
+    events = [
+        None,
+        ee.ScalarInt(secondsintoyear=123, nano=4),
+        ee.ScalarInt(secondsintoyear=123, nano=4, val=1),
+        ee.ScalarInt(secondsintoyear=122, nano=3, val=2),
+        ee.ScalarInt(secondsintoyear=122, nano=3, val=2),
+    ]
+
+    payload_info = ee.PayloadInfo(
+        year=2017,
+        type=5,
+        pvname="BL14J-PS-SHTR-03:OPS",
+        elementCount=1,
+    )
+
+    result = validation.basic_data_checks(payload_info, events, lazy=True)
+    expected_errors = [
+        (0, validation.PbError.EVENT_NOT_DECODED),
+    ]
+
+    assert result == expected_errors

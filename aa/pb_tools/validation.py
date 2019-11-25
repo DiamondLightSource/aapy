@@ -41,13 +41,16 @@ def log_parsing_error(index, error_type):
     MODULE_LOGGER.info(f"{error_string} at index {index}")
 
 
-def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list):
+def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list,
+                      lazy=False):
     """
     Run some basic checks on PB file events
 
     Args:
         payload_info: PayloadInfo for the events
         pb_events: List of PB event objects
+        lazy: return as soon as first error is found (saves time
+              parsing big files with lots of errors)
 
     Returns:
         List of tuples giving index and error type
@@ -76,16 +79,19 @@ def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list):
                 errors.append((index, PbError.EVENT_MISSING_VALUE))
             timestamp = pb.event_timestamp(year, event)
 
-            # Check timestamps monotonically increasing
+            # Following checks not valid on first event
             if prev_event is not None:
                 prev_timestamp = pb.event_timestamp(year, prev_event)
+                # Check timestamps monotonically increasing
                 if timestamp < prev_timestamp:
                     log_parsing_error(index, PbError.EVENT_OUT_OF_ORDER)
                     errors.append((index, PbError.EVENT_OUT_OF_ORDER))
                 elif timestamp == prev_timestamp:
+                    # All fields of this event match the previous one
                     if event == prev_event:
                         log_parsing_error(index, PbError.EVENT_DUPLICATED)
                         errors.append((index, PbError.EVENT_DUPLICATED))
+                    # Only timestamp duplicated
                     else:
                         log_parsing_error(index,
                                           PbError.EVENTS_SHARE_TIMESTAMP)
@@ -93,6 +99,7 @@ def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list):
                                        PbError.EVENTS_SHARE_TIMESTAMP))
 
         prev_event = event
-
+        if lazy and len(errors) > 0:
+            break
         index += 1
     return errors

@@ -150,12 +150,15 @@ class PbGroup():
         count_files_with_errors = 0
         for this_file, its_path in zip(self.pb_files, self.file_paths):
             this_file.decode_raw_lines()
-            this_file.check_data_for_errors()
+            this_file.check_data_for_errors(lazy=True)
             if len(this_file.decoding_errors) > 0:
                 report(f"{its_path} has "
                        f"{len(this_file.decoding_errors)} errors")
                 count_files_with_errors += 1
         return count_files_with_errors
+
+    def free(self):
+        del(self.pb_files)
 
     def __eq__(self, other):
         """TODO: Decide whether comparing pb_files is a valid check"""
@@ -179,6 +182,7 @@ def demo(search_path = None):
     for key, group in data.items():
         group.read_files()
         total_with_errors += group.check_files_for_errors()
+        group.free()
 
     report(f"Read {total_files} total files, "
            f"found {total_with_errors} have errors")

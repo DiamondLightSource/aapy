@@ -79,3 +79,28 @@ def test_writing_then_reading_file_gives_same_data():
     assert g.pb_events == f.pb_events
 
     os.remove(filepath)
+
+
+def test_all_events_equal_type_returns_True_when_one_event():
+    test_list = [
+        ee.ScalarInt(secondsintoyear=123, nano=4, val=123),
+    ]
+    assert pb_file.all_events_equal_type(test_list) == True
+
+
+def test_all_events_equal_type_returns_True_for_list_of_same():
+    test_list = [
+        ee.ScalarInt(secondsintoyear=123, nano=4, val=123),
+        ee.ScalarInt(secondsintoyear=123, nano=4, val=1),
+        ee.ScalarInt(secondsintoyear=456, nano=3, val=56)
+    ]
+    assert pb_file.all_events_equal_type(test_list) == True
+
+
+def test_all_events_equal_type_returns_False_for_list_of_different():
+    test_list = [
+        ee.ScalarInt(secondsintoyear=123, nano=4, val=123),
+        ee.ScalarDouble(secondsintoyear=123, nano=4, val=123.4),
+        ee.ScalarInt(secondsintoyear=456, nano=3, val=56)
+    ]
+    assert pb_file.all_events_equal_type(test_list) == False
