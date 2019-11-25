@@ -80,7 +80,7 @@ def find_different_type(pb_files):
 
 def find_all_files_in_tree(root_dir):
     """
-    Walk the tree under root dir, populating a dict containing Dir objects
+    Walk the tree under root dir, populating a dict containing PbGroup objects
     with full paths to all files found.
 
     Args:
@@ -92,9 +92,16 @@ def find_all_files_in_tree(root_dir):
     pb_files = {}
     for this_dir, subdirs, filenames in os.walk(root_dir):
         if len(filenames) > 0:
-            full_paths = [os.path.join(this_dir, file) for file in filenames]
-            pb_files[this_dir] = PbGroup(dir_path=this_dir,
-                                         file_paths=full_paths)
+            for prefix, filenames_per_pv in separate_by_prefix(filenames).items():
+                full_paths = [
+                    os.path.join(this_dir, file)
+                    for file in filenames_per_pv
+                ]
+                # Create the key by joining path to directory with prefix
+                # e.g. root/BL13I/OP/MIRR/01/X/RBV
+                key = os.path.join(this_dir, prefix)
+                pb_files[key] = PbGroup(dir_path=this_dir,
+                                        file_paths=full_paths)
 
     return pb_files
 
@@ -121,6 +128,9 @@ def separate_by_prefix(list_of_filenames):
 
 
 class PbGroup():
+    """
+    Represent a group of PB files for a single PV
+    """
     def __init__(self, dir_path, file_paths):
         self.dir_path = dir_path
         self.file_paths = file_paths
@@ -134,3 +144,12 @@ class PbGroup():
         for this_file in self.pb_files:
             this_file.decode_raw_lines()
             this_file.check_data_for_errors()
+
+    def __eq__(self, other):
+        """TODO: Decide whether comparing pb_files is a valid check"""
+        return self.dir_path == other.dir_path \
+               and self.file_paths == other.file_paths \
+               and self.pb_files == other.pb_files
+
+    def __repr__(self):
+        return f"PbGroup for dir {self.dir_path} containing {self.file_paths}"
