@@ -150,10 +150,10 @@ def find_all_files_in_tree(root_dir):
     for this_dir, subdirs, filenames in os.walk(root_dir):
         if len(filenames) > 0:
             for prefix, filenames_per_pv in group_filenames_by_prefix(filenames).items():
-                full_paths = [
+                full_paths = sorted([
                     os.path.join(this_dir, file)
                     for file in filenames_per_pv
-                ]
+                ])
                 # Create the key by joining path to directory with prefix
                 # e.g. root/BL13I/OP/MIRR/01/X/RBV
                 key = os.path.join(this_dir, prefix)

@@ -41,16 +41,16 @@ def test_find_all_files_in_tree_gives_expected_output():
     expect = {
         os.path.join(base_path, "X", "RBV"): fixes.PbGroup(
             dir_path=os.path.join(base_path, "X"),
-            file_paths=[
+            file_paths=sorted([
                 os.path.join(base_path, "X", "RBV:2018.pb"),
                 os.path.join(base_path, "X", "RBV:2019.pb"),
-            ]),
+            ])),
         os.path.join(base_path, "STAT"): fixes.PbGroup(
             dir_path = base_path,
-            file_paths = [
+            file_paths = sorted([
                 os.path.join(base_path, "STAT:2018.pb"),
                 os.path.join(base_path, "STAT:2019.pb"),
-            ]),
+            ])),
 
     }
     expect_count = 4
