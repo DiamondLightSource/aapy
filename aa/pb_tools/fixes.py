@@ -1,6 +1,10 @@
 import os
 import logging
+
+import numpy
+
 from aa.pb_tools import pb_file
+
 
 def main():
     # List of input file paths
@@ -31,7 +35,7 @@ def report(message):
     print(message)
 
 
-def find_different_type(pb_files):
+def find_different_type(file_paths, pb_files):
     """
     Given a list of files, determine if there are any that are a different type
 
@@ -44,17 +48,19 @@ def find_different_type(pb_files):
 
     if len(pb_files) == 0:
         report("No PB files given")
-        return None, None, []
+        return
 
+    """
     if len(pb_files) == 2:
         report("With only two input files, it's not possible to tell "
                "which one is right and which wrong.")
-        return None, None, []
+        return
+    """
 
     # Create a dict, index type, value a list of filenames which have that type
     files_by_type = {}
 
-    for filename, pb_data in pb_files.items():
+    for filename, pb_data in zip(file_paths, pb_files):
         this_type = pb_data.payload_info.type
         current_list = files_by_type.get(this_type, [])
         current_list.append(filename)
@@ -63,20 +69,29 @@ def find_different_type(pb_files):
     if len(files_by_type) == 1:
         # Only one type present in set
         report("All files have same type")
-        return None, None, []
+        return
     if len(files_by_type) == 2:
         # Two different types present
         # Work out which has fewest, and how many
         index = 0
-        if len(files_by_type[0]):
-            pass #incomplete
+        counts = [len(file_list) for file_list in files_by_type.items()]
+        types = files_by_type.values()
+        if counts[0] == counts[1]:
+            report(f"Equal number of mismatched types ({counts[0]})")
+            return
+        else:
+            # TODO this logic seems back to front
+            count_of_smallest = min(counts)
+            index_of_smallest = counts.index(min(counts))
+            type_of_smallest = types[index_of_smallest]
 
-        report(f"Least represented type: {minority} having {min_count} files")
-        return None, None, files_by_type[minority]
+            report(f"Least represented type: {type_of_smallest} "
+                   f"having {count_of_smallest} files")
+            return
     else:
         report("More than two types present in list of files, "
                "can't make a sensible deduction about which is right.")
-        return None, None, []
+        return
 
 
 def find_all_files_in_tree(root_dir):
@@ -147,6 +162,8 @@ class PbGroup():
         return count_files
 
     def check_files_for_errors(self):
+
+        # Errors within individual files
         count_files_with_errors = 0
         for this_file, its_path in zip(self.pb_files, self.file_paths):
             this_file.decode_raw_lines()
@@ -155,9 +172,15 @@ class PbGroup():
                 report(f"{its_path} has "
                        f"{len(this_file.decoding_errors)} errors")
                 count_files_with_errors += 1
+
+        # Check for non-matching types
+
+        find_different_type(self.file_paths, self.pb_files)
         return count_files_with_errors
 
-    def free(self):
+    def free_events(self):
+        """Try to avoid keeping all events in memory when we are searching
+        through large numbers of files"""
         del(self.pb_files)
 
     def __eq__(self, other):
@@ -171,6 +194,7 @@ class PbGroup():
 
 
 def demo(search_path = None):
+    """Walk the tree at given path. Check each file for errors and report."""
     if search_path is None:
         search_path = "/dls/science/users/tdq39642/aa/lts_one_device/"
     logging.basicConfig(level=logging.WARN)
@@ -180,9 +204,10 @@ def demo(search_path = None):
     total_with_errors = 0
     report(f"Founf {total_files} files in this directory.")
     for key, group in data.items():
+        report(f"Checking files in {group.dir_path}:")
         group.read_files()
         total_with_errors += group.check_files_for_errors()
-        group.free()
+        group.free_events()
 
     report(f"Read {total_files} total files, "
            f"found {total_with_errors} have errors")
