@@ -1,6 +1,3 @@
-import re
-
-
 class ParsingError(Exception):
     pass
 
@@ -51,4 +48,3 @@ def pv_name_from_path(path):
         pv_name = pv_stem
 
     return pv_name
-

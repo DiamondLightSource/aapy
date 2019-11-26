@@ -4,6 +4,8 @@ protobuf
 pytz
 requests
 tzlocal
+click
+PyQt5
 # Development
 pluggy>=0.12.0
 pytest

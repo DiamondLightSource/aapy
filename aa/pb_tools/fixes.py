@@ -119,7 +119,6 @@ def find_different_type(file_paths, pb_files):
             return
 
         else:
-            # TODO this logic seems back to front
             count_of_smallest = min(counts)
             index_of_smallest = counts.index(min(counts))
             type_of_smallest = types[index_of_smallest]
@@ -220,11 +219,9 @@ class PbGroup():
 
         if type_mismatch:
             # Correlate mismatched types with type errors
-            # TODO Horrible algorithm to start
             files_with_type_errors = []
             for this_file in self.pb_files:
                 if PbError.EVENT_MISSING_VALUE in this_file.parsing_errors:
-                    # TODO Ugh
                     index = self.pb_files.index(this_file)
                     files_with_type_errors.append(index)
 
