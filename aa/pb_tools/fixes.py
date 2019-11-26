@@ -4,6 +4,7 @@ import logging
 import numpy
 
 from aa.pb_tools import pb_file
+from aa.pb_tools.validation import PbError
 
 
 def main():
@@ -35,6 +36,29 @@ def report(message):
     print(message)
 
 
+def group_files_by_year(file_paths, pb_files):
+    """
+    Generate a dictionary with keys of year (from payload info) and values of
+    paths to files having that type.
+
+    Args:
+        file_paths: List of paths to PB files
+        pb_files: List of PbFile objects
+
+    Returns:
+        dict of type vs list of paths of files with that type
+    """
+    files_by_year = {}
+
+    for filename, pb_data in zip(file_paths, pb_files):
+        this_year = pb_data.payload_info.year
+        current_list = files_by_year.get(this_year, [])
+        current_list.append(filename)
+        files_by_year[this_year] = current_list
+
+    return files_by_year
+
+
 def group_files_by_type(file_paths, pb_files):
     """
     Generate a dictionary with keys of file type and values of files having
@@ -63,15 +87,15 @@ def find_different_type(file_paths, pb_files):
     Given a list of files, determine if there are any that are a different type
 
     Args:
-        pb_files:
+        pb_files: list of PbFile objects
 
     Returns:
-
+        type mismatch (bool) files by type (dict)
     """
 
     if len(pb_files) == 0:
         report("No PB files given")
-        return
+        return {}
 
     # Create a dict, index type, value a list of filenames which have that type
     files_by_type = group_files_by_type(file_paths, pb_files)
@@ -79,7 +103,10 @@ def find_different_type(file_paths, pb_files):
     if len(files_by_type) == 1:
         # Only one type present in set
         report("All files have same type")
-        return
+        return False, files_by_type
+
+    report("These files don't all have the same type.")
+
     if len(files_by_type) == 2:
         # Two different types present
         # Work out which has fewest, and how many
@@ -87,20 +114,23 @@ def find_different_type(file_paths, pb_files):
         counts = [len(file_list) for file_list in files_by_type.items()]
         types = files_by_type.values()
         if counts[0] == counts[1]:
-            report(f"Equal number of mismatched types ({counts[0]})")
+            report(f"- equal number of mismatched types "
+                   f"({counts[0]} files each)")
             return
+
         else:
             # TODO this logic seems back to front
             count_of_smallest = min(counts)
             index_of_smallest = counts.index(min(counts))
             type_of_smallest = types[index_of_smallest]
 
-            report(f"Least represented type: {type_of_smallest} "
+            report(f"- least represented type: {type_of_smallest} "
                    f"having {count_of_smallest} files")
             return
+
     else:
-        report("More than two types present in list of files, "
-               "can't make a sensible deduction about which is right.")
+        report("More than two types present in list of files. "
+               "Can't make a sensible deduction about which is right.")
         return
 
 
@@ -119,7 +149,7 @@ def find_all_files_in_tree(root_dir):
     total_count = 0
     for this_dir, subdirs, filenames in os.walk(root_dir):
         if len(filenames) > 0:
-            for prefix, filenames_per_pv in separate_by_prefix(filenames).items():
+            for prefix, filenames_per_pv in group_filenames_by_prefix(filenames).items():
                 full_paths = [
                     os.path.join(this_dir, file)
                     for file in filenames_per_pv
@@ -134,7 +164,7 @@ def find_all_files_in_tree(root_dir):
     return pb_files, total_count
 
 
-def separate_by_prefix(list_of_filenames):
+def group_filenames_by_prefix(list_of_filenames):
     """
     Returns a dict with the supplied filenames split by the prefix (before
     the colon)
@@ -184,8 +214,24 @@ class PbGroup():
                 count_files_with_errors += 1
 
         # Check for non-matching types
+        type_mismatch, self.files_by_type = find_different_type(
+            self.file_paths, self.pb_files
+        )
 
-        find_different_type(self.file_paths, self.pb_files)
+        if type_mismatch:
+            # Correlate mismatched types with type errors
+            # TODO Horrible algorithm to start
+            files_with_type_errors = []
+            for this_file in self.pb_files:
+                if PbError.EVENT_MISSING_VALUE in this_file.parsing_errors:
+                    # TODO Ugh
+                    index = self.pb_files.index(this_file)
+                    files_with_type_errors.append(index)
+
+            if len(files_with_type_errors):
+                pass
+
+
         return count_files_with_errors
 
     def free_events(self):
@@ -212,7 +258,7 @@ def demo(search_path = None):
         search_path
     )
     total_with_errors = 0
-    report(f"Founf {total_files} files in this directory.")
+    report(f"Found {total_files} files in this directory.")
     for key, group in data.items():
         report(f"Checking files in {group.dir_path}:")
         group.read_files()
