@@ -33,6 +33,8 @@ class PbFile:
         self.payload_info = None
         self.pb_events = None
         self.decoding_errors = None
+        self.read_path = None
+        self.write_path = None
 
     def decode_raw_lines(self, requested_type=None):
         """
@@ -57,6 +59,7 @@ class PbFile:
 
     def read_raw_lines_from_file(self, full_path):
         """Read raw data from file"""
+        self.read_path = full_path
         with open(full_path, "rb") as raw_file:
             raw_data = raw_file.read()
         # Extract a chunk from the raw data
@@ -78,6 +81,7 @@ class PbFile:
 
     def write_raw_lines_to_file(self, output_file_path):
         """Write payload info and raw data to file"""
+        self.write_path = output_file_path
         raw_header = serialize_payload_info_to_raw(self.payload_info)
         bytes_to_write = raw_header + b"\n"
 
@@ -92,6 +96,7 @@ class PbFile:
 
 
 def all_events_equal_type(list_of_events: list):
+    """Return true if all events have the same type"""
     comparison_type = type(list_of_events[0])
 
     if len(list_of_events) < 1:
