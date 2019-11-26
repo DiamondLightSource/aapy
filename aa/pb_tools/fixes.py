@@ -7,30 +7,6 @@ from aa.pb_tools import pb_file
 from aa.pb_tools.validation import PbError
 
 
-def main():
-    # List of input file paths
-    root_path = "/mnt/archiver1/lts/BL14J/PS/SHTR/03"
-    input_files = [os.path.join(root_path, filename) for filename in [
-        "OPS:2017.pb",
-        "OPS:2018.pb",
-        "OPS:2019.pb",
-    ]]
-    input_files.append("/dls/science/users/tdq39642/aa/OPS:2017.pb")
-
-    pb_files = {filename: pb_file.PbFile(filename) for filename in input_files}
-
-    for filename, pb_data in pb_files.items():
-        pb_data.decode_raw_lines()
-        pb_data.check_data_for_errors()
-
-    # If one file has a different type in the payload info then it
-    # might be wrong, suggest changing to match the others;
-    # Can check if changing to match the others would get rid of all
-    # missing value erorrs in that file
-    minority, majority, odd_ones_out = find_different_type(pb_files)
-    report(f"Filenames retunred: {odd_ones_out}")
-
-
 def report(message):
     """These will eventually be logs"""
     print(message)
