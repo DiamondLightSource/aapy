@@ -1,8 +1,6 @@
 import os
 import logging
 
-import numpy
-
 from aa.pb_tools import pb_file
 from aa.pb_tools.validation import PbError
 
@@ -86,7 +84,6 @@ def find_different_type(file_paths, pb_files):
     if len(files_by_type) == 2:
         # Two different types present
         # Work out which has fewest, and how many
-        index = 0
         counts = [len(file_list) for file_list in files_by_type.items()]
         types = files_by_type.values()
         if counts[0] == counts[1]:
@@ -122,7 +119,7 @@ def find_all_files_in_tree(root_dir):
     """
     pb_files = {}
     total_count = 0
-    for this_dir, subdirs, filenames in os.walk(root_dir):
+    for this_dir, _, filenames in os.walk(root_dir):
         if len(filenames) > 0:
             for prefix, filenames_per_pv in group_filenames_by_prefix(filenames).items():
                 full_paths = sorted([
@@ -168,6 +165,7 @@ class PbGroup():
         self.dir_path = dir_path
         self.file_paths = file_paths
         self.pb_files = []
+        self.files_by_type = None
 
     def read_files(self):
         count_files = 0
@@ -232,7 +230,7 @@ def demo(search_path = None):
     )
     total_with_errors = 0
     report(f"Found {total_files} files in this directory.")
-    for key, group in data.items():
+    for _, group in data.items():
         report(f"Checking files in {group.dir_path}:")
         group.read_files()
         total_with_errors += group.check_files_for_errors()

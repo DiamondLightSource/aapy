@@ -21,7 +21,14 @@ class PbFile:
 
     def __init__(self, filename=None):
         self.logger = logging.getLogger(f"{__name__}")
-        self.empty()
+
+        # Do this instead of calling empty() to appease pylint
+        self.raw_lines = None
+        self.payload_info = None
+        self.pb_events = None
+        self.decoding_errors = None
+        self.read_path = None
+        self.write_path = None
 
         # Read raw data if we are given a filename
         if filename:
