@@ -340,3 +340,6 @@ int-import-graph=
 # Exceptions that will emit a warning when being caught. Defaults to
 # "Exception"
 overgeneral-exceptions=Exception
+
+# This required to understand usage of PyQt5; extenstions not loaded by default
+extension-pkg-whitelist=PyQt5

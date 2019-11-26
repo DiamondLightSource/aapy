@@ -5,17 +5,14 @@ perform some simple fixes.
 import sys
 import os
 import logging
-import datetime
 from pathlib import Path
-import pytz
 
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem
 from PyQt5 import uic
 from PyQt5.QtGui import QColor, QPalette
 from PyQt5.QtCore import QSize
+from google.protobuf.message import DecodeError, EncodeError
 
-
-from aa import pb
 from aa.pb import get_iso_timestamp_for_event
 from aa.pb_tools import pb_file, validation
 
@@ -64,6 +61,7 @@ class PbFileInspector():
         form.errors_list.currentRowChanged.connect(self.scroll_table_to_event)
         self.ui.show()
         self.pb_file = pb_file.PbFile()
+        self.error_list = None
         self.reset()
 
         if load_path:
@@ -123,7 +121,7 @@ class PbFileInspector():
             self.ui.element_count_control.setValue(
                 self.pb_file.payload_info.elementCount
             )
-        except Exception as e:
+        except DecodeError as e:
             self.set_status(f"Exception reading header: {e}")
             return False
         else:
@@ -217,8 +215,8 @@ class PbFileInspector():
                 LIGHT_GREEN
             )
         else:
-            [make_cell_red(self.ui.errors_list.item(idx))
-             for idx in range(self.ui.errors_list.count())]
+            for idx in range(self.ui.errors_list.count()):
+                make_cell_red(self.ui.errors_list.item(idx))
 
     def populate_events_table(self):
         """Populate the events table from stored info"""
@@ -274,7 +272,7 @@ class PbFileInspector():
         """
         try:
             self.pb_file.serialize_to_raw_lines()
-        except Exception as e:
+        except EncodeError as e:
             self.set_status(f"Exception encoding events: {e}", is_bad=True)
             return False
 
@@ -295,7 +293,7 @@ class PbFileInspector():
             return False
         try:
             self.pb_file.write_raw_lines_to_file(save_path)
-        except Exception as e:
+        except IOError as e:
             self.set_status(f"Exception saving file: {e}, is_bad=True")
             return False
         else:
@@ -360,7 +358,6 @@ def make_cell_red(cell_obj):
 
 
 def generate_save_path(orig_path, save_dir, save_suffix):
-    orig_basename = os.path.basename(orig_path)
     orig_stem = os.path.basename(orig_path).split(".")[0]
     new_filename = orig_stem + save_suffix.strip() + ".pb"
     return os.path.join(
