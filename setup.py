@@ -12,6 +12,7 @@ setup(
           'protobuf',
           'pytz',
           'requests',
-          'tzlocal'
+          'tzlocal',
+          'PyQt5'
       ]
      )
