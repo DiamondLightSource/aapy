@@ -35,6 +35,29 @@ def report(message):
     print(message)
 
 
+def group_files_by_type(file_paths, pb_files):
+    """
+    Generate a dictionary with keys of file type and values of files having
+    that type.
+
+    Args:
+        file_paths: List of paths to PB files
+        pb_files: List of PbFile objects
+
+    Returns:
+        dict of type vs list of paths of files with that type
+    """
+    files_by_type = {}
+
+    for filename, pb_data in zip(file_paths, pb_files):
+        this_type = pb_data.payload_info.type
+        current_list = files_by_type.get(this_type, [])
+        current_list.append(filename)
+        files_by_type[this_type] = current_list
+
+    return files_by_type
+
+
 def find_different_type(file_paths, pb_files):
     """
     Given a list of files, determine if there are any that are a different type
@@ -50,21 +73,8 @@ def find_different_type(file_paths, pb_files):
         report("No PB files given")
         return
 
-    """
-    if len(pb_files) == 2:
-        report("With only two input files, it's not possible to tell "
-               "which one is right and which wrong.")
-        return
-    """
-
     # Create a dict, index type, value a list of filenames which have that type
-    files_by_type = {}
-
-    for filename, pb_data in zip(file_paths, pb_files):
-        this_type = pb_data.payload_info.type
-        current_list = files_by_type.get(this_type, [])
-        current_list.append(filename)
-        files_by_type[this_type] = current_list
+    files_by_type = group_files_by_type(file_paths, pb_files)
 
     if len(files_by_type) == 1:
         # Only one type present in set
