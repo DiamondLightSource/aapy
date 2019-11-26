@@ -58,6 +58,9 @@ def rewrite_pb_header_type(in_path, out_path, new_type):
     Modify the type in the payload info for the protocol
     buffer file at IN_PATH, saving a new file to OUT_PATH
     without attempting to decode and encode the events.
+    Therefore there is no guarantee that the new type is the
+    correct one for these events, and we don't try to
+    convert the type of the events either.
     The new type has the index NEW_TYPE which is
     an integer type index from the following list:
 
