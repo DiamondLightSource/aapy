@@ -10,7 +10,7 @@ def report(message):
     print(message)
 
 
-def group_files_by_year(file_paths, pb_files):
+def group_files_by_year(pb_files):
     """
     Generate a dictionary with keys of year (from payload info) and values of
     paths to files having that type.
@@ -24,16 +24,16 @@ def group_files_by_year(file_paths, pb_files):
     """
     files_by_year = {}
 
-    for filename, pb_data in zip(file_paths, pb_files):
+    for pb_data in pb_files:
         this_year = pb_data.payload_info.year
         current_list = files_by_year.get(this_year, [])
-        current_list.append(filename)
+        current_list.append(pb_data.read_path)
         files_by_year[this_year] = current_list
 
     return files_by_year
 
 
-def group_files_by_type(file_paths, pb_files):
+def group_files_by_type(pb_files):
     """
     Generate a dictionary with keys of file type and values of files having
     that type.
@@ -47,10 +47,10 @@ def group_files_by_type(file_paths, pb_files):
     """
     files_by_type = {}
 
-    for filename, pb_data in zip(file_paths, pb_files):
+    for pb_data in pb_files:
         this_type = pb_data.payload_info.type
         current_list = files_by_type.get(this_type, [])
-        current_list.append(filename)
+        current_list.append(pb_data.read_path)
         files_by_type[this_type] = current_list
 
     return files_by_type

@@ -74,9 +74,12 @@ def test_group_files_by_year_gives_expected_output():
         suffix = ""
         while f"{year}.pb{suffix}" in filenames:
             suffix += "1"
-        filenames.append(f"{year}.pb{suffix}")
+        this_filename = f"{year}.pb{suffix}"
+        test_file.read_path = this_filename
+        filenames.append(this_filename)
 
-    result = fixes.group_files_by_year(filenames, pb_files)
+
+    result = fixes.group_files_by_year(pb_files)
 
     expected = {
         2017: ["2017.pb"],
@@ -105,9 +108,11 @@ def test_group_files_by_type_gives_expected_output():
         suffix = ""
         while f"{year}.pb{suffix}" in filenames:
             suffix += "1"
-        filenames.append(f"{year}.pb{suffix}")
+        this_filename = f"{year}.pb{suffix}"
+        test_file.read_path = this_filename
+        filenames.append(this_filename)
 
-    result = fixes.group_files_by_type(filenames, pb_files)
+    result = fixes.group_files_by_type(pb_files)
 
     expected = {
         1: ["2001.pb"],
