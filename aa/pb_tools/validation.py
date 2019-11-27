@@ -2,7 +2,7 @@
 Tools for validating and fixing protobuf files
 """
 import logging
-from enum import Enum
+from enum import Flag, auto
 
 from aa import pb
 from aa import epics_event_pb2 as ee
@@ -10,16 +10,19 @@ from aa import epics_event_pb2 as ee
 # A logger for this module
 MODULE_LOGGER = logging.getLogger("{}".format(__name__))
 
-
-class PbError(Enum):
+    
+class PbError(Flag):
     """Different error conditions that can occur in a PB file"""
-    HEADER_NOT_DECODED = 0
-    EVENT_NOT_DECODED = 1
-    EVENT_MISSING_VALUE = 2
-    EVENT_MISSING_TIMESTAMP = 3
-    EVENT_OUT_OF_ORDER = 4
-    EVENTS_SHARE_TIMESTAMP = 5
-    EVENT_DUPLICATED = 6
+    HEADER_NOT_DECODED = auto()
+    EVENT_NOT_DECODED = auto()
+    EVENT_MISSING_VALUE = auto()
+    EVENT_MISSING_TIMESTAMP = auto()
+    EVENT_OUT_OF_ORDER = auto()
+    EVENTS_SHARE_TIMESTAMP = auto()
+    EVENT_DUPLICATED = auto()
+    ALL = HEADER_NOT_DECODED | EVENT_NOT_DECODED | EVENT_MISSING_VALUE \
+          | EVENT_MISSING_TIMESTAMP | EVENT_OUT_OF_ORDER \
+          | EVENTS_SHARE_TIMESTAMP | EVENT_DUPLICATED
 
 
 PB_ERROR_STRINGS = {
