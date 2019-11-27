@@ -72,12 +72,14 @@ class PbFile:
         # Extract a chunk from the raw data
         self.payload_info, self.raw_lines = one_chunk_from_raw(raw_data)
 
-    def check_data_for_errors(self, lazy=False):
+    def check_data_for_errors(self, lazy=False,
+                              only_check=validation.PbError.ALL):
         """Run checks on data and populate list of errors"""
         self.decoding_errors = validation.basic_data_checks(
             self.payload_info,
             self.pb_events,
-            lazy
+            lazy=lazy,
+            only_check=only_check
         )
 
     def serialize_to_raw_lines(self):

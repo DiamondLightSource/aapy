@@ -107,7 +107,10 @@ def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list,
 def record_error(index: int, error_type: PbError, only_check: Flag,
                  errors: list):
     """
-    Log a parsing error and append it to the given list
+    Log a parsing error and append it to the given list.
+    Note that irrespective of only_check, we always record HEADER_NOT_DECODED
+    because it's a fundamental problem with the file that breaks everything.
+
     Args:
         index: The event index into file where it occurred
         error_type: Error type from PbError
@@ -117,7 +120,7 @@ def record_error(index: int, error_type: PbError, only_check: Flag,
     Returns:
 
     """
-    if error_type & only_check:
+    if error_type & only_check or error_type == PbError.HEADER_NOT_DECODED:
         error_string = PB_ERROR_STRINGS[error_type]
         MODULE_LOGGER.info(f"{error_string} at index {index}")
 

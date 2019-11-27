@@ -99,3 +99,16 @@ def test_basic_data_checks_with_only_check_returns_only_requested(test_events,
         (4, validation.PbError.EVENT_DUPLICATED),
     ]
     assert result == expected_errors
+
+def test_basic_data_checks_with_both_lazy_and_only_check_gives_correct_event(
+        test_events, payload_info
+):
+    mask = validation.PbError.EVENT_MISSING_VALUE \
+           | validation.PbError.EVENT_DUPLICATED
+    result = validation.basic_data_checks(payload_info, test_events,
+                                          lazy=True, only_check=mask)
+    # Make sure we get this one, not just the first that we skipped
+    expected_errors = [
+        (1, validation.PbError.EVENT_MISSING_VALUE),
+    ]
+    assert result == expected_errors
