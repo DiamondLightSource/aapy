@@ -6,6 +6,8 @@ requests
 tzlocal
 click
 PyQt5
+cothread
+epicscorelibs
 # Development
 pluggy>=0.12.0
 pytest

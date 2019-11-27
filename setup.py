@@ -13,6 +13,8 @@ setup(
           'pytz',
           'requests',
           'tzlocal',
-          'PyQt5'
+          'PyQt5',
+          'cothread',
+          'epicscorelibs' # Required to provide libca for cothread
       ]
      )

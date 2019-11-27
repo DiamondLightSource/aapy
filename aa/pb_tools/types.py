@@ -21,7 +21,8 @@ typemap.put(ArchDBRTypes.DBR_V4_GENERIC_BYTES, new DBR2PBTypeMapping(PBV4Generic
 """
 from collections import namedtuple
 
-from cothread.catools import caget, dbr
+from cothread.catools import caget
+from cothread import dbr
 
 from aa import epics_event_pb2 as ee
 
