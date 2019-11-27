@@ -16,7 +16,6 @@ def group_files_by_year(pb_files):
     paths to files having that type.
 
     Args:
-        file_paths: List of paths to PB files
         pb_files: List of PbFile objects
 
     Returns:
@@ -39,7 +38,6 @@ def group_files_by_type(pb_files):
     that type.
 
     Args:
-        file_paths: List of paths to PB files
         pb_files: List of PbFile objects
 
     Returns:
@@ -56,7 +54,7 @@ def group_files_by_type(pb_files):
     return files_by_type
 
 
-def find_different_type(file_paths, pb_files):
+def find_different_type(pb_files):
     """
     Given a list of files, determine if there are any that are a different type
 
@@ -72,7 +70,7 @@ def find_different_type(file_paths, pb_files):
         return {}
 
     # Create a dict, index type, value a list of filenames which have that type
-    files_by_type = group_files_by_type(file_paths, pb_files)
+    files_by_type = group_files_by_type(pb_files)
 
     if len(files_by_type) == 1:
         # Only one type present in set
@@ -188,7 +186,7 @@ class PbGroup():
 
         # Check for non-matching types
         type_mismatch, self.files_by_type = find_different_type(
-            self.file_paths, self.pb_files
+            self.pb_files
         )
 
         if type_mismatch:
