@@ -27,41 +27,48 @@ from cothread import dbr
 from aa import epics_event_pb2 as ee
 
 TypeMapping = namedtuple("TypeMapping",
-                         "dbr_type pb_scalar_type pb_vector_type")
+                         "ca_type dbr_type pb_scalar_type pb_vector_type")
 
 
 COTHREAD_TYPE_MAPPING = [
     TypeMapping(
+        ca_type=dbr.ca_str,
         dbr_type=[dbr.DBR_STRING, dbr.DBR_CHAR_STR],
         pb_scalar_type=ee.ScalarString,
         pb_vector_type=ee.VectorString
     ),
     TypeMapping(
+        ca_type=dbr.ca_int,
         dbr_type=[dbr.DBR_SHORT],
         pb_scalar_type=ee.ScalarShort,
         pb_vector_type=ee.VectorShort
     ),
     TypeMapping(
+        ca_type=dbr.ca_float,
         dbr_type=[dbr.DBR_FLOAT],
         pb_scalar_type=ee.ScalarFloat,
         pb_vector_type=ee.VectorFloat
     ),
     TypeMapping(
+        ca_type=dbr.ca_int,
         dbr_type=[dbr.DBR_ENUM],
         pb_scalar_type=ee.ScalarEnum,
         pb_vector_type=ee.VectorEnum
     ),
     TypeMapping(
+        ca_type=dbr.ca_int,
         dbr_type=[dbr.DBR_CHAR],
         pb_scalar_type=ee.ScalarByte, # Not precise match
         pb_vector_type=ee.VectorChar
     ),
     TypeMapping(
+        ca_type=dbr.ca_int,
         dbr_type=[dbr.DBR_LONG], # Not precise match ?
         pb_scalar_type=ee.ScalarInt,
         pb_vector_type=ee.VectorInt
     ),
     TypeMapping(
+        ca_type=dbr.ca_float,
         dbr_type=[dbr.DBR_DOUBLE],
         pb_scalar_type=ee.ScalarDouble,
         pb_vector_type=ee.VectorDouble
@@ -87,8 +94,10 @@ def ca_to_pb_type(ca_value):
         if data_type in mapping.dbr_type:
             if isinstance(ca_value, dbr.ca_array):
                 pb_type = mapping.pb_vector_type
-            else:
+            elif isinstance(ca_value, mapping.ca_type):
                 pb_type = mapping.pb_scalar_type
+            else:
+                raise ValueError("Couldn't map CA type to PB type")
     return pb_type
 
 
