@@ -85,21 +85,21 @@ def find_different_type(pb_files):
         # Two different types present
         # Work out which has fewest, and how many
         counts = [len(file_list) for file_list in files_by_type.items()]
-        types = files_by_type.values()
+        list_of_types = files_by_type.values()
 
         for pb_type, count in zip(files_by_type.keys(), counts):
             report(f"{pb_type}: {count} files")
         if counts[0] == counts[1]:
-            report(f"- equal number of mismatched types "
+            report(f"-> equal number of mismatched types "
                    f"({counts[0]} files each)")
             return True, files_by_type
 
         else:
             count_of_smallest = min(counts)
             index_of_smallest = counts.index(min(counts))
-            type_of_smallest = types[index_of_smallest]
+            type_of_smallest = list_of_types[index_of_smallest]
 
-            report(f"- least represented type: {type_of_smallest} "
+            report(f"-> least represented type: {type_of_smallest} "
                    f"having {count_of_smallest} files")
             return True, files_by_type
 
@@ -108,7 +108,7 @@ def find_different_type(pb_files):
     else:
         report("More than two types present in list of files. "
                "Can't make a sensible deduction about which is right.")
-        return False, files_by_type
+        return True, files_by_type
 
 
 def find_all_files_in_tree(root_dir):
@@ -163,6 +163,29 @@ def group_filenames_by_prefix(list_of_filenames):
     return result
 
 
+def join_all_lists_except(exclude_key, orig_dict):
+    """
+    Given a dict where each value is a list, and one key, return a list
+    which is the concatenation of all elements in the dict EXCEPT the given key
+
+    Args:
+        exclude_key: Key to exclude
+        orig_dict: Starting dictionary; each element must be a list
+
+    Returns:
+        List combining all elements except those at exclude_key
+    """
+    # Make a list of keys without exclude_key in it
+    keys = list(orig_dict.keys())
+    keys.remove(exclude_key)
+    expected_error_types = keys
+    # Collect lists from remaining keys
+    expected_error_files = []
+    for key in expected_error_types:
+        expected_error_files.extend(orig_dict[key])
+    return expected_error_files
+
+
 class PbGroup():
     """
     Represent a group of PB files for a single PV
@@ -212,24 +235,34 @@ class PbGroup():
                 if len(this_file.decoding_errors) > 0:
                     paths_with_type_errors.append(this_file.read_path)
 
-            live_type = self.check_live_pv_type()
-            if live_type is not None:
+            live_pv_type = self.check_live_pv_type()
+            if live_pv_type is not None:
                 # Try to correlate with live type
-                if live_type in self.files_by_type.keys():
+                if live_pv_type in self.files_by_type.keys():
                     report("Live type matches some of our files.")
-                    # We want to find the type we expect to have the errors
+                    # Make a list of filenames which have different types
+                    # from the live PV.
                     # this algorithm is rubbish but might do the job
-                    keys = list(self.files_by_type.keys())
-                    keys.remove(live_type)
-                    expected_error_types = keys
-                    expected_list = []
-                    for key in expected_error_types:    
-                        expected_list.append(key)
-                    if expected_list.sort() == paths_with_type_errors.sort():
-                        report("The type(s) other than the live type have "
-                               "all the files with errors")
+                    #
+                    # Start with list of all types
+                    expected_error_files = join_all_lists_except(
+                        exclude_key=live_pv_type,
+                        orig_dict=self.files_by_type
+                    )
+                    if expected_error_files.sort() == \
+                            paths_with_type_errors.sort():
+                        report("All the files with errors have types that "
+                               "don't match the live PV, ")
+                        report("so let's see if they can be reinterpreted with "
+                               f"{live_pv_type}")
+                        # Attempt reinterpret
+
                     else:
                         report("Can't correlate live type to errors in files")
+
+                else:
+                    # live pv type is none
+                    pass
 
         return count_files_with_errors
 

@@ -1,4 +1,5 @@
 import os
+from aa import pb
 from aa import epics_event_pb2 as ee
 from aa.pb_tools import fixes, pb_file
 
@@ -123,11 +124,23 @@ def test_group_files_by_type_gives_expected_output():
     result = fixes.group_files_by_type(pb_files)
 
     expected = {
-        1: ["2001.pb"],
-        2: ["2002.pb"],
-        3: ["2003.pb",
-            "2003.pb1"],
-        4: ["2004.pb"],
+        pb.TYPE_MAPPINGS[1]: ["2001.pb"],
+        pb.TYPE_MAPPINGS[2]: ["2002.pb"],
+        pb.TYPE_MAPPINGS[3]: ["2003.pb",
+                              "2003.pb1"],
+        pb.TYPE_MAPPINGS[4]: ["2004.pb"],
     }
 
     assert result == expected
+
+
+def test_join_all_lists_except_gives_correct_output():
+    test_dict = {
+        "a": [1, 2, 3],
+        "b": [4, 5, 6],
+        "c": [7, 8, 9],
+    }
+    exclude_key = "b"
+    expected_output = [1, 2, 3, 7, 8, 9]
+    result = fixes.join_all_lists_except(exclude_key, test_dict)
+    assert result == expected_output
