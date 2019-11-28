@@ -1,5 +1,7 @@
-from pytest import mark
-from cothread.catools import dbr
+from pytest import mark, raises
+import mock
+from cothread import dbr
+from cothread.catools import ca_nothing
 
 from aa.pb_tools import types
 from aa import epics_event_pb2 as ee
@@ -44,3 +46,29 @@ def test_ca_to_pb_type_gives_correct_vector_output(ca_type, dbr_type, pb_type):
 
     assert result == pb_type
 
+
+@mark.parametrize("ca_type,dbr_type,pb_type", SCALAR_TYPE_MAP)
+@mock.patch("aa.pb_tools.types.caget")
+def test_get_type_of_live_pv_gives_expected_for_scalars(mock_caget,
+       ca_type, dbr_type, pb_type):
+
+    mock_caget.return_value=ca_type()
+    mock_caget.return_value.datatype = dbr_type
+    assert types.get_pb_type_of_live_pv("FAKE-PV") == pb_type
+
+
+@mark.parametrize("ca_type,dbr_type,pb_type", VECTOR_TYPE_MAP)
+@mock.patch("aa.pb_tools.types.caget")
+def test_get_type_of_live_pv_gives_expected_for_vectors(mock_caget,
+       ca_type, dbr_type, pb_type):
+
+    mock_caget.return_value=dbr.ca_array([0,1,2])
+    mock_caget.return_value.datatype = dbr_type
+    assert types.get_pb_type_of_live_pv("FAKE-PV") == pb_type
+
+
+@mock.patch("aa.pb_tools.types.caget")
+def test_get_type_of_live_pv_throws_ValueError_if_pv_not_found(mock_caget):
+    mock_caget.return_value=ca_nothing("FAKE-PV")
+    with raises(ValueError):
+        types.get_pb_type_of_live_pv("FAKE-PV")

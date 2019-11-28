@@ -26,6 +26,7 @@ from cothread import dbr
 
 from aa import epics_event_pb2 as ee
 
+
 TypeMapping = namedtuple("TypeMapping",
                          "ca_type dbr_type pb_scalar_type pb_vector_type")
 
@@ -83,12 +84,19 @@ def ca_to_pb_type(ca_value):
     vector type.
 
     Args:
-        ca_value:
+        ca_value: The return value from a caget.
 
     Returns:
+        The type from list defined in epics_event_pb2
 
+    Raises:
+        ValueError if the lookup failed.
     """
-    data_type = ca_value.datatype
+    try:
+        data_type = ca_value.datatype
+    except AttributeError:
+        raise ValueError("Did not get PV value")
+
     pb_type = None
     for mapping in COTHREAD_TYPE_MAPPING:
         if data_type in mapping.dbr_type:
@@ -101,6 +109,19 @@ def ca_to_pb_type(ca_value):
     return pb_type
 
 
-def get_type_of_live_pv(pv_name):
+def get_pb_type_of_live_pv(pv_name):
+    """
+    Do a caget on the named PV, and from the result look up the PB type
+    that it corresponds to.
+
+    Args:
+        pv_name: Name of the PV to get
+
+    Returns:
+        he type from list defined in epics_event_pb2
+
+    Raises:
+        ValueError if the caget or lookup failed.
+    """
     result = caget(pv_name, timeout=0.1)
-    return result.datatype
+    return ca_to_pb_type(result)
