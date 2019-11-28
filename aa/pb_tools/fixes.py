@@ -1,7 +1,8 @@
 import os
 import logging
 
-from aa.pb_tools import pb_file
+from aa import pb
+from aa.pb_tools import pb_file, types
 from aa.pb_tools.validation import PbError
 
 
@@ -46,7 +47,8 @@ def group_files_by_type(pb_files):
     files_by_type = {}
 
     for pb_data in pb_files:
-        this_type = pb_data.payload_info.type
+        idx = pb_data.payload_info.type
+        this_type = pb.TYPE_MAPPINGS[idx]
         current_list = files_by_type.get(this_type, [])
         current_list.append(pb_data.read_path)
         files_by_type[this_type] = current_list
@@ -84,6 +86,9 @@ def find_different_type(pb_files):
         # Work out which has fewest, and how many
         counts = [len(file_list) for file_list in files_by_type.items()]
         types = files_by_type.values()
+
+        for pb_type, count in zip(files_by_type.keys(), counts):
+            report(f"{pb_type}: {count} files")
         if counts[0] == counts[1]:
             report(f"- equal number of mismatched types "
                    f"({counts[0]} files each)")
@@ -97,6 +102,8 @@ def find_different_type(pb_files):
             report(f"- least represented type: {type_of_smallest} "
                    f"having {count_of_smallest} files")
             return True, files_by_type
+
+
 
     else:
         report("More than two types present in list of files. "
@@ -119,7 +126,8 @@ def find_all_files_in_tree(root_dir):
     total_count = 0
     for this_dir, _, filenames in os.walk(root_dir):
         if len(filenames) > 0:
-            for prefix, filenames_per_pv in group_filenames_by_prefix(filenames).items():
+            for prefix, filenames_per_pv \
+                    in group_filenames_by_prefix(filenames).items():
                 full_paths = sorted([
                     os.path.join(this_dir, file)
                     for file in filenames_per_pv
@@ -166,7 +174,6 @@ class PbGroup():
         self.pb_files = []
         self.files_by_type = None
 
-
     def read_files(self):
         """Create a PbFile for each file in self.file_paths"""
         count_files = 0
@@ -191,23 +198,50 @@ class PbGroup():
                        f"{len(this_file.decoding_errors)} errors")
                 count_files_with_errors += 1
 
-
-
         # Check for non-matching types
         type_mismatch, self.files_by_type = find_different_type(
             self.pb_files
         )
 
         if type_mismatch:
+            report("Trying to determine which type is correct.")
+
             # Correlate mismatched types with type errors
-            files_with_type_errors = []
+            paths_with_type_errors = []
             for this_file in self.pb_files:
                 if len(this_file.decoding_errors) > 0:
-                    index = self.pb_files.index(this_file)
-                    files_with_type_errors.append(index)
+                    paths_with_type_errors.append(this_file.read_path)
 
+            live_type = self.check_live_pv_type()
+            if live_type is not None:
+                # Try to correlate with live type
+                if live_type in self.files_by_type.keys():
+                    report("Live type matches some of our files.")
+                    # We want to find the type we expect to have the errors
+                    # this algorithm is rubbish but might do the job
+                    keys = list(self.files_by_type.keys())
+                    keys.remove(live_type)
+                    expected_error_types = keys
+                    expected_list = []
+                    for key in expected_error_types:    
+                        expected_list.append(key)
+                    if expected_list.sort() == paths_with_type_errors.sort():
+                        report("The type(s) other than the live type have "
+                               "all the files with errors")
+                    else:
+                        report("Can't correlate live type to errors in files")
 
         return count_files_with_errors
+
+    def check_live_pv_type(self):
+        pv_name = self.pb_files[0].payload_info.pvname
+        try:
+            live_type = types.get_pb_type_of_live_pv(pv_name)
+            report(f"Type of live PV is {live_type}")
+            return live_type
+        except ValueError:
+            report("Couldn't get type from live PV")
+            return None
 
     def free_events(self):
         """Try to avoid keeping all events in memory when we are searching
@@ -235,7 +269,7 @@ def demo(search_path = None):
     total_with_errors = 0
     report(f"Found {total_files} files in this directory.")
     for _, group in data.items():
-        report(f"Checking {group.dir_path}/{group.prefix}* :")
+        report(f"\nChecking {group.dir_path}/{group.prefix}* :")
         group.read_files()
         total_with_errors += group.check_files_for_type_errors()
         group.free_events()
