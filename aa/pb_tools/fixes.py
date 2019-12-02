@@ -206,7 +206,7 @@ class PbGroup():
             count_files += 1
         return count_files
 
-    def check_for_type_errors_using_type(self, new_type):
+    def check_if_new_type_fixes_errors(self, new_type):
         """
         Returns True if no type errors found after
         reinterpreting all files with new_type, otherwise False
@@ -228,9 +228,8 @@ class PbGroup():
         return True if total_type_erorrs == 0 else False
 
     def check_files_for_type_errors(self):
-        # Errors within individual files
-        # Only check type errors for now
         count_files_with_errors = 0
+        paths_with_type_errors = []
 
         for this_file, its_path in zip(self.pb_files, self.file_paths):
             this_file.decode_raw_lines()
@@ -242,6 +241,14 @@ class PbGroup():
                 report(f"{its_path} has "
                        f"{len(this_file.decoding_errors)} errors")
                 count_files_with_errors += 1
+                paths_with_type_errors.append(this_file.read_path)
+
+        return paths_with_type_errors
+
+    def find_correct_type(self):
+        # Errors within individual files
+        # Only check type errors for now
+        paths_with_type_errors = self.check_files_for_type_errors()
 
         # Check for non-matching types
         type_mismatch, self.files_by_type = find_different_type(
@@ -252,11 +259,6 @@ class PbGroup():
             report("Trying to determine which type is correct.")
 
             # Correlate mismatched types with type errors
-            paths_with_type_errors = []
-            for this_file in self.pb_files:
-                if len(this_file.decoding_errors) > 0:
-                    paths_with_type_errors.append(this_file.read_path)
-
             live_pv_type = self.check_live_pv_type()
             if live_pv_type is not None:
                 # Try to correlate with live type
@@ -278,7 +280,7 @@ class PbGroup():
                         report("so let's see if they can be reinterpreted with "
                                f"{live_pv_type}")
                         # Attempt reinterpret
-                        reinterpret_ok = self.check_for_type_errors_using_type(
+                        reinterpret_ok = self.check_if_new_type_fixes_errors(
                             pb.INVERSE_TYPE_MAPPINGS[live_pv_type]
                         )
                         if reinterpret_ok:
@@ -292,9 +294,16 @@ class PbGroup():
                     # live pv type is none
                     pass
 
-        return count_files_with_errors
+        return len(paths_with_type_errors)
 
     def check_live_pv_type(self):
+        """
+        Read the PV name from the first PB file. Check what the type is of the
+        live PV with that name, using caget.
+
+        Returns:
+            A class from aa.epics_event_pb2.TYPE_MAPPINGS or None
+        """
         pv_name = self.pb_files[0].payload_info.pvname
         try:
             live_type = types.get_pb_type_of_live_pv(pv_name)
@@ -310,7 +319,6 @@ class PbGroup():
         del(self.pb_files)
 
     def __eq__(self, other):
-        """TODO: Decide whether comparing pb_files is a valid check"""
         return self.dir_path == other.dir_path \
                and self.file_paths == other.file_paths \
                and self.pb_files == other.pb_files
@@ -332,7 +340,7 @@ def demo(search_path = None):
     for _, group in data.items():
         report(f"\nChecking {group.dir_path}/{group.prefix}* :")
         group.read_files()
-        total_with_errors += group.check_files_for_type_errors()
+        total_with_errors += group.find_correct_type()
         group.free_events()
 
     report(f"Read {total_files} total files, "
