@@ -55,6 +55,9 @@ TYPE_MAPPINGS = {
 }
 
 
+INVERSE_TYPE_MAPPINGS={cls:numeric for numeric, cls in TYPE_MAPPINGS.items()}
+
+
 ESC_BYTE = b'\x1B'
 NL_BYTE = b'\x0A'
 CR_BYTE = b'\x0D'

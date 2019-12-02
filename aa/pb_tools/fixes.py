@@ -88,7 +88,7 @@ def find_different_type(pb_files):
         list_of_types = files_by_type.values()
 
         for pb_type, count in zip(files_by_type.keys(), counts):
-            report(f"{pb_type}: {count} files")
+            report(f"   {pb_type}: {count} files")
         if counts[0] == counts[1]:
             report(f"-> equal number of mismatched types "
                    f"({counts[0]} files each)")
@@ -186,6 +186,7 @@ def join_all_lists_except(exclude_key, orig_dict):
     return expected_error_files
 
 
+
 class PbGroup():
     """
     Represent a group of PB files for a single PV
@@ -204,6 +205,27 @@ class PbGroup():
             self.pb_files.append(pb_file.PbFile(file_path))
             count_files += 1
         return count_files
+
+    def check_for_type_errors_using_type(self, new_type):
+        """
+        Returns True if no type errors found after
+        reinterpreting all files with new_type, otherwise False
+
+        Args:
+            new_type:
+
+        Returns:
+            True if NO ERRORS else False
+        """
+        total_type_erorrs = 0
+        for this_file in self.pb_files:
+            this_file.decode_raw_lines(requested_type=new_type)
+            this_file.check_data_for_errors(
+                lazy=True,
+                only_check=PbError.EVENT_MISSING_VALUE
+            )
+            total_type_erorrs += len(this_file.decoding_errors)
+        return True if total_type_erorrs == 0 else False
 
     def check_files_for_type_errors(self):
         # Errors within individual files
@@ -256,7 +278,13 @@ class PbGroup():
                         report("so let's see if they can be reinterpreted with "
                                f"{live_pv_type}")
                         # Attempt reinterpret
-
+                        reinterpret_ok = self.check_for_type_errors_using_type(
+                            pb.INVERSE_TYPE_MAPPINGS[live_pv_type]
+                        )
+                        if reinterpret_ok:
+                            report("Yes! Recommend this")
+                        else:
+                            report("Nope :(")
                     else:
                         report("Can't correlate live type to errors in files")
 
