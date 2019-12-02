@@ -148,7 +148,10 @@ def test_join_all_lists_except_gives_correct_output():
 
 @mark.parametrize("a,b,expect",[
     ([1,2,3], [3,2,1], True),
-    ([1,2,3], [3,3,1], False),
+    ([1,2,3], [4,3,1], False),
+    ([1,2,3], [1,2], True),
+    ([1,2,3,4,5,6], [5,4,3], True),
+    ([1,2,3,4,5,6], [4,5,7], False)
 ])
-def test_compare_lists_sorted_gives_correct_result(a, b, expect):
-    assert fixes.compare_lists_sorted(a, b) == expect
+def test_all_b_within_a_gives_correct_result(a, b, expect):
+    assert fixes.all_b_within_a(a, b) == expect

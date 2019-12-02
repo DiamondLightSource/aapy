@@ -186,10 +186,20 @@ def join_all_lists_except(exclude_key, orig_dict):
     return expected_error_files
 
 
-def compare_lists_sorted(a, b):
-    print(a)
-    print(b)
-    return sorted(a) == sorted(b)
+def all_b_within_a(a, b):
+    """
+    Return true if all elements of b are also in a.
+
+    Args:
+        a:  Outer comparison list
+        b:  Inner comparison list
+
+    Returns:
+        True if all elements of b are also in a, else false
+    """
+    a = set(a)
+    b = set(b)
+    return b <= a
 
 
 class PbGroup():
@@ -269,10 +279,12 @@ class PbGroup():
         TODO: If live PV check fails, fall back to looking for majority type
 
         Returns:
-
         """
         # Check for type errors within individual files
         paths_with_type_errors = self.check_files_for_type_errors()
+        if len(paths_with_type_errors) == 0:
+            report("No type errors found. No action required.")
+            return 0
 
         # Check if type in files has changed
         type_mismatch, self.files_by_type = find_different_type(
@@ -296,24 +308,25 @@ class PbGroup():
                     exclude_key=live_pv_type,
                     orig_dict=self.files_by_type
                 )
-                if compare_lists_sorted(
+                if all_b_within_a(
                     expected_error_files,
                     paths_with_type_errors
                 ):
                     report("All the files with errors have types that "
-                           "don't match the live PV, ")
-                    report("so let's see if they can be reinterpreted with "
-                           f"{live_pv_type}")
+                           "don't match the live PV. ")
+                    report("Test if they can be reinterpreted with "
+                           f"{live_pv_type}:")
                     # Attempt reinterpret
                     reinterpret_ok = self.check_if_new_type_fixes_errors(
                         pb.INVERSE_TYPE_MAPPINGS[live_pv_type]
                     )
                     if reinterpret_ok:
-                        report("Yes! Recommend this")
+                        report("Yes they can. Recommend this")
                     else:
                         report("Nope :(")
                 else:
-                    report("Can't correlate live type to errors in files")
+                    report("Files with errors do not all have different "
+                           "type from the live PV.")
 
 
         return len(paths_with_type_errors)
