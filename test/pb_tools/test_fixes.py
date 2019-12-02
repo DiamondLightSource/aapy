@@ -1,4 +1,5 @@
 import os
+from pytest import mark
 from aa import pb
 from aa import epics_event_pb2 as ee
 from aa.pb_tools import fixes, pb_file
@@ -144,3 +145,10 @@ def test_join_all_lists_except_gives_correct_output():
     expected_output = [1, 2, 3, 7, 8, 9]
     result = fixes.join_all_lists_except(exclude_key, test_dict)
     assert result == expected_output
+
+@mark.parametrize("a,b,expect",[
+    ([1,2,3], [3,2,1], True),
+    ([1,2,3], [3,3,1], False),
+])
+def test_compare_lists_sorted_gives_correct_result(a, b, expect):
+    assert fixes.compare_lists_sorted(a, b) == expect

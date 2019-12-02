@@ -186,6 +186,11 @@ def join_all_lists_except(exclude_key, orig_dict):
     return expected_error_files
 
 
+def compare_lists_sorted(a, b):
+    print(a)
+    print(b)
+    return sorted(a) == sorted(b)
+
 
 class PbGroup():
     """
@@ -228,6 +233,13 @@ class PbGroup():
         return True if total_type_erorrs == 0 else False
 
     def check_files_for_type_errors(self):
+        """
+        Check all files for EVENT_MISSING_VALUE errors and return a list
+        of paths to the files which have such errors.
+
+        Returns:
+            List of path to files having errors
+        """
         count_files_with_errors = 0
         paths_with_type_errors = []
 
@@ -246,11 +258,23 @@ class PbGroup():
         return paths_with_type_errors
 
     def find_correct_type(self):
-        # Errors within individual files
-        # Only check type errors for now
+        """
+        Check if any files have type errors, and whether all files have the
+        same type in the payload_info.
+        Check type of live PV. If all files containing errors have a
+        different type from the live PV, try re-interpreting them with the
+        live type. If this makes the errors go away, this change is suggested
+        as a fix.
+
+        TODO: If live PV check fails, fall back to looking for majority type
+
+        Returns:
+
+        """
+        # Check for type errors within individual files
         paths_with_type_errors = self.check_files_for_type_errors()
 
-        # Check for non-matching types
+        # Check if type in files has changed
         type_mismatch, self.files_by_type = find_different_type(
             self.pb_files
         )
@@ -260,39 +284,37 @@ class PbGroup():
 
             # Correlate mismatched types with type errors
             live_pv_type = self.check_live_pv_type()
-            if live_pv_type is not None:
-                # Try to correlate with live type
-                if live_pv_type in self.files_by_type.keys():
-                    report("Live type matches some of our files.")
-                    # Make a list of filenames which have different types
-                    # from the live PV.
-                    # this algorithm is rubbish but might do the job
-                    #
-                    # Start with list of all types
-                    expected_error_files = join_all_lists_except(
-                        exclude_key=live_pv_type,
-                        orig_dict=self.files_by_type
-                    )
-                    if expected_error_files.sort() == \
-                            paths_with_type_errors.sort():
-                        report("All the files with errors have types that "
-                               "don't match the live PV, ")
-                        report("so let's see if they can be reinterpreted with "
-                               f"{live_pv_type}")
-                        # Attempt reinterpret
-                        reinterpret_ok = self.check_if_new_type_fixes_errors(
-                            pb.INVERSE_TYPE_MAPPINGS[live_pv_type]
-                        )
-                        if reinterpret_ok:
-                            report("Yes! Recommend this")
-                        else:
-                            report("Nope :(")
-                    else:
-                        report("Can't correlate live type to errors in files")
+            if live_pv_type is None:
+                return
 
+            # Try to correlate with live type
+            if live_pv_type in self.files_by_type.keys():
+                report("Live type matches some of our files.")
+                # Make a list of filenames which have different types
+                # from the live PV
+                expected_error_files = join_all_lists_except(
+                    exclude_key=live_pv_type,
+                    orig_dict=self.files_by_type
+                )
+                if compare_lists_sorted(
+                    expected_error_files,
+                    paths_with_type_errors
+                ):
+                    report("All the files with errors have types that "
+                           "don't match the live PV, ")
+                    report("so let's see if they can be reinterpreted with "
+                           f"{live_pv_type}")
+                    # Attempt reinterpret
+                    reinterpret_ok = self.check_if_new_type_fixes_errors(
+                        pb.INVERSE_TYPE_MAPPINGS[live_pv_type]
+                    )
+                    if reinterpret_ok:
+                        report("Yes! Recommend this")
+                    else:
+                        report("Nope :(")
                 else:
-                    # live pv type is none
-                    pass
+                    report("Can't correlate live type to errors in files")
+
 
         return len(paths_with_type_errors)
 
