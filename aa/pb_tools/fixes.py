@@ -128,8 +128,6 @@ def find_different_type(pb_files):
                    f"having {count_of_smallest} files")
             return True, files_by_type
 
-
-
     else:
         LOG.info("More than two types present in list of files.")
         return True, files_by_type

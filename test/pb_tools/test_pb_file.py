@@ -1,6 +1,6 @@
 import os
 
-from aa.pb_tools import pb_file
+from aa.pb_tools import pb_file, validation
 from aa import epics_event_pb2 as ee
 import utils as testutils
 
@@ -79,6 +79,18 @@ def test_writing_then_reading_file_gives_same_data():
     assert g.pb_events == f.pb_events
 
     os.remove(filepath)
+
+
+def test_decode_and_check_errors_lazily_gives_correct_result():
+    full_path = testutils.get_data_filepath('wrong_type.pb')
+    f = pb_file.PbFile(full_path)
+    f.decode_and_check_lazily()
+
+    expect_errors = [
+        (idx, validation.PbError.EVENT_MISSING_VALUE) for idx in range(11)
+    ]
+
+    assert f.decoding_errors == expect_errors
 
 
 def test_all_events_equal_type_returns_True_when_one_event():
