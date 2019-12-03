@@ -417,11 +417,13 @@ def check_files_in_dir(search_path):
     )
     actions = []
     LOG.info(f"Found {total_files} files in this directory.")
-    for _, group in data.items():
+    while len(data) > 0:
+        _, group = data.popitem()
         LOG.info(f"\nChecking {group.dir_path}/{group.prefix}* :")
         group.read_files()
         actions += group.suggest_corrective_actions()
-        group.free_events()
+        #group.free_events()
+        del group
 
     LOG.info(f"\nRead {total_files} total files, "
            f"came up with {len(actions)} actions:")
