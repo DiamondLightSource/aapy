@@ -82,6 +82,7 @@ def test_writing_then_reading_file_gives_same_data():
 
 
 def test_decode_and_check_errors_lazily_gives_correct_result():
+    """Load a file we know the errors for. Check the output."""
     full_path = testutils.get_data_filepath('wrong_type.pb')
     f = pb_file.PbFile(full_path)
     f.decode_and_check_lazily()
@@ -91,6 +92,20 @@ def test_decode_and_check_errors_lazily_gives_correct_result():
     ]
 
     assert f.decoding_errors == expect_errors
+
+
+def test_decode_and_check_errors_lazily_agress_with_check_data_for_errors_in_case_of_missing_value_only():
+    full_path = testutils.get_data_filepath('wrong_type.pb')
+    f = pb_file.PbFile(full_path)
+    f.decode_and_check_lazily()
+
+    result_a = f.decoding_errors
+
+    f.decode_raw_lines()
+    f.check_data_for_errors()
+    result_b = f.decoding_errors
+
+    assert result_a == result_b
 
 
 def test_all_events_equal_type_returns_True_when_one_event():
