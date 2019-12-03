@@ -11,6 +11,31 @@ def report(message):
     print(message)
 
 
+class Action():
+    def __init__(self, file_path):
+        self.file_path = file_path
+
+    def __str__(self):
+        return f"Action on {self.file_path}"
+
+
+class ChangeType(Action):
+    def __init__(self, file_path, new_type):
+        super(ChangeType, self).__init__(file_path)
+        self.new_type = new_type
+
+    def __str__(self):
+        return f"Change type to {self.new_type} " \
+            f"on {self.file_path}"
+
+
+class DontKnow(Action):
+
+    def __str__(self):
+        return f"Don't know what to do with file {self.file_path}"
+
+
+
 def group_files_by_year(pb_files):
     """
     Generate a dictionary with keys of year (from payload info) and values of
@@ -106,8 +131,7 @@ def find_different_type(pb_files):
 
 
     else:
-        report("More than two types present in list of files. "
-               "Can't make a sensible deduction about which is right.")
+        report("More than two types present in list of files.")
         return True, files_by_type
 
 
@@ -212,6 +236,7 @@ class PbGroup():
         self.prefix = prefix
         self.pb_files = []
         self.files_by_type = None
+        self.actions = []
 
     def read_files(self):
         """Create a PbFile for each file in self.file_paths"""
@@ -221,19 +246,23 @@ class PbGroup():
             count_files += 1
         return count_files
 
-    def check_if_new_type_fixes_errors(self, new_type):
+    def check_if_new_type_fixes_errors(self, new_type, only=None):
         """
         Returns True if no type errors found after
         reinterpreting all files with new_type, otherwise False
 
         Args:
-            new_type:
+            new_type: Type to try reinterpreting; numerical index
+            only: List of file paths to check; must be a subset of
+                  self.pb_files
 
         Returns:
             True if NO ERRORS else False
         """
         total_type_erorrs = 0
         for this_file in self.pb_files:
+            if only is not None and this_file.read_path not in only:
+                continue
             this_file.decode_raw_lines(requested_type=new_type)
             this_file.check_data_for_errors(
                 lazy=True,
@@ -267,7 +296,7 @@ class PbGroup():
 
         return paths_with_type_errors
 
-    def find_correct_type(self):
+    def suggest_corrective_actions(self):
         """
         Check if any files have type errors, and whether all files have the
         same type in the payload_info.
@@ -281,10 +310,11 @@ class PbGroup():
         Returns:
         """
         # Check for type errors within individual files
+        self.actions = []
         paths_with_type_errors = self.check_files_for_type_errors()
         if len(paths_with_type_errors) == 0:
             report("No type errors found. No action required.")
-            return 0
+            return self.actions
 
         # Check if type in files has changed
         type_mismatch, self.files_by_type = find_different_type(
@@ -304,12 +334,12 @@ class PbGroup():
                 report("Live type matches some of our files.")
                 # Make a list of filenames which have different types
                 # from the live PV
-                expected_error_files = join_all_lists_except(
+                paths_with_other_types = join_all_lists_except(
                     exclude_key=live_pv_type,
                     orig_dict=self.files_by_type
                 )
                 if all_b_within_a(
-                    expected_error_files,
+                    paths_with_other_types,
                     paths_with_type_errors
                 ):
                     report("All the files with errors have types that "
@@ -317,19 +347,33 @@ class PbGroup():
                     report("Test if they can be reinterpreted with "
                            f"{live_pv_type}:")
                     # Attempt reinterpret
+                    new_type = pb.INVERSE_TYPE_MAPPINGS[live_pv_type]
                     reinterpret_ok = self.check_if_new_type_fixes_errors(
-                        pb.INVERSE_TYPE_MAPPINGS[live_pv_type]
+                        new_type
                     )
                     if reinterpret_ok:
                         report("Yes they can. Recommend this")
+                        for file_path in paths_with_type_errors:
+                            self.actions.append(
+                                ChangeType(file_path,
+                                           new_type=new_type)
+                            )
                     else:
-                        report("Nope :(")
+                        report("Changing type doesn't fix all type errors")
+                        for file_path in paths_with_type_errors:
+                            self.actions.append(
+                                DontKnow(file_path)
+                            )
                 else:
                     report("Files with errors do not all have different "
                            "type from the live PV.")
+                    for file_path in paths_with_type_errors:
+                        self.actions.append(
+                            DontKnow(file_path)
+                        )
 
 
-        return len(paths_with_type_errors)
+        return self.actions
 
     def check_live_pv_type(self):
         """
@@ -362,21 +406,23 @@ class PbGroup():
         return f"PbGroup for dir {self.dir_path} containing {self.file_paths}"
 
 
-def demo(search_path = None):
+def check_files_in_dir(search_path):
     """Walk the tree at given path. Check each file for errors and report."""
-    if search_path is None:
-        search_path = "/dls/science/users/tdq39642/aa/lts_one_device/"
+    assert os.path.isdir(search_path)
     logging.basicConfig(level=logging.WARN)
     data, total_files = find_all_files_in_tree(
         search_path
     )
-    total_with_errors = 0
+    actions = []
     report(f"Found {total_files} files in this directory.")
     for _, group in data.items():
         report(f"\nChecking {group.dir_path}/{group.prefix}* :")
         group.read_files()
-        total_with_errors += group.find_correct_type()
+        actions += group.suggest_corrective_actions()
         group.free_events()
 
-    report(f"Read {total_files} total files, "
-           f"found {total_with_errors} have errors")
+    report(f"\nRead {total_files} total files, "
+           f"came up with {len(actions)} actions:")
+    report('-'*20)
+    for action in actions:
+        report(action)
