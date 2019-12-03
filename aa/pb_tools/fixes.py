@@ -5,6 +5,7 @@ from aa import pb
 from aa.pb_tools import pb_file, types
 from aa.pb_tools.validation import PbError
 
+LOG = logging.getLogger(__name__)
 
 def report(message):
     """These will eventually be logs"""
@@ -93,7 +94,7 @@ def find_different_type(pb_files):
     """
 
     if len(pb_files) == 0:
-        report("No PB files given")
+        LOG.warning("No PB files given")
         return False, {}
 
     # Create a dict, index type, value a list of filenames which have that type
@@ -101,10 +102,10 @@ def find_different_type(pb_files):
 
     if len(files_by_type) == 1:
         # Only one type present in set
-        report("All files have same type")
+        LOG.info("All files have same type")
         return False, files_by_type
 
-    report("These files don't all have the same type.")
+    LOG.info("These files don't all have the same type.")
 
     if len(files_by_type) == 2:
         # Two different types present
@@ -113,9 +114,9 @@ def find_different_type(pb_files):
         list_of_types = files_by_type.values()
 
         for pb_type, count in zip(files_by_type.keys(), counts):
-            report(f"   {pb_type}: {count} files")
+            LOG.debug(f"   {pb_type}: {count} files")
         if counts[0] == counts[1]:
-            report(f"-> equal number of mismatched types "
+            LOG.debug(f"-> equal number of mismatched types "
                    f"({counts[0]} files each)")
             return True, files_by_type
 
@@ -124,14 +125,14 @@ def find_different_type(pb_files):
             index_of_smallest = counts.index(min(counts))
             type_of_smallest = list_of_types[index_of_smallest]
 
-            report(f"-> least represented type: {type_of_smallest} "
+            LOG.debug(f"-> least represented type: {type_of_smallest} "
                    f"having {count_of_smallest} files")
             return True, files_by_type
 
 
 
     else:
-        report("More than two types present in list of files.")
+        LOG.info("More than two types present in list of files.")
         return True, files_by_type
 
 
@@ -289,7 +290,7 @@ class PbGroup():
                 only_check=PbError.EVENT_MISSING_VALUE
             )
             if len(this_file.decoding_errors) > 0:
-                report(f"{its_path} has "
+                LOG.info(f"{its_path} has "
                        f"{len(this_file.decoding_errors)} errors")
                 count_files_with_errors += 1
                 paths_with_type_errors.append(this_file.read_path)
@@ -313,7 +314,7 @@ class PbGroup():
         self.actions = []
         paths_with_type_errors = self.check_files_for_type_errors()
         if len(paths_with_type_errors) == 0:
-            report("No type errors found. No action required.")
+            LOG.info("No type errors found. No action required.")
             return self.actions
 
         # Check if type in files has changed
@@ -322,7 +323,7 @@ class PbGroup():
         )
 
         if type_mismatch:
-            report("Trying to determine which type is correct.")
+            LOG.debug("Trying to determine which type is correct.")
 
             # Correlate mismatched types with type errors
             live_pv_type = self.check_live_pv_type()
@@ -331,7 +332,7 @@ class PbGroup():
 
             # Try to correlate with live type
             if live_pv_type in self.files_by_type.keys():
-                report("Live type matches some of our files.")
+                LOG.debug("Live type matches some of our files.")
                 # Make a list of filenames which have different types
                 # from the live PV
                 paths_with_other_types = join_all_lists_except(
@@ -342,9 +343,9 @@ class PbGroup():
                     paths_with_other_types,
                     paths_with_type_errors
                 ):
-                    report("All the files with errors have types that "
+                    LOG.info("All the files with errors have types that "
                            "don't match the live PV. ")
-                    report("Test if they can be reinterpreted with "
+                    LOG.debug("Test if they can be reinterpreted with "
                            f"{live_pv_type}:")
                     # Attempt reinterpret
                     new_type = pb.INVERSE_TYPE_MAPPINGS[live_pv_type]
@@ -352,21 +353,22 @@ class PbGroup():
                         new_type
                     )
                     if reinterpret_ok:
-                        report("Yes they can. Recommend this")
+                        LOG.info("All error files can be reinterpreted "
+                                 "with live type")
                         for file_path in paths_with_type_errors:
                             self.actions.append(
                                 ChangeType(file_path,
                                            new_type=new_type)
                             )
                     else:
-                        report("Changing type doesn't fix all type errors")
+                        LOG.info("Changing type doesn't fix all type errors")
                         for file_path in paths_with_type_errors:
                             self.actions.append(
                                 DontKnow(file_path)
                             )
                 else:
-                    report("Files with errors do not all have different "
-                           "type from the live PV.")
+                    LOG.info("Files with errors do not all have different "
+                             "type from the live PV.")
                     for file_path in paths_with_type_errors:
                         self.actions.append(
                             DontKnow(file_path)
@@ -386,10 +388,10 @@ class PbGroup():
         pv_name = self.pb_files[0].payload_info.pvname
         try:
             live_type = types.get_pb_type_of_live_pv(pv_name)
-            report(f"Type of live PV is {live_type}")
+            LOG.debug(f"Type of live PV is {live_type}")
             return live_type
         except ValueError:
-            report("Couldn't get type from live PV")
+            LOG.info("Couldn't get type from live PV")
             return None
 
     def free_events(self):
@@ -409,20 +411,19 @@ class PbGroup():
 def check_files_in_dir(search_path):
     """Walk the tree at given path. Check each file for errors and report."""
     assert os.path.isdir(search_path)
-    logging.basicConfig(level=logging.WARN)
+    LOG.setLevel(level=logging.INFO)
     data, total_files = find_all_files_in_tree(
         search_path
     )
     actions = []
-    report(f"Found {total_files} files in this directory.")
+    LOG.info(f"Found {total_files} files in this directory.")
     for _, group in data.items():
-        report(f"\nChecking {group.dir_path}/{group.prefix}* :")
+        LOG.info(f"\nChecking {group.dir_path}/{group.prefix}* :")
         group.read_files()
         actions += group.suggest_corrective_actions()
         group.free_events()
 
-    report(f"\nRead {total_files} total files, "
+    LOG.info(f"\nRead {total_files} total files, "
            f"came up with {len(actions)} actions:")
-    report('-'*20)
     for action in actions:
-        report(action)
+        LOG.info(action)
