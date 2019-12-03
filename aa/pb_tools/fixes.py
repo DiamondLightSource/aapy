@@ -284,13 +284,14 @@ class PbGroup():
         paths_with_type_errors = []
 
         for this_file, its_path in zip(self.pb_files, self.file_paths):
-            LOG.debug("Decode raw lines")
-            this_file.decode_raw_lines()
-            LOG.debug("Check for errors")
-            this_file.check_data_for_errors(
-                lazy=True,
-                only_check=PbError.EVENT_MISSING_VALUE
-            )
+            LOG.debug("Decode raw lines & check errors")
+            #this_file.decode_raw_lines()
+            #LOG.debug("Check for errors")
+            #this_file.check_data_for_errors(
+            #    lazy=True,
+            #    only_check=PbError.EVENT_MISSING_VALUE
+            #)
+            this_file.decode_and_check_lazily()
             if len(this_file.decoding_errors) > 0:
                 LOG.info(f"{its_path} has "
                        f"{len(this_file.decoding_errors)} errors")
@@ -419,9 +420,12 @@ def check_files_in_dir(search_path):
     )
     actions = []
     LOG.info(f"Found {total_files} files in this directory.")
+    counter = 0
     while len(data) > 0:
+        counter += 1
         _, group = data.popitem()
-        LOG.info(f"\nChecking {group.dir_path}/{group.prefix}* :")
+        LOG.info(f"\nChecking {counter}/{total_files} "
+                 f"{group.dir_path}/{group.prefix}* :")
         group.read_files()
         actions += group.suggest_corrective_actions()
         #group.free_events()

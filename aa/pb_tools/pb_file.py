@@ -64,6 +64,14 @@ class PbFile:
             self.raw_lines, decode_type
         )
 
+    def decode_and_check_lazily(self):
+        error_set = set()
+        for line in self.raw_lines:
+            event = raw_event_from_line(line, self.payload_info.type)
+            error_set.update(validation.check_single_event(event))
+        error_list = [(-1, error) for error in error_set]
+        self.decoding_errors = error_list
+
     def read_raw_lines_from_file(self, full_path):
         """Read raw data from file"""
         self.read_path = full_path
