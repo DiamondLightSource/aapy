@@ -74,7 +74,7 @@ def group_files_by_type(pb_files):
 
     for pb_data in pb_files:
         idx = pb_data.payload_info.type
-        this_type = pb.TYPE_MAPPINGS[idx]
+        this_type = idx
         current_list = files_by_type.get(this_type, [])
         current_list.append(pb_data.read_path)
         files_by_type[this_type] = current_list
@@ -348,7 +348,7 @@ class PbGroup():
                     LOG.debug("Test if they can be reinterpreted with "
                            f"{live_pv_type}:")
                     # Attempt reinterpret
-                    new_type = pb.INVERSE_TYPE_MAPPINGS[live_pv_type]
+                    new_type = live_pv_type
                     reinterpret_ok = self.check_if_new_type_fixes_errors(
                         new_type
                     )

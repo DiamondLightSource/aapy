@@ -125,11 +125,10 @@ def test_group_files_by_type_gives_expected_output():
     result = fixes.group_files_by_type(pb_files)
 
     expected = {
-        pb.TYPE_MAPPINGS[1]: ["2001.pb"],
-        pb.TYPE_MAPPINGS[2]: ["2002.pb"],
-        pb.TYPE_MAPPINGS[3]: ["2003.pb",
-                              "2003.pb1"],
-        pb.TYPE_MAPPINGS[4]: ["2004.pb"],
+        1: ["2001.pb"],
+        2: ["2002.pb"],
+        3: ["2003.pb", "2003.pb1"],
+        4: ["2004.pb"],
     }
 
     assert result == expected

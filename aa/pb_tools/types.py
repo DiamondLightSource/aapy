@@ -25,7 +25,7 @@ from cothread.catools import caget
 from cothread import dbr
 
 from aa import epics_event_pb2 as ee
-
+from aa import pb
 
 TypeMapping = namedtuple("TypeMapping",
                          "ca_type dbr_type pb_scalar_type pb_vector_type")
@@ -35,44 +35,44 @@ COTHREAD_TYPE_MAPPING = [
     TypeMapping(
         ca_type=dbr.ca_str,
         dbr_type=[dbr.DBR_STRING, dbr.DBR_CHAR_STR],
-        pb_scalar_type=ee.ScalarString,
-        pb_vector_type=ee.VectorString
+        pb_scalar_type=pb.INVERSE_TYPE_MAPPINGS[ee.ScalarString],
+        pb_vector_type=pb.INVERSE_TYPE_MAPPINGS[ee.VectorString],
     ),
     TypeMapping(
         ca_type=dbr.ca_int,
         dbr_type=[dbr.DBR_SHORT],
-        pb_scalar_type=ee.ScalarShort,
-        pb_vector_type=ee.VectorShort
+        pb_scalar_type=pb.INVERSE_TYPE_MAPPINGS[ee.ScalarShort],
+        pb_vector_type=pb.INVERSE_TYPE_MAPPINGS[ee.VectorShort],
     ),
     TypeMapping(
         ca_type=dbr.ca_float,
         dbr_type=[dbr.DBR_FLOAT],
-        pb_scalar_type=ee.ScalarFloat,
-        pb_vector_type=ee.VectorFloat
+        pb_scalar_type=pb.INVERSE_TYPE_MAPPINGS[ee.ScalarFloat],
+        pb_vector_type=pb.INVERSE_TYPE_MAPPINGS[ee.VectorFloat],
     ),
     TypeMapping(
         ca_type=dbr.ca_int,
         dbr_type=[dbr.DBR_ENUM],
-        pb_scalar_type=ee.ScalarEnum,
-        pb_vector_type=ee.VectorEnum
+        pb_scalar_type=pb.INVERSE_TYPE_MAPPINGS[ee.ScalarEnum],
+        pb_vector_type=pb.INVERSE_TYPE_MAPPINGS[ee.VectorEnum],
     ),
     TypeMapping(
         ca_type=dbr.ca_int,
         dbr_type=[dbr.DBR_CHAR],
-        pb_scalar_type=ee.ScalarByte, # Not precise match
-        pb_vector_type=ee.VectorChar
+        pb_scalar_type=pb.INVERSE_TYPE_MAPPINGS[ee.ScalarByte],
+        pb_vector_type=pb.INVERSE_TYPE_MAPPINGS[ee.VectorChar],
     ),
     TypeMapping(
         ca_type=dbr.ca_int,
         dbr_type=[dbr.DBR_LONG], # Not precise match ?
-        pb_scalar_type=ee.ScalarInt,
-        pb_vector_type=ee.VectorInt
+        pb_scalar_type=pb.INVERSE_TYPE_MAPPINGS[ee.ScalarInt],
+        pb_vector_type=pb.INVERSE_TYPE_MAPPINGS[ee.VectorInt],
     ),
     TypeMapping(
         ca_type=dbr.ca_float,
         dbr_type=[dbr.DBR_DOUBLE],
-        pb_scalar_type=ee.ScalarDouble,
-        pb_vector_type=ee.VectorDouble
+        pb_scalar_type=pb.INVERSE_TYPE_MAPPINGS[ee.ScalarDouble],
+        pb_vector_type=pb.INVERSE_TYPE_MAPPINGS[ee.VectorDouble],
     ),
 ]
 

@@ -5,25 +5,26 @@ from cothread.catools import ca_nothing
 
 from aa.pb_tools import types
 from aa import epics_event_pb2 as ee
+from aa import pb
 
 
 SCALAR_TYPE_MAP = [
-    (dbr.ca_str,   dbr.DBR_STRING, ee.ScalarString),
-    (dbr.ca_int,   dbr.DBR_SHORT,  ee.ScalarShort),
-    (dbr.ca_int,   dbr.DBR_LONG,   ee.ScalarInt),
-    (dbr.ca_float, dbr.DBR_FLOAT,  ee.ScalarFloat),
-    (dbr.ca_float, dbr.DBR_DOUBLE, ee.ScalarDouble),
-    (dbr.ca_int,   dbr.DBR_CHAR,   ee.ScalarByte),
+    (dbr.ca_str,   dbr.DBR_STRING, pb.INVERSE_TYPE_MAPPINGS[ee.ScalarString]),
+    (dbr.ca_int,   dbr.DBR_SHORT,  pb.INVERSE_TYPE_MAPPINGS[ee.ScalarShort]),
+    (dbr.ca_int,   dbr.DBR_LONG,   pb.INVERSE_TYPE_MAPPINGS[ee.ScalarInt]),
+    (dbr.ca_float, dbr.DBR_FLOAT,  pb.INVERSE_TYPE_MAPPINGS[ee.ScalarFloat]),
+    (dbr.ca_float, dbr.DBR_DOUBLE, pb.INVERSE_TYPE_MAPPINGS[ee.ScalarDouble]),
+    (dbr.ca_int,   dbr.DBR_CHAR,   pb.INVERSE_TYPE_MAPPINGS[ee.ScalarByte]),
 ]
 
 
 VECTOR_TYPE_MAP = [
-    (dbr.ca_array, dbr.DBR_STRING, ee.VectorString),
-    (dbr.ca_array, dbr.DBR_SHORT,  ee.VectorShort),
-    (dbr.ca_array, dbr.DBR_LONG,   ee.VectorInt),
-    (dbr.ca_array, dbr.DBR_FLOAT,  ee.VectorFloat),
-    (dbr.ca_array, dbr.DBR_DOUBLE, ee.VectorDouble),
-    (dbr.ca_array, dbr.DBR_CHAR,   ee.VectorChar),
+    (dbr.ca_array, dbr.DBR_STRING, pb.INVERSE_TYPE_MAPPINGS[ee.VectorString]),
+    (dbr.ca_array, dbr.DBR_SHORT,  pb.INVERSE_TYPE_MAPPINGS[ee.VectorShort]),
+    (dbr.ca_array, dbr.DBR_LONG,   pb.INVERSE_TYPE_MAPPINGS[ee.VectorInt]),
+    (dbr.ca_array, dbr.DBR_FLOAT,  pb.INVERSE_TYPE_MAPPINGS[ee.VectorFloat]),
+    (dbr.ca_array, dbr.DBR_DOUBLE, pb.INVERSE_TYPE_MAPPINGS[ee.VectorDouble]),
+    (dbr.ca_array, dbr.DBR_CHAR,   pb.INVERSE_TYPE_MAPPINGS[ee.VectorChar]),
 ]
 
 
