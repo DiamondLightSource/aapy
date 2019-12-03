@@ -36,6 +36,32 @@ PB_ERROR_STRINGS = {
     PbError.ALL: "All errror types"
 }
 
+def check_single_event(event):
+    """
+    Run the checks which are possible on a single event without reference
+    to others.
+
+    Args:
+        payload_info: The PayloadInfo for the PB file
+        event: The PB event object itself
+
+    Returns:
+        List of error types found
+    """
+    errors = set()
+
+    if event is None:
+        errors.add(PbError.EVENT_NOT_DECODED)
+    else:
+        # Check val field was populated
+        # If not, indicates e.g. wrong type
+        if not event.HasField("val"):
+            errors.add(PbError.EVENT_MISSING_VALUE)
+        if not event.HasField("secondsintoyear"):
+            errors.add(PbError.EVENT_MISSING_TIMESTAMP)
+
+    return errors
+
 
 def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list,
                       lazy=False, only_check=PbError.ALL):

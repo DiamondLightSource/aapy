@@ -1,7 +1,6 @@
 import os
 import logging
 
-from aa import pb
 from aa.pb_tools import pb_file, types
 from aa.pb_tools.validation import PbError
 
@@ -243,6 +242,7 @@ class PbGroup():
         """Create a PbFile for each file in self.file_paths"""
         count_files = 0
         for file_path in self.file_paths:
+            LOG.debug(f"Create PbFile for {file_path}")
             self.pb_files.append(pb_file.PbFile(file_path))
             count_files += 1
         return count_files
@@ -284,7 +284,9 @@ class PbGroup():
         paths_with_type_errors = []
 
         for this_file, its_path in zip(self.pb_files, self.file_paths):
+            LOG.debug("Decode raw lines")
             this_file.decode_raw_lines()
+            LOG.debug("Check for errors")
             this_file.check_data_for_errors(
                 lazy=True,
                 only_check=PbError.EVENT_MISSING_VALUE
@@ -411,7 +413,7 @@ class PbGroup():
 def check_files_in_dir(search_path):
     """Walk the tree at given path. Check each file for errors and report."""
     assert os.path.isdir(search_path)
-    LOG.setLevel(level=logging.INFO)
+    LOG.setLevel(level=logging.DEBUG)
     data, total_files = find_all_files_in_tree(
         search_path
     )

@@ -1,4 +1,4 @@
-from pytest import fixture
+from pytest import fixture, mark
 from aa import epics_event_pb2 as ee
 from aa.pb_tools import validation
 
@@ -100,6 +100,7 @@ def test_basic_data_checks_with_only_check_returns_only_requested(test_events,
     ]
     assert result == expected_errors
 
+
 def test_basic_data_checks_with_both_lazy_and_only_check_gives_correct_event(
         test_events, payload_info
 ):
@@ -112,3 +113,15 @@ def test_basic_data_checks_with_both_lazy_and_only_check_gives_correct_event(
         (1, validation.PbError.EVENT_MISSING_VALUE),
     ]
     assert result == expected_errors
+
+
+@mark.parametrize("event,errors",[
+    (None, {validation.PbError.EVENT_NOT_DECODED}),
+    (ee.ScalarInt(secondsintoyear=123, nano=4),
+     {validation.PbError.EVENT_MISSING_VALUE}),
+    (ee.ScalarInt(),
+     {validation.PbError.EVENT_MISSING_TIMESTAMP,
+      validation.PbError.EVENT_MISSING_VALUE})
+])
+def test_check_single_event_gies_correct_result(event, errors):
+    assert validation.check_single_event(event) == errors
