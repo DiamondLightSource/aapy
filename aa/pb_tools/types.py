@@ -123,5 +123,5 @@ def get_pb_type_of_live_pv(pv_name):
     Raises:
         ValueError if the caget or lookup failed.
     """
-    result = caget(pv_name, timeout=0.1)
+    result = caget(pv_name, timeout=0.1, throw=False)
     return ca_to_pb_type(result)

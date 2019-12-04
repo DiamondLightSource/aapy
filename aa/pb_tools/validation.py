@@ -55,8 +55,15 @@ def check_single_event(event):
     else:
         # Check val field was populated
         # If not, indicates e.g. wrong type
-        if not event.HasField("val"):
-            errors.add(PbError.EVENT_MISSING_VALUE)
+        try:
+            # Test valid for scalar events only;
+            # throws ValueError for vector events
+            if not event.HasField("val"):
+                errors.add(PbError.EVENT_MISSING_VALUE)
+        except ValueError:
+            # Test valid for vector events only
+            if len(event.val) == 0:
+                errors.add(PbError.EVENT_MISSING_VALUE)
         if not event.HasField("secondsintoyear"):
             errors.add(PbError.EVENT_MISSING_TIMESTAMP)
 
@@ -98,9 +105,17 @@ def basic_data_checks(payload_info: ee.PayloadInfo, pb_events: list,
         else:
             # Check val field was populated
             # If not, indicates e.g. wrong type
-            if not event.HasField("val"):
-                errors = record_error(index, PbError.EVENT_MISSING_VALUE,
-                                      only_check, errors)
+            try:
+                # Test valid for scalar events only;
+                # throws ValueError for vector events
+                if not event.HasField("val"):
+                    errors = record_error(index, PbError.EVENT_MISSING_VALUE,
+                                          only_check, errors)
+            except ValueError:
+                # Test valid for vector events only
+                if len(event.val) == 0:
+                    errors = record_error(index, PbError.EVENT_MISSING_VALUE,
+                                          only_check, errors)
 
             timestamp = pb.event_timestamp(year, event)
 

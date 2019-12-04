@@ -328,7 +328,11 @@ class PbGroup():
             # Correlate mismatched types with type errors
             live_pv_type = self.check_live_pv_type()
             if live_pv_type is None:
-                return
+                for file_path in paths_with_type_errors:
+                    self.actions.append(
+                        DontKnow(file_path)
+                    )
+                return self.actions
 
             # Try to correlate with live type
             if live_pv_type in self.files_by_type.keys():
