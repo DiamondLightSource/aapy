@@ -259,3 +259,17 @@ def test_find_different_type_with_two_unequal_types():
         5: [this_file.read_path for this_file in files_five],
         6: [this_file.read_path for this_file in files_six],
     }
+
+
+def test_find_different_types_given_nothing_returns_nothing():
+    type_mismatch, files_by_type = fixes.find_different_type([])
+    assert type_mismatch == False
+
+    assert files_by_type == {}
+
+
+def test_count_elems_of_sub_lists_gives_correct_output():
+    test_dict = {idx: [i for i in range(idx)] for idx in range(5)}
+    expect = [i for i in range(5)]
+
+    assert fixes.count_elemns_of_sub_lists(test_dict) == expect

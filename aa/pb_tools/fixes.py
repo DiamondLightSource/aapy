@@ -55,6 +55,10 @@ def group_files_by_year(pb_files):
     return files_by_year
 
 
+def count_elemns_of_sub_lists(outer_dict):
+    return [len(file_list) for file_list in outer_dict.values()]
+
+
 def group_files_by_type(pb_files):
     """
     Generate a dictionary with keys of file type and values of files having
@@ -106,7 +110,7 @@ def find_different_type(pb_files):
     if len(files_by_type) == 2:
         # Two different types present
         # Work out which has fewest, and how many
-        counts = [len(file_list) for file_list in files_by_type.items()]
+        counts = count_elemns_of_sub_lists(files_by_type)
         list_of_types = files_by_type.values()
 
         for pb_type, count in zip(files_by_type.keys(), counts):
@@ -117,12 +121,8 @@ def find_different_type(pb_files):
             return True, files_by_type
 
         else:
-            count_of_smallest = min(counts)
-            index_of_smallest = counts.index(min(counts))
-            type_of_smallest = list_of_types[index_of_smallest]
-
-            LOG.debug(f"-> least represented type: {type_of_smallest} "
-                   f"having {count_of_smallest} files")
+            # Removed nonworking code
+            LOG.debug(f"Unequal number of mismatched types")
             return True, files_by_type
 
     else:
