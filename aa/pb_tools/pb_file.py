@@ -34,6 +34,12 @@ class PbFile:
         if filename:
             self.read_raw_lines_from_file(filename)
 
+    def __repr__(self):
+        if self.read_path:
+            return f"PB from {self.read_path}"
+        else:
+            return super(PbFile, self).__repr__()
+
     def empty(self):
         """Initialize with an empty state"""
         self.raw_lines = None

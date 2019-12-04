@@ -154,3 +154,108 @@ def test_join_all_lists_except_gives_correct_output():
 ])
 def test_all_b_within_a_gives_correct_result(a, b, expect):
     assert fixes.all_b_within_a(a, b) == expect
+
+
+def test_creating_list_of_actions():
+    """Just makes sure these classes can be instantiated with
+    correct signature"""
+    action_list = [
+        fixes.ChangeType("/file/path/1", new_type=4),
+        fixes.DontKnow("/file/path/2"),
+    ]
+
+def test_find_different_type_with_all_same():
+    type_used = 5
+
+    test_files = []
+    for idx in range(10):
+        new_file = pb_file.PbFile()
+        new_file.read_path = f"File {idx}"
+        new_file.payload_info = ee.PayloadInfo(
+            year=2017,
+            type=type_used,
+            pvname="BL14J-PS-SHTR-03:OPS",
+            elementCount=1,
+        )
+        test_files.append(new_file)
+
+
+    type_mismatch, files_by_type = fixes.find_different_type(test_files)
+
+    assert type_mismatch == False
+
+    assert files_by_type == {
+        type_used: [this_file.read_path for this_file in test_files]
+    }
+
+def test_find_different_type_with_two_equal_types():
+    type_used = 5
+
+    test_files = []
+    files_five = []
+    files_six = []
+    for idx in range(10):
+        new_file = pb_file.PbFile()
+        new_file.read_path = f"File {idx}"
+        new_file.payload_info = ee.PayloadInfo(
+            year=2017,
+            type=type_used,
+            pvname="BL14J-PS-SHTR-03:OPS",
+            elementCount=1,
+        )
+
+        if idx % 2 == 0:
+            files_five.append(new_file)
+        else:
+            new_file.payload_info.type = 6
+            files_six.append(new_file)
+        test_files.append(new_file)
+
+    print(test_files)
+
+    print([f.payload_info.type for f in test_files])
+
+    type_mismatch, files_by_type = fixes.find_different_type(test_files)
+
+    assert type_mismatch == True
+
+    assert files_by_type == {
+        5: [this_file.read_path for this_file in files_five],
+        6: [this_file.read_path for this_file in files_six],
+    }
+
+def test_find_different_type_with_two_unequal_types():
+    type_used = 5
+
+    test_files = []
+    files_five = []
+    files_six = []
+    for idx in range(10):
+        new_file = pb_file.PbFile()
+        new_file.read_path = f"File {idx}"
+        new_file.payload_info = ee.PayloadInfo(
+            year=2017,
+            type=type_used,
+            pvname="BL14J-PS-SHTR-03:OPS",
+            elementCount=1,
+        )
+
+        if idx % 3 == 0:
+            files_five.append(new_file)
+        else:
+            new_file.payload_info.type = 6
+            files_six.append(new_file)
+        test_files.append(new_file)
+
+    print(test_files)
+
+    print([f.payload_info.type for f in test_files])
+
+    type_mismatch, files_by_type = fixes.find_different_type(test_files)
+
+    assert type_mismatch == True
+
+    assert files_by_type == {
+        5: [this_file.read_path for this_file in files_five],
+        6: [this_file.read_path for this_file in files_six],
+    }

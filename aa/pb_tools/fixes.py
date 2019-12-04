@@ -4,11 +4,8 @@ import logging
 from aa.pb_tools import pb_file, types
 from aa.pb_tools.validation import PbError
 
-LOG = logging.getLogger(__name__)
 
-def report(message):
-    """These will eventually be logs"""
-    print(message)
+LOG = logging.getLogger(__name__)
 
 
 class Action():
