@@ -269,7 +269,7 @@ def test_find_different_types_given_nothing_returns_nothing():
 
 
 def test_count_elems_of_sub_lists_gives_correct_output():
-    test_dict = {idx: [i for i in range(idx)] for idx in range(5)}
-    expect = [i for i in range(5)]
+    test_dict = {idx: [i for i in range(idx)] for idx in range(4, -1, -1)}
+    expect = [(i,i) for i in range(5)]
 
     assert fixes.count_elemns_of_sub_lists(test_dict) == expect

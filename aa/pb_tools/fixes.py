@@ -56,7 +56,8 @@ def group_files_by_year(pb_files):
 
 
 def count_elemns_of_sub_lists(outer_dict):
-    return [len(file_list) for file_list in outer_dict.values()]
+    counts = {key: len(sub_list) for key, sub_list in outer_dict.items()}
+    return sorted(counts.items(), key=lambda t: t[1])
 
 
 def group_files_by_type(pb_files):
@@ -111,18 +112,19 @@ def find_different_type(pb_files):
         # Two different types present
         # Work out which has fewest, and how many
         counts = count_elemns_of_sub_lists(files_by_type)
-        list_of_types = files_by_type.values()
 
-        for pb_type, count in zip(files_by_type.keys(), counts):
-            LOG.debug(f"   {pb_type}: {count} files")
-        if counts[0] == counts[1]:
+        for type_key, file_count in counts:
+            LOG.debug(f"{type_key}: {file_count} files")
+
+        if counts[0][1] == counts[1][1]:
             LOG.debug(f"-> equal number of mismatched types "
-                   f"({counts[0]} files each)")
+                   f"({counts[0][1]} files each)")
             return True, files_by_type
 
         else:
             # Removed nonworking code
             LOG.debug(f"Unequal number of mismatched types")
+            LOG.debug(f"Type {counts[0][0]} has fewest files ({counts[0][1]})")
             return True, files_by_type
 
     else:
