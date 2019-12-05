@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
       name='aapy',
-      version='0.6',
+      version='0.7',
       description='Python client for the EPICS Archiver Appliance',
       license='Apache License 2.0',
       packages=['aa'],
