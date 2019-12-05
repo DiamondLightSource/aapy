@@ -57,6 +57,18 @@ def test_unescape_bytes_handles_example_escaped_bytes():
     assert pb.unescape_bytes(test_bytes) == b'hello' + pb.NL_BYTE + b'bye'
 
 
+def test_escape_bytes_does_not_change_regular_bytes():
+    test_bytes = b'hello:-1|bye'
+    assert pb.escape_bytes(test_bytes) == test_bytes
+
+
+def test_escape_bytes_handles_example_unescaped_bytes():
+    test_bytes = b'hello' + b'\x0A' + b'bye' + b'\x1B'
+    expected = b'hello' + pb.ESC_BYTE + b'\x02' + b'bye' + \
+               pb.ESC_BYTE + b'\x01'
+    assert pb.escape_bytes(test_bytes) == expected
+
+
 def test_event_timestamp_gives_correct_answer_1970():
     event = mock.MagicMock()
     event.secondsintoyear = 10
@@ -152,3 +164,11 @@ def test_PbFileFetcher_read_pb_files_omits_subsequent_event(dummy_pv, jan_2001):
     dec_2015 = utils.utc_datetime(2015, 12, 1)
     data = fetcher._read_pb_files([filepath], dummy_pv, jan_2001, dec_2015, None)
     assert len(data) == 0
+
+def test_get_iso_timestamp_for_event_has_expected_output():
+    event = ee.ScalarInt()
+    event.secondsintoyear = 15156538
+    event.nano = 381175701
+    year = 2017
+    expected = "2017-06-25T11:08:58.381176+01:00"
+    assert pb.get_iso_timestamp_for_event(year, event) == expected
