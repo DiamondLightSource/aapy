@@ -162,7 +162,7 @@ def event_from_line(line, pv, year, event_type):
 
     Args:
         line: A line of chunks of data
-        pv: Name of th  e PV
+        pv: Name of the PV
         year: Year of interest
         event_type: Need to know the type of the event as key of TYPE_MAPPINGS
 
