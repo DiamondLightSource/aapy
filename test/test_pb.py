@@ -69,6 +69,16 @@ def test_escape_bytes_handles_example_unescaped_bytes():
     assert pb.escape_bytes(test_bytes) == expected
 
 
+def test_unescape_bytes_works_in_correct_order_and_is_reversible():
+    test_bytes = b'hello \x1B\x01\x02 bye \x1B\x01\x03'
+    expected = b'hello \x1B\x02 bye \x1B\x03'
+    unescaped = pb.unescape_bytes(test_bytes)
+    assert unescaped == expected
+    escaped = pb.escape_bytes(unescaped)
+    assert escaped == test_bytes
+
+
+
 def test_event_timestamp_gives_correct_answer_1970():
     event = mock.MagicMock()
     event.secondsintoyear = 10

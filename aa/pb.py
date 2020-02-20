@@ -62,13 +62,21 @@ ESC_BYTE = b'\x1B'
 NL_BYTE = b'\x0A'
 CR_BYTE = b'\x0D'
 
-# The characters sequences required to unescape AA pb file format.
-PB_REPLACEMENTS = collections.OrderedDict([
+# The character sequences required to unescape & escape AA pb file format.
+# Note that we need to be careful about the ordering here. We must apply them
+# in the opposite order when escaping and unescaping. In particular, the
+# escape byte needs to be escaped *first* and unescaped *last* in order to
+# prevent extra bytes appearing and causing problems. See #59.
+PB_REPLACEMENTS_ESCAPING = collections.OrderedDict([
     (ESC_BYTE + b'\x01', ESC_BYTE),
     (ESC_BYTE + b'\x02', NL_BYTE),
     (ESC_BYTE + b'\x03', CR_BYTE),
 ])
-
+PB_REPLACEMENTS_UNESCAPING = collections.OrderedDict([
+    (ESC_BYTE + b'\x03', CR_BYTE),
+    (ESC_BYTE + b'\x02', NL_BYTE),
+    (ESC_BYTE + b'\x01', ESC_BYTE),
+])
 
 def unescape_bytes(byte_seq):
     """Replace specific sub-sequences in a bytes sequence.
@@ -81,7 +89,7 @@ def unescape_bytes(byte_seq):
     Returns:
         the byte sequence unescaped according to the AA file format rules
     """
-    for key, value in PB_REPLACEMENTS.items():
+    for key, value in PB_REPLACEMENTS_UNESCAPING.items():
         byte_seq = byte_seq.replace(key, value)
     return byte_seq
 
@@ -97,7 +105,7 @@ def escape_bytes(byte_seq):
     Returns:
         the byte sequence escaped according to the AA file format rules
     """
-    for key, value in PB_REPLACEMENTS.items():
+    for key, value in PB_REPLACEMENTS_ESCAPING.items():
         byte_seq = byte_seq.replace(value, key)
     return byte_seq
 
