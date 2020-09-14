@@ -19,7 +19,7 @@ class JsonFetcher(fetcher.AaFetcher):
         json_data = response.json()
         archive_data = data.ArchiveData.empty(pv)
 
-        if json_data:
+        if json_data and 'data' in json_data[0]:
             events = []
             json_events = json_data[0]['data']
             for json_event in json_events:
