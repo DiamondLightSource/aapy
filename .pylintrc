@@ -46,7 +46,7 @@ symbols=no
 # --disable=W"
 #
 # Disable logging formatting - it's not that important
-disable=logging-format-interpolation
+disable=logging-format-interpolation,raise-missing-from
 
 
 [REPORTS]
