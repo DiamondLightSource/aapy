@@ -34,6 +34,7 @@ def test_AaRestClient_construct_url(kwargs, aa_client):
         ('getCurrentlyDisconnectedPVs', 'get_currently_disconnected_pvs', {}),
         ('archivePV', 'archive_pv', {'pv': 'dummy', 'samplingperiod': 10, 'samplingmethod': MONITOR}),
         ('pauseArchivingPV', 'pause_archiving_pv', {'pv': 'dummy'}),
+        ('resumeArchivingPV', 'resume_archiving_pv', {'pv': 'dummy'}),
         ('deletePV', 'delete_pv', {'pv': 'dummy'}),
         ('abortArchivingPV', 'abort_archiving_pv', {'pv': 'dummy'})
 ])

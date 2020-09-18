@@ -99,6 +99,9 @@ class AaRestClient(object):
     def pause_archiving_pv(self, pv):
         return self._rest_get('pauseArchivingPV', pv=pv)
 
+    def resume_archiving_pv(self, pv):
+        return self._rest_get('resumeArchivingPV', pv=pv)
+
     def delete_pv(self, pv):
         return self._rest_get('deletePV', pv=pv)
 
