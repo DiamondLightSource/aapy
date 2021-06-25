@@ -1,15 +1,15 @@
 """Simple client to the Channel Archiver using xmlrpc."""
 import logging as log
 
-try:
-    from xmlrpc.client import ServerProxy
-except ImportError:  # Python 2 compatibility
-    from xmlrpclib import ServerProxy
-
 import numpy
 
 from aa import data, utils
 from aa.fetcher import Fetcher
+
+try:
+    from xmlrpc.client import ServerProxy
+except ImportError:  # Python 2 compatibility
+    from xmlrpclib import ServerProxy
 
 
 class CaClient(object):

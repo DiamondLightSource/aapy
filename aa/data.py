@@ -1,10 +1,10 @@
 """Objects representing data returned from the Archiver Appliance."""
 import logging
+
 import numpy
 import pytz
 
 from . import utils
-
 
 DIFFERENT_PV_ERROR = "All concatenated ArchiveData objects must have the same PV name"
 TIMESTAMP_WARNING = "Timestamps not monotonically increasing: {} -> {}"

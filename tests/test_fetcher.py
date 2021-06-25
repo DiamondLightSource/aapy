@@ -8,7 +8,6 @@ import tzlocal
 
 from aa import fetcher
 
-
 EARLY_DATE = datetime(2001, 1, 1, 1, 1)
 LATE_DATE = datetime(2010, 2, 3, 4, 5)
 

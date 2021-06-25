@@ -3,11 +3,11 @@ import os
 import mock
 import pytest
 import requests
-
-from aa import data, pb, utils
-from aa import epics_event_pb2 as ee
 import utils as testutils
 
+from aa import data
+from aa import epics_event_pb2 as ee
+from aa import pb, utils
 
 TIMESTAMP_2001 = 978307200
 TIMESTAMP_INACCURACY = 1e-6

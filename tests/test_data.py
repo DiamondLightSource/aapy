@@ -3,7 +3,7 @@ import datetime
 import mock
 import numpy
 import pytest
-from pytz import utc, timezone
+from pytz import timezone, utc
 
 from aa import data
 

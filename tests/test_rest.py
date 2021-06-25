@@ -1,8 +1,7 @@
 import mock
 import pytest
 
-from aa import rest, MONITOR
-
+from aa import MONITOR, rest
 
 HOSTNAME = "host"
 SOCKET = "host:80"

@@ -5,7 +5,6 @@ import pytest
 
 from aa import ca
 
-
 CA_EVENT_1D = {"value": [1], "secs": 100, "nano": 1e8, "sevr": 0}
 
 

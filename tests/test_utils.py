@@ -6,7 +6,6 @@ import tzlocal
 
 from aa import utils
 
-
 TZ_BST = pytz.timezone("Europe/London")
 UNIX_TIME = 1504023969
 JUST_AFTER_EPOCH = datetime(1970, 1, 1, 0, 0, 15, tzinfo=pytz.UTC)

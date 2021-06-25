@@ -20,18 +20,18 @@ Note: due to the way the protobuf objects are constructed, pylint can't
 correctly deduce some properties, so I have manually disabled some warnings.
 
 """
+import collections
 import datetime
+import logging as log
 import os
 import re
-import collections
-import logging as log
 
 import pytz
 import requests
 
-from . import data, fetcher, utils
+from . import data
 from . import epics_event_pb2 as ee
-
+from . import fetcher, utils
 
 # It is not clear to me why I can't extract this information
 # from the compiled protobuf file.

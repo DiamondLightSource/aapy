@@ -1,5 +1,5 @@
-import pytest
 import numpy
+import pytest
 
 from aa import data, utils
 

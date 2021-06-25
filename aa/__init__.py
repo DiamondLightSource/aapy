@@ -4,6 +4,7 @@ import logging
 import pytz
 import tzlocal
 
+from aa._version_git import __version__
 
 SCAN = "SCAN"
 MONITOR = "MONITOR"
@@ -26,6 +27,3 @@ def set_up_logging(fmt=LOG_FORMAT, level=LOG_LEVEL):
 
     """
     logging.basicConfig(format=fmt, level=level, datefmt="%Y-%m-%d %I:%M:%S")
-
-
-from aa._version_git import __version__

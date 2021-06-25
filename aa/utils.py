@@ -1,11 +1,11 @@
 """Miscellaneous utility functions."""
 from __future__ import print_function
-from datetime import datetime
+
 import logging
+from datetime import datetime
 
 import pytz
 import tzlocal
-
 
 # string23 is used for type-checking for strings in both Python 2 and Python 3.
 try:

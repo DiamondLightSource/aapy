@@ -1,5 +1,5 @@
-from datetime import datetime
 import json
+from datetime import datetime
 
 import jsonschema
 import mock
@@ -8,7 +8,6 @@ import pytest
 import utils
 
 from aa import js
-
 
 EARLY_DATE = datetime(2001, 1, 1, 1, 1)
 LATE_DATE = datetime(2010, 2, 3, 4, 5)
