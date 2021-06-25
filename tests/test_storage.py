@@ -17,7 +17,7 @@ def test_pv_name_from_path(path, pv):
 
 
 @pytest.mark.parametrize(
-    "path,", [("BL13J/MO/PI:2018.pb"), ("BL13J:2018.pb"), ("BL14I/MO/STAGE/01/XF.RBV"),]
+    "path,", [("BL13J/MO/PI:2018.pb"), ("BL13J:2018.pb"), ("BL14I/MO/STAGE/01/XF.RBV")]
 )
 def test_pv_name_from_path_raises_ParsingError_if_not_conventional(path):
     with pytest.raises(storage.ParsingError):

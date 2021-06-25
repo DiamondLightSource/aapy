@@ -243,7 +243,7 @@ def data_from_events(pv, events, count=None):
     # Use the first event to determine the type of array to use.
     try:
         first_event = events[0]
-        if isinstance(first_event.value, utils.string23):
+        if isinstance(first_event.value, str):
             wf_length = 1
             dt = numpy.dtype("U100")
         else:

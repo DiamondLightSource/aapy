@@ -15,7 +15,10 @@ TIMESTAMP_INACCURACY = 1e-6
 
 PV = "dummy"
 # The raw bytes containing some Archiver Appliance data.
-RAW_PAYLOAD_INFO = b"\x08\x06\x12\x14\x53\x52\x2d\x44\x49\x2d\x44\x43\x43\x54\x2d\x30\x31\x3a\x53\x49\x47\x4e\x41\x4c\x18\xdf\x0f\x20\x01"
+RAW_PAYLOAD_INFO = (
+    b"\x08\x06\x12\x14\x53\x52\x2d\x44\x49\x2d\x44\x43\x43\x54\x2d\x30\x31\x3a\x53"
+    b"\x49\x47\x4e\x41\x4c\x18\xdf\x0f\x20\x01"
+)
 RAW_EVENT = (
     b"\x08\x8f\xd9\xa3\x01\x10\x86\x8f\xfd\x01\x19\x0c\x19\x52\xcb\x7d\x8a\x70\x40"
 )
@@ -106,7 +109,10 @@ def test_PbFetcher_get_calls_get_with_correct_url(dummy_pv, jan_2018):
         mock_get.return_value = testutils.mock_response(raw=PB_CHUNK)
         pb_fetcher = pb.PbFetcher("dummy.com", 8000)
         pb_fetcher.get_event_at(dummy_pv, jan_2018)
-        expected_url = "http://dummy.com:8000/retrieval/data/getData.raw?pv=dummy&from=2018-01-01T00:00:00Z&to=2018-01-01T00:00:00Z"
+        expected_url = (
+            "http://dummy.com:8000/retrieval/data/getData.raw"
+            "?pv=dummy&from=2018-01-01T00:00:00Z&to=2018-01-01T00:00:00Z"
+        )
         mock_get.assert_called_with(expected_url, stream=True)
 
 
