@@ -147,7 +147,7 @@ def break_up_chunks(raw_data):
         raw_data: Raw data from file
 
     Returns:
-        OrderedDict: keys are years; values are lists of chunks
+        collections.OrderedDict: keys are years; values are lists of chunks
     """
     chunks = [chunk.strip() for chunk in raw_data.split(b"\n\n")]
     log.info("{} chunks in pb file".format(len(chunks)))
