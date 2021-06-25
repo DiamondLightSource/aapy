@@ -37,7 +37,7 @@ def add_local_timezone(dt):
         dt: naive datetime
 
     Raises:
-        AssertionError if dt already has a timezone
+        AssertionError: if dt already has a timezone
     """
     assert dt.tzinfo is None
     localtz = tzlocal.get_localzone()
