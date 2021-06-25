@@ -6,6 +6,8 @@ import tzlocal
 
 from aa._version_git import __version__
 
+__all__ = [__version__]
+
 SCAN = "SCAN"
 MONITOR = "MONITOR"
 
