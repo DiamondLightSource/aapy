@@ -47,7 +47,7 @@ def add_local_timezone(dt):
     """
     assert dt.tzinfo is None
     localtz = tzlocal.get_localzone()
-    logging.warning('Assuming timezone for {} is {}'.format(dt, localtz))
+    logging.warning("Assuming timezone for {} is {}".format(dt, localtz))
     return localtz.localize(dt)
 
 
@@ -57,8 +57,8 @@ def year_timestamp(year):
 
 def print_raw_bytes(byte_seq):
     for b in byte_seq:
-        print('\\x{:02x}'.format(ord(b)), end='')
-    print('')
+        print("\\x{:02x}".format(ord(b)), end="")
+    print("")
 
 
 def binary_search(seq, f, target):

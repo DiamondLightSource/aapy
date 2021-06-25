@@ -17,7 +17,7 @@ def pv_name_from_path(path):
     E.g. "BL14I/MO/STAGE/01/XF.RBV:2019.pb" goes to
     "BL14I-MO-STAGE-01:XF.RBV"
     """
-    #pattern = re.compile(r"((?:(?:[\w/]+)+)(?:.\w+)?):(\w+\.pb)")
+    # pattern = re.compile(r"((?:(?:[\w/]+)+)(?:.\w+)?):(\w+\.pb)")
     # Strip relative specifier from beginning
     if path[0] == ".":
         path = path[2:]
@@ -25,7 +25,7 @@ def pv_name_from_path(path):
     split_by_dot = path.split(".")
     # There will be one dot if PV does not specify a field
     # otherwise two
-    if len(split_by_dot) not in [2,3] or split_by_dot[-1] != "pb":
+    if len(split_by_dot) not in [2, 3] or split_by_dot[-1] != "pb":
         raise ParsingError("Does not look like a protobuf file")
 
     # Strip off the trailing part of the file name
@@ -48,4 +48,3 @@ def pv_name_from_path(path):
         pv_name = pv_stem
 
     return pv_name
-

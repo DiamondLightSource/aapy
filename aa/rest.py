@@ -8,7 +8,7 @@ class AaRestClient(object):
     """Class used for making calls to the AA Rest API."""
 
     def __init__(self, hostname, port=80):
-        self._hostname = '{}:{}'.format(hostname, port)
+        self._hostname = "{}:{}".format(hostname, port)
 
     def _construct_url(self, command, **kwargs):
         """Construct the appropriate URL for the AA Rest API.
@@ -18,12 +18,12 @@ class AaRestClient(object):
             kwargs: any parameters used in the URL
 
         """
-        url = 'http://{}/mgmt/bpl/{}'.format(self._hostname, command)
+        url = "http://{}/mgmt/bpl/{}".format(self._hostname, command)
         if kwargs:
             k, v = kwargs.popitem()
-            url += '?{}={}'.format(k, str(v))
+            url += "?{}={}".format(k, str(v))
             for k, v in kwargs.items():
-                url += '&{}={}'.format(k, str(v))
+                url += "&{}={}".format(k, str(v))
         return url
 
     def _rest_get(self, command, **kwargs):
@@ -64,55 +64,56 @@ class AaRestClient(object):
         # disconnected (those from get_currently_disconnnected_pvs()),
         # but not those that have never connected (those from
         # get_never_connected_pvs()).
-        return self._rest_get('getAllPVs', limit=limit)
+        return self._rest_get("getAllPVs", limit=limit)
 
     def get_pv_type_info(self, pv):
-        return self._rest_get('getPVTypeInfo', pv=pv)
+        return self._rest_get("getPVTypeInfo", pv=pv)
 
     def get_pv_status(self, pv):
-        return self._rest_get('getPVStatus', pv=pv)
+        return self._rest_get("getPVStatus", pv=pv)
 
     def get_pv_statuses(self, pv_names):
-        payload = 'pv=' + ','.join(pv_names)
-        return self._rest_post('getPVStatus', payload=payload, headers={
-            'Content-Type': 'application/x-www-form-urlencoded'
-        })
+        payload = "pv=" + ",".join(pv_names)
+        return self._rest_post(
+            "getPVStatus",
+            payload=payload,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
 
     def get_never_connected_pvs(self):
-        pv_info = self._rest_get('getNeverConnectedPVs')
-        return [info['pvName'] for info in pv_info]
+        pv_info = self._rest_get("getNeverConnectedPVs")
+        return [info["pvName"] for info in pv_info]
 
     def get_currently_disconnected_pvs(self):
-        pv_info = self._rest_get('getCurrentlyDisconnectedPVs')
-        return set([info['pvName'] for info in pv_info])
+        pv_info = self._rest_get("getCurrentlyDisconnectedPVs")
+        return set([info["pvName"] for info in pv_info])
 
     def archive_pv(self, pv, samplingperiod, samplingmethod=aa.SCAN):
         if samplingmethod not in [aa.SCAN, aa.MONITOR]:
-            raise ValueError('Sampling method {} not valid'.format(samplingmethod))
+            raise ValueError("Sampling method {} not valid".format(samplingmethod))
         return self._rest_get(
-            'archivePV',
+            "archivePV",
             pv=pv,
             samplingperiod=samplingperiod,
-            samplingmethod=samplingmethod
+            samplingmethod=samplingmethod,
         )
 
     def pause_archiving_pv(self, pv):
-        return self._rest_get('pauseArchivingPV', pv=pv)
+        return self._rest_get("pauseArchivingPV", pv=pv)
 
     def resume_archiving_pv(self, pv):
-        return self._rest_get('resumeArchivingPV', pv=pv)
+        return self._rest_get("resumeArchivingPV", pv=pv)
 
     def delete_pv(self, pv):
-        return self._rest_get('deletePV', pv=pv)
+        return self._rest_get("deletePV", pv=pv)
 
     def abort_archiving_pv(self, pv):
-        return self._rest_get('abortArchivingPV', pv=pv)
+        return self._rest_get("abortArchivingPV", pv=pv)
 
     def change_archival_parameters(self, pv, period, method=aa.MONITOR):
         return self._rest_get(
-            'changeArchivalParameters',
+            "changeArchivalParameters",
             pv=pv,
             samplingperiod=period,
-            samplingmethod=method.upper()
+            samplingmethod=method.upper(),
         )
-

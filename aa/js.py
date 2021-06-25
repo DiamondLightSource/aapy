@@ -13,21 +13,22 @@ class JsonFetcher(fetcher.AaFetcher):
             port: port to connect to
         """
         super(JsonFetcher, self).__init__(hostname, port)
-        self._url = '{}/retrieval/data/getData.json'.format(self._endpoint)
+        self._url = "{}/retrieval/data/getData.json".format(self._endpoint)
 
     def _parse_raw_data(self, response, pv, start, end, count):
         json_data = response.json()
         archive_data = data.ArchiveData.empty(pv)
 
-        if json_data and 'data' in json_data[0]:
+        if json_data and "data" in json_data[0]:
             events = []
-            json_events = json_data[0]['data']
+            json_events = json_data[0]["data"]
             for json_event in json_events:
-                timestamp = json_event['secs'] + 1e-9 * json_event['nanos']
-                events.append(data.ArchiveEvent(pv,
-                                                json_event['val'],
-                                                timestamp,
-                                                json_event['severity']))
+                timestamp = json_event["secs"] + 1e-9 * json_event["nanos"]
+                events.append(
+                    data.ArchiveEvent(
+                        pv, json_event["val"], timestamp, json_event["severity"]
+                    )
+                )
 
             archive_data = data.data_from_events(pv, events)
 
