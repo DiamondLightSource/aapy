@@ -7,12 +7,6 @@ from datetime import datetime
 import pytz
 import tzlocal
 
-# string23 is used for type-checking for strings in both Python 2 and Python 3.
-try:
-    string23 = basestring
-except NameError:
-    string23 = str
-
 
 def utc_datetime(*args):
     # pylint: disable=no-value-for-parameter

@@ -2,7 +2,6 @@ from datetime import datetime
 
 import pytest
 import pytz
-import tzlocal
 
 from aa import utils
 
@@ -65,26 +64,26 @@ def test_binary_search_returns_zero_for_empty_seq():
 
 
 def test_binary_search_returns_zero_if_target_below_range():
-    f = lambda x: x
+    f = lambda x: x  # noqa
     assert utils.binary_search([2, 3, 4], f, 1) == 0
 
 
 def test_binary_search_returns_len_seq_if_target_above_range():
-    f = lambda x: x
+    f = lambda x: x  # noqa
     assert utils.binary_search([1, 2, 3], f, 4) == 3
 
 
 def test_binary_search_returns_upper_index():
-    f = lambda x: x
+    f = lambda x: x  # noqa
     assert utils.binary_search([1, 2], f, 1.5) == 1
 
 
 def test_binary_search_returns_upper_index_for_larger_sequence():
     # This tests an otherwise-untested block in the algorithm.
-    f = lambda x: x
+    f = lambda x: x  # noqa
     assert utils.binary_search([1, 2, 3, 4], f, 3.5) == 3
 
 
 def test_binary_search_returns_index_plus_one_if_value_equals_item_in_seq():
-    f = lambda x: x
+    f = lambda x: x  # noqa
     assert utils.binary_search([1, 2], f, 1) == 1
