@@ -4,8 +4,8 @@ from xmlrpc.client import ServerProxy
 
 import numpy
 
-from aa import data, utils
-from aa.fetcher import Fetcher
+from . import data, utils
+from .fetcher import Fetcher
 
 __all__ = [
     "CaClient",

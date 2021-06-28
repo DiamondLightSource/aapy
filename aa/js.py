@@ -1,5 +1,5 @@
 """Class for fetching data from the Archiver Appliance using JSON."""
-from aa import data, fetcher
+from . import data, fetcher
 
 __all__ = ["JsonFetcher"]
 
