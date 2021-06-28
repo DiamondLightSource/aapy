@@ -1,6 +1,8 @@
 """Class for fetching data from the Archiver Appliance using JSON."""
 from aa import data, fetcher
 
+__all__ = ["JsonFetcher"]
+
 
 class JsonFetcher(fetcher.AaFetcher):
     """Class to fetch data from the Archiver Appliance using JSON."""

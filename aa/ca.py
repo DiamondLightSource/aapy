@@ -7,6 +7,11 @@ import numpy
 from aa import data, utils
 from aa.fetcher import Fetcher
 
+__all__ = [
+    "CaClient",
+    "CaFetcher",
+]
+
 
 class CaClient(object):
     """Class to handle XMLRPC interaction with a channel archiver."""

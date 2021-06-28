@@ -6,6 +6,11 @@ import requests
 
 from . import utils
 
+__all__ = [
+    "Fetcher",
+    "AaFetcher",
+]
+
 
 class Fetcher(object):
     """Abstract base class for fetching data from an archiver."""
