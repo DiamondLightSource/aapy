@@ -33,6 +33,20 @@ from . import data
 from . import epics_event_pb2 as ee
 from . import fetcher, utils
 
+__all__ = [
+    "unescape_bytes",
+    "escape_bytes",
+    "event_timestamp",
+    "search_events",
+    "break_up_chunks",
+    "event_from_line",
+    "parse_pb_data",
+    "PbFetcher",
+    "PbFileFetcher",
+    "get_iso_timestamp_for_event",
+]
+
+
 # It is not clear to me why I can't extract this information
 # from the compiled protobuf file.
 TYPE_MAPPINGS = {

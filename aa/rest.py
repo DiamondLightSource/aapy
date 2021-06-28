@@ -1,7 +1,9 @@
 """Class for making calls to the Archiver Appliance Rest API."""
 import requests
 
-import aa
+from .utils import MONITOR, SCAN
+
+__all__ = ["AaRestClient"]
 
 
 class AaRestClient(object):
@@ -88,8 +90,8 @@ class AaRestClient(object):
         pv_info = self._rest_get("getCurrentlyDisconnectedPVs")
         return set([info["pvName"] for info in pv_info])
 
-    def archive_pv(self, pv, samplingperiod, samplingmethod=aa.SCAN):
-        if samplingmethod not in [aa.SCAN, aa.MONITOR]:
+    def archive_pv(self, pv, samplingperiod, samplingmethod=SCAN):
+        if samplingmethod not in [SCAN, MONITOR]:
             raise ValueError("Sampling method {} not valid".format(samplingmethod))
         return self._rest_get(
             "archivePV",
@@ -110,7 +112,7 @@ class AaRestClient(object):
     def abort_archiving_pv(self, pv):
         return self._rest_get("abortArchivingPV", pv=pv)
 
-    def change_archival_parameters(self, pv, period, method=aa.MONITOR):
+    def change_archival_parameters(self, pv, period, method=MONITOR):
         return self._rest_get(
             "changeArchivalParameters",
             pv=pv,

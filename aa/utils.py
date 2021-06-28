@@ -7,6 +7,18 @@ from datetime import datetime
 import pytz
 import tzlocal
 
+__all__ = [
+    "utc_datetime",
+    "utc_now",
+    "EPOCH",
+    "datetime_to_epoch",
+    "epoch_to_datetime",
+    "add_local_timezone",
+    "year_timestamp",
+    "print_raw_bytes",
+    "binary_search",
+]
+
 
 def utc_datetime(*args):
     # pylint: disable=no-value-for-parameter
@@ -86,3 +98,26 @@ def binary_search(seq, f, target):
         elif next_val <= target:
             lower = current
     return upper
+
+
+SCAN = "SCAN"
+MONITOR = "MONITOR"
+
+# Make UTC and local timezone easy to get hold of.
+LOCALTZ = tzlocal.get_localzone()
+UTC = pytz.utc
+
+# Logging utilities
+LOG_FORMAT = "%(asctime)s %(levelname)-8s %(message)s"
+LOG_LEVEL = logging.DEBUG
+
+
+def set_up_logging(fmt=LOG_FORMAT, level=LOG_LEVEL):
+    """Simple logging setup.
+
+    Args:
+        fmt: logging format to use
+        level: logging level to use
+
+    """
+    logging.basicConfig(format=fmt, level=level, datefmt="%Y-%m-%d %I:%M:%S")
