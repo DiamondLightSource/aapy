@@ -20,19 +20,18 @@ Note: due to the way the protobuf objects are constructed, pylint can't
 correctly deduce some properties, so I have manually disabled some warnings.
 
 """
+import collections
 import datetime
+import logging as log
 import os
 import re
-import collections
-import logging as log
 
 import pytz
 import requests
 
-from . import data, fetcher, utils
+from . import data
 from . import epics_event_pb2 as ee
-
-
+from . import fetcher, utils
 
 # It is not clear to me why I can't extract this information
 # from the compiled protobuf file.
@@ -51,32 +50,37 @@ TYPE_MAPPINGS = {
     11: ee.VectorChar,
     12: ee.VectorInt,
     13: ee.VectorDouble,
-    14: ee.V4GenericBytes
+    14: ee.V4GenericBytes,
 }
 
 
-INVERSE_TYPE_MAPPINGS={cls:numeric for numeric, cls in TYPE_MAPPINGS.items()}
+INVERSE_TYPE_MAPPINGS = {cls: numeric for numeric, cls in TYPE_MAPPINGS.items()}
 
 
-ESC_BYTE = b'\x1B'
-NL_BYTE = b'\x0A'
-CR_BYTE = b'\x0D'
+ESC_BYTE = b"\x1B"
+NL_BYTE = b"\x0A"
+CR_BYTE = b"\x0D"
 
 # The character sequences required to unescape & escape AA pb file format.
 # Note that we need to be careful about the ordering here. We must apply them
 # in the opposite order when escaping and unescaping. In particular, the
 # escape byte needs to be escaped *first* and unescaped *last* in order to
 # prevent extra bytes appearing and causing problems. See #59.
-PB_REPLACEMENTS_ESCAPING = collections.OrderedDict([
-    (ESC_BYTE + b'\x01', ESC_BYTE),
-    (ESC_BYTE + b'\x02', NL_BYTE),
-    (ESC_BYTE + b'\x03', CR_BYTE),
-])
-PB_REPLACEMENTS_UNESCAPING = collections.OrderedDict([
-    (ESC_BYTE + b'\x03', CR_BYTE),
-    (ESC_BYTE + b'\x02', NL_BYTE),
-    (ESC_BYTE + b'\x01', ESC_BYTE),
-])
+PB_REPLACEMENTS_ESCAPING = collections.OrderedDict(
+    [
+        (ESC_BYTE + b"\x01", ESC_BYTE),
+        (ESC_BYTE + b"\x02", NL_BYTE),
+        (ESC_BYTE + b"\x03", CR_BYTE),
+    ]
+)
+PB_REPLACEMENTS_UNESCAPING = collections.OrderedDict(
+    [
+        (ESC_BYTE + b"\x03", CR_BYTE),
+        (ESC_BYTE + b"\x02", NL_BYTE),
+        (ESC_BYTE + b"\x01", ESC_BYTE),
+    ]
+)
+
 
 def unescape_bytes(byte_seq):
     """Replace specific sub-sequences in a bytes sequence.
@@ -122,10 +126,10 @@ def get_timestamp_from_line_function(chunk_info):
         event = TYPE_MAPPINGS[chunk_info.type]()
         event.ParseFromString(unescape_bytes(line))
         event_time = event_timestamp(
-            chunk_info.year,  # pylint: disable=no-member
-            event
+            chunk_info.year, event  # pylint: disable=no-member
         )
         return event_time
+
     return timestamp_from_line
 
 
@@ -143,19 +147,17 @@ def break_up_chunks(raw_data):
         raw_data: Raw data from file
 
     Returns:
-        OrderedDict: keys are years; values are lists of chunks
+        collections.OrderedDict: keys are years; values are lists of chunks
     """
-    chunks = [chunk.strip() for chunk in raw_data.split(b'\n\n')]
-    log.info('{} chunks in pb file'.format(len(chunks)))
+    chunks = [chunk.strip() for chunk in raw_data.split(b"\n\n")]
+    log.info("{} chunks in pb file".format(len(chunks)))
     year_chunks = collections.OrderedDict()
     for chunk in chunks:
-        lines = chunk.split(b'\n')
+        lines = chunk.split(b"\n")
         chunk_info = ee.PayloadInfo()
         chunk_info.ParseFromString(unescape_bytes(lines[0]))
         chunk_year = chunk_info.year  # pylint: disable=no-member
-        log.info('Year {}: {} events in chunk'.format(
-            chunk_year, len(lines) - 1)
-        )
+        log.info("Year {}: {} events in chunk".format(chunk_year, len(lines) - 1))
         try:
             _, ls = year_chunks[chunk_year]
             ls.extend(lines[1:])
@@ -180,11 +182,9 @@ def event_from_line(line, pv, year, event_type):
     unescaped = unescape_bytes(line)
     event = TYPE_MAPPINGS[event_type]()
     event.ParseFromString(unescaped)
-    return data.ArchiveEvent(pv,
-                             event.val,
-                             event_timestamp(year, event),
-                             event.severity)
-
+    return data.ArchiveEvent(
+        pv, event.val, event_timestamp(year, event), event.severity
+    )
 
 
 def parse_pb_data(raw_data, pv, start, end, count=None):
@@ -223,22 +223,22 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
         # year boundaries for the time being.
         if s > 0:
             s -= 1
-        log.info('Year {} start {} end {}'.format(year, s, e))
+        log.info("Year {} start {} end {}".format(year, s, e))
         for line in lines[s:e]:
             events.append(event_from_line(line, pv, year, chunk_info.type))
     return data.data_from_events(pv, events, count)
 
 
 class PbFetcher(fetcher.AaFetcher):
-
     def __init__(self, hostname, port):
         super(PbFetcher, self).__init__(hostname, port, binary=True)
-        self._url = '{}/retrieval/data/getData.raw'.format(self._endpoint)
+        self._url = "{}/retrieval/data/getData.raw".format(self._endpoint)
 
     def _get_values(self, pv, start, end, count, request_params):
         try:
-            return super(PbFetcher, self)._get_values(pv, start, end, count,
-                                                      request_params)
+            return super(PbFetcher, self)._get_values(
+                pv, start, end, count, request_params
+            )
         except requests.exceptions.HTTPError as e:
             # Not found typically means no data for the PV in this time range.
             if e.response.status_code == 404:
@@ -252,16 +252,15 @@ class PbFetcher(fetcher.AaFetcher):
 
 
 class PbFileFetcher(fetcher.Fetcher):
-
     def __init__(self, root):
         self._root = root
 
     def _get_pb_file(self, pv, year):
         # Split PV on either dash or colon
-        parts = re.split('[-:]', pv)
+        parts = re.split("[-:]", pv)
         suffix = parts.pop()
         directory = os.path.join(self._root, os.path.sep.join(parts))
-        filename = '{}:{}.pb'.format(suffix, year)
+        filename = "{}:{}.pb".format(suffix, year)
         return os.path.join(directory, filename)
 
     @staticmethod
@@ -269,20 +268,20 @@ class PbFileFetcher(fetcher.Fetcher):
         raw_data = bytearray()
         for filepath in files:
             try:
-                with open(filepath, 'rb') as f:
+                with open(filepath, "rb") as f:
                     # Ascii code for new line character. Makes a
                     # new 'chunk' for each file.
                     raw_data.append(10)
                     raw_data.extend(f.read())
-            except IOError: # File not found. No data.
-                log.warning('No pb file {} found')
+            except IOError:  # File not found. No data.
+                log.warning("No pb file {} found")
         return parse_pb_data(bytes(raw_data), pv, start, end, count)
 
     def _get_values(self, pv, start, end=None, count=None, request_params=None):
         pb_files = []
         for year in range(start.year, end.year + 1):
             pb_files.append(self._get_pb_file(pv, year))
-        log.info('Parsing pb files {}'.format(pb_files))
+        log.info("Parsing pb files {}".format(pb_files))
         return self._read_pb_files(pb_files, pv, start, end, count)
 
 
@@ -291,7 +290,4 @@ def get_iso_timestamp_for_event(year, event):
     and year."""
     timestamp = event_timestamp(year, event)
     timezone = pytz.timezone("Europe/London")
-    return datetime.datetime.fromtimestamp(
-        timestamp,
-        timezone
-    ).isoformat()
+    return datetime.datetime.fromtimestamp(timestamp, timezone).isoformat()

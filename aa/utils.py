@@ -1,17 +1,11 @@
 """Miscellaneous utility functions."""
 from __future__ import print_function
-from datetime import datetime
+
 import logging
+from datetime import datetime
 
 import pytz
 import tzlocal
-
-
-# string23 is used for type-checking for strings in both Python 2 and Python 3.
-try:
-    string23 = basestring
-except NameError:
-    string23 = str
 
 
 def utc_datetime(*args):
@@ -43,11 +37,11 @@ def add_local_timezone(dt):
         dt: naive datetime
 
     Raises:
-        AssertionError if dt already has a timezone
+        AssertionError: if dt already has a timezone
     """
     assert dt.tzinfo is None
     localtz = tzlocal.get_localzone()
-    logging.warning('Assuming timezone for {} is {}'.format(dt, localtz))
+    logging.warning("Assuming timezone for {} is {}".format(dt, localtz))
     return localtz.localize(dt)
 
 
@@ -57,8 +51,8 @@ def year_timestamp(year):
 
 def print_raw_bytes(byte_seq):
     for b in byte_seq:
-        print('\\x{:02x}'.format(ord(b)), end='')
-    print('')
+        print("\\x{:02x}".format(ord(b)), end="")
+    print("")
 
 
 def binary_search(seq, f, target):

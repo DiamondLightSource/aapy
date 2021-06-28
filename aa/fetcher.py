@@ -60,10 +60,9 @@ class Fetcher(object):
         if instant.tzinfo is None:
             instant = utils.add_local_timezone(instant)
         try:
-            return self.get_values(pv, instant, instant, 1,
-                                   request_params).get_event(0)
+            return self.get_values(pv, instant, instant, 1, request_params).get_event(0)
         except IndexError:
-            error_msg = 'No data found for pv {} at timestamp {}'
+            error_msg = "No data found for pv {} at timestamp {}"
             raise ValueError(error_msg.format(pv, instant))
 
 
@@ -73,7 +72,7 @@ class AaFetcher(Fetcher):
     def __init__(self, hostname, port, binary=False):
         self._host = hostname
         self._port = port
-        self._endpoint = 'http://{}:{}'.format(self._host, self._port)
+        self._endpoint = "http://{}:{}".format(self._host, self._port)
         self._url = None
         self._binary = binary
 
@@ -91,22 +90,20 @@ class AaFetcher(Fetcher):
 
         """
         assert dt.tzinfo is not None
-        return dt.astimezone(pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+        return dt.astimezone(pytz.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     def _construct_url(self, pv, start, end, request_params):
         if request_params is None:
             request_params = {}
 
-        suffix = '?pv={}&from={}&to={}'.format(
-            pv,
-            self._format_datetime(start),
-            self._format_datetime(end)
+        suffix = "?pv={}&from={}&to={}".format(
+            pv, self._format_datetime(start), self._format_datetime(end)
         )
 
         for key, value in request_params.items():
             suffix += "&{}={}".format(key, value)
 
-        return '{}{}'.format(self._url, suffix)
+        return "{}{}".format(self._url, suffix)
 
     def _fetch_data(self, pv, start, end, request_params):
         url = self._construct_url(pv, start, end, request_params)

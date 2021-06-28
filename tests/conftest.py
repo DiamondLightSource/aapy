@@ -1,12 +1,12 @@
-import pytest
 import numpy
+import pytest
 
 from aa import data, utils
 
 
 @pytest.fixture
 def dummy_pv():
-    return 'dummy'
+    return "dummy"
 
 
 @pytest.fixture
@@ -46,10 +46,9 @@ def empty_data(dummy_pv):
 
 @pytest.fixture
 def data_1d(dummy_pv):
-    return data.ArchiveData(dummy_pv,
-                            numpy.array((1,)),
-                            numpy.array((100.1,)),
-                            numpy.array((0,)))
+    return data.ArchiveData(
+        dummy_pv, numpy.array((1,)), numpy.array((100.1,)), numpy.array((0,))
+    )
 
 
 @pytest.fixture
@@ -58,10 +57,12 @@ def data_2_events(dummy_pv):
     Returns:
         1d ArchiveData with two events.
     """
-    return data.ArchiveData(dummy_pv,
-                            numpy.array((1, 2)).reshape(2, 1),
-                            numpy.array((100.1, 100.2)),
-                            numpy.array((0, 1)))
+    return data.ArchiveData(
+        dummy_pv,
+        numpy.array((1, 2)).reshape(2, 1),
+        numpy.array((100.1, 100.2)),
+        numpy.array((0, 1)),
+    )
 
 
 @pytest.fixture
@@ -70,15 +71,16 @@ def data_2d_2_events(dummy_pv):
     Returns:
         2d ArchiveData with two events.
     """
-    return data.ArchiveData(dummy_pv,
-                            numpy.array(((1.1, 2, 3), (3, 4.5, 6))),
-                            numpy.array((10.21, 11.01)),
-                            numpy.array((1, 5)))
+    return data.ArchiveData(
+        dummy_pv,
+        numpy.array(((1.1, 2, 3), (3, 4.5, 6))),
+        numpy.array((10.21, 11.01)),
+        numpy.array((1, 5)),
+    )
 
 
 @pytest.fixture
 def data_2d(dummy_pv):
-    return data.ArchiveData(dummy_pv,
-                            numpy.array(((1.1, 2, 3),)),
-                            numpy.array((10.21,)),
-                            numpy.array((1,)))
+    return data.ArchiveData(
+        dummy_pv, numpy.array(((1.1, 2, 3),)), numpy.array((10.21,)), numpy.array((1,))
+    )

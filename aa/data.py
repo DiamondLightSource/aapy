@@ -1,19 +1,21 @@
 """Objects representing data returned from the Archiver Appliance."""
 import logging
+
 import numpy
 import pytz
 
 from . import utils
 
-
-DIFFERENT_PV_ERROR = 'All concatenated ArchiveData objects must have the same PV name'
-TIMESTAMP_WARNING = 'Timestamps not monotonically increasing: {} -> {}'
+DIFFERENT_PV_ERROR = "All concatenated ArchiveData objects must have the same PV name"
+TIMESTAMP_WARNING = "Timestamps not monotonically increasing: {} -> {}"
 
 
 class ArchiveEvent(object):
 
-    DESC = ('Archive event for PV {}: '
-            'timestamp {:%Y-%m-%d %H:%M:%S.%f %Z} value {} severity {:.0f}')
+    DESC = (
+        "Archive event for PV {}: "
+        "timestamp {:%Y-%m-%d %H:%M:%S.%f %Z} value {} severity {:.0f}"
+    )
 
     def __init__(self, pv, value, timestamp, severity):
         self._pv = pv
@@ -61,16 +63,13 @@ class ArchiveEvent(object):
 
     def __str__(self):
         return ArchiveEvent.DESC.format(
-            self.pv,
-            self.utc_datetime,
-            self.value,
-            self.severity
+            self.pv, self.utc_datetime, self.value, self.severity
         )
 
     __repr__ = __str__
 
     def __eq__(self, other):
-        equal = (isinstance(other, ArchiveEvent))
+        equal = isinstance(other, ArchiveEvent)
         equal = equal and self.pv == other.pv
         equal = equal and numpy.allclose(self.value, other.value)
         equal = equal and self.timestamp == other.timestamp
@@ -80,9 +79,11 @@ class ArchiveEvent(object):
 
 class ArchiveData(object):
 
-    DESC = ('Archive data for PV {}: {} events'
-            ' first timestamp {:%Y-%m-%d %H:%M:%S.%f %Z}'
-            ' last timestamp {:%Y-%m-%d %H:%M:%S.%f %Z}')
+    DESC = (
+        "Archive data for PV {}: {} events"
+        " first timestamp {:%Y-%m-%d %H:%M:%S.%f %Z}"
+        " last timestamp {:%Y-%m-%d %H:%M:%S.%f %Z}"
+    )
 
     def __init__(self, pv, values, timestamps, severities):
         values = numpy.array(values)
@@ -105,7 +106,7 @@ class ArchiveData(object):
                 logging.warning(
                     TIMESTAMP_WARNING.format(
                         utils.epoch_to_datetime(ts_array[nonzero_index]),
-                        utils.epoch_to_datetime(ts_array[nonzero_index + 1])
+                        utils.epoch_to_datetime(ts_array[nonzero_index + 1]),
                     )
                 )
 
@@ -136,9 +137,9 @@ class ArchiveData(object):
             numpy array of datetime objects
 
         """
-        return numpy.array([
-            utils.epoch_to_datetime(ts).astimezone(tz) for ts in self._timestamps
-        ])
+        return numpy.array(
+            [utils.epoch_to_datetime(ts).astimezone(tz) for ts in self._timestamps]
+        )
 
     @property
     def utc_datetimes(self):
@@ -155,8 +156,9 @@ class ArchiveData(object):
         return self._severities
 
     def get_event(self, index):
-        return ArchiveEvent(self.pv, self.values[index],
-                            self.timestamps[index], self.severities[index])
+        return ArchiveEvent(
+            self.pv, self.values[index], self.timestamps[index], self.severities[index]
+        )
 
     def concatenate(self, other, zero_pad=False):
         """Combine two ArchiveData objects.
@@ -180,8 +182,7 @@ class ArchiveData(object):
             first_length, first_size = self.values.shape
             second_length, second_size = other.values.shape
 
-            target_shape = (first_length + second_length,
-                            max(first_size, second_size))
+            target_shape = (first_length + second_length, max(first_size, second_size))
             new_values = numpy.zeros(target_shape)
             new_values[:first_length, :first_size] = self.values
             new_values[first_length:, :second_size] = other.values
@@ -198,13 +199,13 @@ class ArchiveData(object):
                 self.pv,
                 len(self.values),
                 utils.epoch_to_datetime(self._timestamps[0]),
-                utils.epoch_to_datetime(self._timestamps[-1])
+                utils.epoch_to_datetime(self._timestamps[-1]),
             )
 
     __repr__ = __str__
 
     def __eq__(self, other):
-        equal = (isinstance(other, ArchiveData))
+        equal = isinstance(other, ArchiveData)
         equal = equal and self.pv == other.pv
         equal = equal and numpy.allclose(self.values, other.values)
         equal = equal and numpy.allclose(self.timestamps, other.timestamps)
@@ -212,19 +213,18 @@ class ArchiveData(object):
         return equal
 
     def __iter__(self):
-        for value, timestamp, severity in zip(self.values,
-                                              self.timestamps,
-                                              self.severities):
+        for value, timestamp, severity in zip(
+            self.values, self.timestamps, self.severities
+        ):
             yield ArchiveEvent(self.pv, value, timestamp, severity)
 
     def __len__(self):
         return len(self.values)
 
     def __getitem__(self, i):
-        return ArchiveEvent(self.pv,
-                            self.values[i],
-                            self.timestamps[i],
-                            self.severities[i])
+        return ArchiveEvent(
+            self.pv, self.values[i], self.timestamps[i], self.severities[i]
+        )
 
 
 def data_from_events(pv, events, count=None):
@@ -243,9 +243,9 @@ def data_from_events(pv, events, count=None):
     # Use the first event to determine the type of array to use.
     try:
         first_event = events[0]
-        if isinstance(first_event.value, utils.string23):
+        if isinstance(first_event.value, str):
             wf_length = 1
-            dt = numpy.dtype('U100')
+            dt = numpy.dtype("U100")
         else:
             wf_length = len(first_event.value)
             dt = numpy.dtype(type(first_event.value[0]))

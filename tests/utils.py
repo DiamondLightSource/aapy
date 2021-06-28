@@ -24,7 +24,7 @@ def get_data_filepath(filename):
         full path to file
 
     """
-    return os.path.join(os.path.dirname(__file__), 'data', filename)
+    return os.path.join(os.path.dirname(__file__), "data", filename)
 
 
 def load_from_file(filename):
@@ -39,5 +39,3 @@ def load_from_file(filename):
     filepath = get_data_filepath(filename)
     with open(filepath) as f:
         return f.read()
-
-
