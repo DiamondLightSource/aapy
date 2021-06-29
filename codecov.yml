@@ -1,0 +1,7 @@
+coverage:
+  status:
+    project:
+      default:
+        # Don't fail CI based on coverage
+        informational: true
+
