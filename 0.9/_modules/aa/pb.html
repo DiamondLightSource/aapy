@@ -1,0 +1,531 @@
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>aa.pb &mdash; aa 0.0+unknown documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/dls-favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: rgb(7, 43, 93)" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> aa
+          
+
+          
+            
+            <img src="../../_static/dls-logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+  <style>
+    /* style mobile top nav to look like main nav */
+    .wy-nav-top {
+        background: rgb(7, 43, 93)
+    }
+  </style>
+  
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../aa.html">aa package</a></li>
+</ul>
+
+            
+          
+  <!-- Include Index in the sidebar -->
+  <!-- https://stackoverflow.com/a/37843854 -->
+  <a href="../../genindex.html">Index</a>
+  <!-- Include all versions of the docs -->
+  <!-- https://holzhaus.github.io/sphinx-multiversion/master/templates.html -->
+  
+  <p class="caption"><span class="caption-text">Versions</span></p>
+  <ul>
+    <li><a href="../../../master/index.html">master</a></li>
+    <li><a href="../../../0.9a1/index.html">0.9a1</a></li>
+    <li><a href="pb.html">0.9</a></li>
+  </ul>
+  
+
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">aa</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>aa.pb</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for aa.pb</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Handle retrieval of data in the Archiver Appliance PB file format.</span>
+
+<span class="sd">The file format is described on this page:</span>
+<span class="sd">https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html</span>
+
+<span class="sd">The data can be parsed in the same way whether retrieved using the</span>
+<span class="sd">Rest API or whether reading files directly from disk. In either</span>
+<span class="sd">case, it is important to treat the data as binary data - a stream of</span>
+<span class="sd">bytes. The Google Protobuf library handles converting the stream of</span>
+<span class="sd">bytes into the objects defined by the EPICSEvent.proto file.</span>
+
+<span class="sd">The Archiver Appliance escapes certain characters as described on the</span>
+<span class="sd">page above, which allows one to deduce the number of events in the</span>
+<span class="sd">binary file using tools such as wc.</span>
+
+<span class="sd">The unescape_bytes() method handles unescaping these characters before</span>
+<span class="sd">handing the interpretation over to the Google Protobuf library.</span>
+
+<span class="sd">Note: due to the way the protobuf objects are constructed, pylint can&#39;t</span>
+<span class="sd">correctly deduce some properties, so I have manually disabled some warnings.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">log</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">pytz</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">data</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">epics_event_pb2</span> <span class="k">as</span> <span class="n">ee</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">fetcher</span><span class="p">,</span> <span class="n">utils</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;unescape_bytes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;escape_bytes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;event_timestamp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;search_events&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;break_up_chunks&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;event_from_line&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;parse_pb_data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PbFetcher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PbFileFetcher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_iso_timestamp_for_event&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="c1"># It is not clear to me why I can&#39;t extract this information</span>
+<span class="c1"># from the compiled protobuf file.</span>
+<span class="n">TYPE_MAPPINGS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">0</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">ScalarString</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">ScalarShort</span><span class="p">,</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">ScalarFloat</span><span class="p">,</span>
+    <span class="mi">3</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">ScalarEnum</span><span class="p">,</span>
+    <span class="mi">4</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">ScalarByte</span><span class="p">,</span>
+    <span class="mi">5</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">ScalarInt</span><span class="p">,</span>
+    <span class="mi">6</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">ScalarDouble</span><span class="p">,</span>
+    <span class="mi">7</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">VectorString</span><span class="p">,</span>
+    <span class="mi">8</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">VectorShort</span><span class="p">,</span>
+    <span class="mi">9</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">VectorFloat</span><span class="p">,</span>
+    <span class="mi">10</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">VectorEnum</span><span class="p">,</span>
+    <span class="mi">11</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">VectorChar</span><span class="p">,</span>
+    <span class="mi">12</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">VectorInt</span><span class="p">,</span>
+    <span class="mi">13</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">VectorDouble</span><span class="p">,</span>
+    <span class="mi">14</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">V4GenericBytes</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="n">INVERSE_TYPE_MAPPINGS</span> <span class="o">=</span> <span class="p">{</span><span class="bp">cls</span><span class="p">:</span> <span class="n">numeric</span> <span class="k">for</span> <span class="n">numeric</span><span class="p">,</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">TYPE_MAPPINGS</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+
+<span class="n">ESC_BYTE</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x1B</span><span class="s2">&quot;</span>
+<span class="n">NL_BYTE</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x0A</span><span class="s2">&quot;</span>
+<span class="n">CR_BYTE</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x0D</span><span class="s2">&quot;</span>
+
+<span class="c1"># The character sequences required to unescape &amp; escape AA pb file format.</span>
+<span class="c1"># Note that we need to be careful about the ordering here. We must apply them</span>
+<span class="c1"># in the opposite order when escaping and unescaping. In particular, the</span>
+<span class="c1"># escape byte needs to be escaped *first* and unescaped *last* in order to</span>
+<span class="c1"># prevent extra bytes appearing and causing problems. See #59.</span>
+<span class="n">PB_REPLACEMENTS_ESCAPING</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="n">ESC_BYTE</span> <span class="o">+</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ESC_BYTE</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">ESC_BYTE</span> <span class="o">+</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x02</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">NL_BYTE</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">ESC_BYTE</span> <span class="o">+</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x03</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">CR_BYTE</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">PB_REPLACEMENTS_UNESCAPING</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="n">ESC_BYTE</span> <span class="o">+</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x03</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">CR_BYTE</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">ESC_BYTE</span> <span class="o">+</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x02</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">NL_BYTE</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">ESC_BYTE</span> <span class="o">+</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ESC_BYTE</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="unescape_bytes"><a class="viewcode-back" href="../../aa.html#aa.pb.unescape_bytes">[docs]</a><span class="k">def</span> <span class="nf">unescape_bytes</span><span class="p">(</span><span class="n">byte_seq</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Replace specific sub-sequences in a bytes sequence.</span>
+
+<span class="sd">    This escaping is defined as part of the Archiver Appliance raw file</span>
+<span class="sd">    format: https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        byte_seq: any byte sequence</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        the byte sequence unescaped according to the AA file format rules</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">PB_REPLACEMENTS_UNESCAPING</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">byte_seq</span> <span class="o">=</span> <span class="n">byte_seq</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">byte_seq</span></div>
+
+
+<div class="viewcode-block" id="escape_bytes"><a class="viewcode-back" href="../../aa.html#aa.pb.escape_bytes">[docs]</a><span class="k">def</span> <span class="nf">escape_bytes</span><span class="p">(</span><span class="n">byte_seq</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Replace specific sub-sequences in a bytes sequence.</span>
+
+<span class="sd">    This escaping is defined as part of the Archiver Appliance raw file</span>
+<span class="sd">    format: https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        byte_seq: any byte sequence</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        the byte sequence escaped according to the AA file format rules</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">PB_REPLACEMENTS_ESCAPING</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">byte_seq</span> <span class="o">=</span> <span class="n">byte_seq</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">byte_seq</span></div>
+
+
+<div class="viewcode-block" id="event_timestamp"><a class="viewcode-back" href="../../aa.html#aa.pb.event_timestamp">[docs]</a><span class="k">def</span> <span class="nf">event_timestamp</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+    <span class="n">year_start</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">year_timestamp</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+    <span class="c1"># This will lose information (the last few decimal places) since</span>
+    <span class="c1"># a double cannot store 18 significant figures.</span>
+    <span class="k">return</span> <span class="n">year_start</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">secondsintoyear</span> <span class="o">+</span> <span class="mf">1e-9</span> <span class="o">*</span> <span class="n">event</span><span class="o">.</span><span class="n">nano</span></div>
+
+
+<span class="k">def</span> <span class="nf">get_timestamp_from_line_function</span><span class="p">(</span><span class="n">chunk_info</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">timestamp_from_line</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">TYPE_MAPPINGS</span><span class="p">[</span><span class="n">chunk_info</span><span class="o">.</span><span class="n">type</span><span class="p">]()</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">ParseFromString</span><span class="p">(</span><span class="n">unescape_bytes</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+        <span class="n">event_time</span> <span class="o">=</span> <span class="n">event_timestamp</span><span class="p">(</span>
+            <span class="n">chunk_info</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">event</span>  <span class="c1"># pylint: disable=no-member</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">event_time</span>
+
+    <span class="k">return</span> <span class="n">timestamp_from_line</span>
+
+
+<div class="viewcode-block" id="search_events"><a class="viewcode-back" href="../../aa.html#aa.pb.search_events">[docs]</a><span class="k">def</span> <span class="nf">search_events</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">chunk_info</span><span class="p">,</span> <span class="n">lines</span><span class="p">):</span>
+    <span class="n">target_time</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">datetime_to_epoch</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+    <span class="n">timestamp_from_line</span> <span class="o">=</span> <span class="n">get_timestamp_from_line_function</span><span class="p">(</span><span class="n">chunk_info</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">binary_search</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">timestamp_from_line</span><span class="p">,</span> <span class="n">target_time</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="break_up_chunks"><a class="viewcode-back" href="../../aa.html#aa.pb.break_up_chunks">[docs]</a><span class="k">def</span> <span class="nf">break_up_chunks</span><span class="p">(</span><span class="n">raw_data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Break up raw data into chunks by year</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        raw_data: Raw data from file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        collections.OrderedDict: keys are years; values are lists of chunks</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="p">[</span><span class="n">chunk</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)]</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> chunks in pb file&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">)))</span>
+    <span class="n">year_chunks</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">chunk_info</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">PayloadInfo</span><span class="p">()</span>
+        <span class="n">chunk_info</span><span class="o">.</span><span class="n">ParseFromString</span><span class="p">(</span><span class="n">unescape_bytes</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">chunk_year</span> <span class="o">=</span> <span class="n">chunk_info</span><span class="o">.</span><span class="n">year</span>  <span class="c1"># pylint: disable=no-member</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Year </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2"> events in chunk&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chunk_year</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">ls</span> <span class="o">=</span> <span class="n">year_chunks</span><span class="p">[</span><span class="n">chunk_year</span><span class="p">]</span>
+            <span class="n">ls</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">year_chunks</span><span class="p">[</span><span class="n">chunk_year</span><span class="p">]</span> <span class="o">=</span> <span class="n">chunk_info</span><span class="p">,</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">year_chunks</span></div>
+
+
+<div class="viewcode-block" id="event_from_line"><a class="viewcode-back" href="../../aa.html#aa.pb.event_from_line">[docs]</a><span class="k">def</span> <span class="nf">event_from_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">event_type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get an ArchiveEvent from this line</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        line: A line of chunks of data</span>
+<span class="sd">        pv: Name of the PV</span>
+<span class="sd">        year: Year of interest</span>
+<span class="sd">        event_type: Need to know the type of the event as key of TYPE_MAPPINGS</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ArchiveEvent</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">unescaped</span> <span class="o">=</span> <span class="n">unescape_bytes</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="n">event</span> <span class="o">=</span> <span class="n">TYPE_MAPPINGS</span><span class="p">[</span><span class="n">event_type</span><span class="p">]()</span>
+    <span class="n">event</span><span class="o">.</span><span class="n">ParseFromString</span><span class="p">(</span><span class="n">unescaped</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">ArchiveEvent</span><span class="p">(</span>
+        <span class="n">pv</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">event_timestamp</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">event</span><span class="p">),</span> <span class="n">event</span><span class="o">.</span><span class="n">severity</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="parse_pb_data"><a class="viewcode-back" href="../../aa.html#aa.pb.parse_pb_data">[docs]</a><span class="k">def</span> <span class="nf">parse_pb_data</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Turn raw PB data into an ArchiveData object</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        raw_data: The raw data</span>
+<span class="sd">        pv: name of PV</span>
+<span class="sd">        start: datetime.datetime for start of window</span>
+<span class="sd">        end: datetime.datetime for end of window</span>
+<span class="sd">        count: return up to this many events</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        An ArchiveData object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">year_chunks</span> <span class="o">=</span> <span class="n">break_up_chunks</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Iterate over years</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="p">(</span><span class="n">chunk_info</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span> <span class="ow">in</span> <span class="n">year_chunks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Find the index of the start event</span>
+        <span class="k">if</span> <span class="n">start</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">:</span>  <span class="c1"># search for the start</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">search_events</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">chunk_info</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">start</span><span class="o">.</span><span class="n">year</span> <span class="o">&gt;</span> <span class="n">year</span><span class="p">:</span>  <span class="c1"># ignore this chunk</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># start.year &lt; year: all events from the start of the year</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># Find the index of the end event</span>
+        <span class="k">if</span> <span class="n">end</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">:</span>  <span class="c1"># search for the end</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">search_events</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">chunk_info</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">end</span><span class="o">.</span><span class="n">year</span> <span class="o">&lt;</span> <span class="n">year</span><span class="p">:</span>  <span class="c1"># ignore this chunk</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># end.year &gt; year: all events to the end of the year</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Include the event preceding the time range. This won&#39;t work over</span>
+        <span class="c1"># year boundaries for the time being.</span>
+        <span class="k">if</span> <span class="n">s</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Year </span><span class="si">{}</span><span class="s2"> start </span><span class="si">{}</span><span class="s2"> end </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="n">s</span><span class="p">:</span><span class="n">e</span><span class="p">]:</span>
+            <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event_from_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">chunk_info</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">data_from_events</span><span class="p">(</span><span class="n">pv</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PbFetcher"><a class="viewcode-back" href="../../aa.html#aa.pb.PbFetcher">[docs]</a><span class="k">class</span> <span class="nc">PbFetcher</span><span class="p">(</span><span class="n">fetcher</span><span class="o">.</span><span class="n">AaFetcher</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PbFetcher</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/retrieval/data/getData.raw&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">request_params</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PbFetcher</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_get_values</span><span class="p">(</span>
+                <span class="n">pv</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">request_params</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Not found typically means no data for the PV in this time range.</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">ArchiveData</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">pv</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">e</span>
+
+    <span class="k">def</span> <span class="nf">_parse_raw_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="n">raw_data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">raw</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">parse_pb_data</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PbFileFetcher"><a class="viewcode-back" href="../../aa.html#aa.pb.PbFileFetcher">[docs]</a><span class="k">class</span> <span class="nc">PbFileFetcher</span><span class="p">(</span><span class="n">fetcher</span><span class="o">.</span><span class="n">Fetcher</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="n">root</span>
+
+    <span class="k">def</span> <span class="nf">_get_pb_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">year</span><span class="p">):</span>
+        <span class="c1"># Split PV on either dash or colon</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;[-:]&quot;</span><span class="p">,</span> <span class="n">pv</span><span class="p">)</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="n">parts</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">))</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">.pb&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="n">year</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_read_pb_files</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="n">raw_data</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">filepath</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="c1"># Ascii code for new line character. Makes a</span>
+                    <span class="c1"># new &#39;chunk&#39; for each file.</span>
+                    <span class="n">raw_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+                    <span class="n">raw_data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>  <span class="c1"># File not found. No data.</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No pb file </span><span class="si">{}</span><span class="s2"> found&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parse_pb_data</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">raw_data</span><span class="p">),</span> <span class="n">pv</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">request_params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">pb_files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">end</span><span class="o">.</span><span class="n">year</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">pb_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_pb_file</span><span class="p">(</span><span class="n">pv</span><span class="p">,</span> <span class="n">year</span><span class="p">))</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Parsing pb files </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pb_files</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_pb_files</span><span class="p">(</span><span class="n">pb_files</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_iso_timestamp_for_event"><a class="viewcode-back" href="../../aa.html#aa.pb.get_iso_timestamp_for_event">[docs]</a><span class="k">def</span> <span class="nf">get_iso_timestamp_for_event</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns an ISO-formatted timestamp string for the given event</span>
+<span class="sd">    and year.&quot;&quot;&quot;</span>
+    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">event_timestamp</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
+    <span class="n">timezone</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="s2">&quot;Europe/London&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">timezone</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Diamond Light Source.
+
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
