@@ -1,7 +1,7 @@
 """Class for making calls to the Archiver Appliance Rest API."""
 import requests
 
-from .utils import MONITOR, SCAN
+from .utils import MONITOR, SCAN, dict_to_tuples
 
 __all__ = ["AaRestClient"]
 
@@ -22,9 +22,10 @@ class AaRestClient(object):
         """
         url = "http://{}/mgmt/bpl/{}".format(self._hostname, command)
         if kwargs:
-            k, v = kwargs.popitem()
+            kwargs = dict_to_tuples(kwargs)
+            k, v = kwargs.pop()
             url += "?{}={}".format(k, str(v))
-            for k, v in kwargs.items():
+            for k, v in kwargs:
                 url += "&{}={}".format(k, str(v))
         return url
 

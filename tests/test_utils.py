@@ -87,3 +87,16 @@ def test_binary_search_returns_upper_index_for_larger_sequence():
 def test_binary_search_returns_index_plus_one_if_value_equals_item_in_seq():
     f = lambda x: x  # noqa
     assert utils.binary_search([1, 2], f, 1) == 1
+
+
+@pytest.mark.parametrize(
+    "input_dict,expect",
+    [
+        (
+            {"b": "bananas", "a": "apples", "c": "cherries"},
+            [("a", "apples"), ("b", "bananas"), ("c", "cherries")],
+        )
+    ],
+)
+def test_dict_to_tuples_has_correct_output(input_dict, expect):
+    assert utils.dict_to_tuples(input_dict) == expect
