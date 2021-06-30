@@ -646,8 +646,25 @@ and year.</p>
 <p>Class used for making calls to the AA Rest API.</p>
 <dl class="py method">
 <dt id="aa.rest.AaRestClient.get_all_pvs">
-<code class="sig-name descname"><span class="pre">get_all_pvs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.get_all_pvs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.get_all_pvs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname"><span class="pre">get_all_pvs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.get_all_pvs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.get_all_pvs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of PVs that are being archived.</p>
+<p>This includes PVs that have connected in the past but are now
+disconnected (those from get_currently_disconnnected_pvs()),
+but not those that have never connected (those from
+get_never_connected_pvs()).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pv</strong> – only return PV names that match pv, which may be a glob</p></li>
+<li><p><strong>limit</strong> – return a maximum of limit PV names. The default (-1)
+returns all PV names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of PV names</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="aa.rest.AaRestClient.get_pv_type_info">
@@ -797,6 +814,20 @@ If target &gt; f(seq[-1]), return len(seq)</p>
 </dd>
 </dl>
 <p>Returns: index of item in seq meeting search requirements</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aa.utils.dict_to_tuples">
+<code class="sig-prename descclassname"><span class="pre">aa.utils.</span></code><code class="sig-name descname"><span class="pre">dict_to_tuples</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/aa/utils.html#dict_to_tuples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.utils.dict_to_tuples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a dict to a list of tuples, sorted alphabetically by key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Dictionary to convert</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of tuples (key, value) sorted alphabetically by key</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
