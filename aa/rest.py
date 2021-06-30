@@ -79,10 +79,10 @@ class AaRestClient(object):
 
         """
         # Only supply the pv argument if it is not None.
-        kwargs = {'limit': limit}
+        kwargs = {"limit": limit}
         if pv is not None:
-            kwargs['pv'] = pv
-        return self._rest_get('getAllPVs', **kwargs)
+            kwargs["pv"] = pv
+        return self._rest_get("getAllPVs", **kwargs)
 
     def get_pv_type_info(self, pv):
         return self._rest_get("getPVTypeInfo", pv=pv)

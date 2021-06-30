@@ -28,7 +28,7 @@ def test_AaRestClient_construct_url(kwargs, aa_client):
 @pytest.mark.parametrize(
     "command,method,kwargs",
     [
-        ('getAllPVs', 'get_all_pvs', {'pv': '*', 'limit': -1}),
+        ("getAllPVs", "get_all_pvs", {"pv": "*", "limit": -1}),
         ("getPVTypeInfo", "get_pv_type_info", {"pv": "dummy"}),
         ("getPVStatus", "get_pv_status", {"pv": "dummy"}),
         ("getNeverConnectedPVs", "get_never_connected_pvs", {}),
