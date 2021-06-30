@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import logging
 from datetime import datetime
+from typing import Dict, List, Tuple
 
 import pytz
 import tzlocal
@@ -124,7 +125,7 @@ def set_up_logging(fmt=LOG_FORMAT, level=LOG_LEVEL):
     logging.basicConfig(format=fmt, level=level, datefmt="%Y-%m-%d %I:%M:%S")
 
 
-def dict_to_tuples(input_dict: dict):
+def dict_to_tuples(input_dict: Dict[str, str]) -> List[Tuple[str, str]]:
     """Convert a dict to a list of tuples, sorted alphabetically by key.
 
     Args:
