@@ -1,7 +1,7 @@
 """Class for making calls to the Archiver Appliance Rest API."""
 import requests
 
-from .utils import MONITOR, SCAN
+from .utils import MONITOR, SCAN, dict_to_tuples
 
 __all__ = ["AaRestClient"]
 
@@ -22,9 +22,10 @@ class AaRestClient(object):
         """
         url = "http://{}/mgmt/bpl/{}".format(self._hostname, command)
         if kwargs:
-            k, v = kwargs.popitem()
+            kwargs = dict_to_tuples(kwargs)
+            k, v = kwargs.pop()
             url += "?{}={}".format(k, str(v))
-            for k, v in kwargs.items():
+            for k, v in kwargs:
                 url += "&{}={}".format(k, str(v))
         return url
 
@@ -61,12 +62,28 @@ class AaRestClient(object):
         response = requests.post(url, payload, headers=headers)
         return response.json()
 
-    def get_all_pvs(self, limit=-1):
-        # This includes PVs that have connected in the past but are now
-        # disconnected (those from get_currently_disconnnected_pvs()),
-        # but not those that have never connected (those from
-        # get_never_connected_pvs()).
-        return self._rest_get("getAllPVs", limit=limit)
+    def get_all_pvs(self, pv=None, limit=-1):
+        """Return a list of PVs that are being archived.
+
+        This includes PVs that have connected in the past but are now
+        disconnected (those from get_currently_disconnnected_pvs()),
+        but not those that have never connected (those from
+        get_never_connected_pvs()).
+
+        Args:
+            pv: only return PV names that match pv, which may be a glob
+            limit: return a maximum of limit PV names. The default (-1)
+                   returns all PV names
+
+        Returns:
+            list of PV names
+
+        """
+        # Only supply the pv argument if it is not None.
+        kwargs = {"limit": limit}
+        if pv is not None:
+            kwargs["pv"] = pv
+        return self._rest_get("getAllPVs", **kwargs)
 
     def get_pv_type_info(self, pv):
         return self._rest_get("getPVTypeInfo", pv=pv)
