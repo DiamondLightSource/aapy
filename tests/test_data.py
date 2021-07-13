@@ -1,4 +1,5 @@
 import datetime
+from collections import OrderedDict
 
 import mock
 import numpy
@@ -42,6 +43,12 @@ def test_ArchiveEvent_str(dummy_pv, event_1d):
     assert dummy_pv in str(event_1d)
 
 
+def test_ArchiveData_has_enum_strings(data_1d):
+    assert not data_1d.has_enum_options
+    data_1d._enum_options = OrderedDict([(1, "One")])
+    assert data_1d.has_enum_options
+
+
 def test_ArchiveData_concatenate_with_different_pv_names_raises_AssertionError():
     array = numpy.zeros((1,))
     data1 = data.ArchiveData("dummy1", array, array, array)
@@ -64,17 +71,32 @@ def test_ArchiveData_concatenate_correctly_zero_pads(data_1d, data_2d):
     numpy.testing.assert_equal(result.values, expected)
 
 
-def test_ArchiveData_concatenate_works_for_two_items():
+@mock.patch("logging.warning")
+def test_ArchiveData_concatenate_works_for_two_items(mock_warning):
     zeros = numpy.zeros((1,))
     ones = numpy.ones((1,))
-    data1 = data.ArchiveData("dummy", zeros, zeros, zeros)
-    data2 = data.ArchiveData("dummy", ones, ones, ones)
+    enum_options1 = {0: "dummy", 1: "fake"}
+    enum_options2 = {0: "rubbish", 2: "nonsense"}
+    data1 = data.ArchiveData("dummy", zeros, zeros, zeros, enum_options1)
+    data2 = data.ArchiveData("dummy", ones, ones, ones, enum_options1)
     expected = numpy.array((0, 1))
+
+    # Concat with enum options the same
     data3 = data1.concatenate(data2)
     # Note that values is always a 2d array.
     numpy.testing.assert_equal(data3.values, expected.reshape(2, 1))
     numpy.testing.assert_equal(data3.timestamps, expected)
     numpy.testing.assert_equal(data3.severities, expected)
+
+    assert data3.enum_options == enum_options1
+    mock_warning.assert_not_called()
+
+    # Concat with enum options different
+    # Should use enum options from first and issue warning.
+    data2._enum_options = enum_options2
+    data3 = data1.concatenate(data2)
+    assert data3.enum_options == enum_options1
+    mock_warning.assert_called_once()
 
 
 def test_ArchiveData_concatenate_works_for_2d_arrays():
@@ -150,12 +172,28 @@ def test_non_empty_ArchiveData_evaluates_as_True(data_1d):
     assert data_1d
 
 
+def test_ArchiveData_equality():
+    zeros = numpy.zeros((1,))
+    ones = numpy.ones((1,))
+    enum_options1 = {0: "dummy", 1: "fake"}
+    enum_options2 = {0: "rubbish", 2: "nonsense"}
+    data1 = data.ArchiveData("dummy", zeros, zeros, zeros, enum_options1)
+    data2 = data.ArchiveData("dummy", zeros, zeros, zeros, enum_options1)
+    assert data1 == data2
+    data3 = data.ArchiveData("dummy", ones, zeros, zeros, enum_options1)
+    data4 = data.ArchiveData("dummy", ones, ones, zeros, enum_options1)
+    data5 = data.ArchiveData("dummy", ones, ones, ones, enum_options1)
+    data6 = data.ArchiveData("dummy", ones, ones, ones, enum_options2)
+    assert data1 != data3 != data4 != data5 != data6
+
+
 def test_ArchiveData_iterates_multiple_times():
     array = numpy.zeros((1,))
-    zero_event = data.ArchiveEvent("dummy", array, array, array)
+    enum_options = OrderedDict([(0, "Good"), (1, "Bad")])
+    zero_event = data.ArchiveEvent("dummy", array, array, array, enum_options)
     for i in range(3):
         array = numpy.zeros((3,))
-        d = data.ArchiveData("dummy", array, array, array)
+        d = data.ArchiveData("dummy", array, array, array, enum_options)
         for event in d:
             assert event == zero_event
 
@@ -181,3 +219,49 @@ def test_data_from_events_handles_two_2d_events(
     dummy_pv, event_2d, event_2d_alt, data_2d_2_events
 ):
     assert data.data_from_events(dummy_pv, (event_2d, event_2d_alt)) == data_2d_2_events
+
+
+def test_parse_enum_options_expected_output():
+    test_input = {
+        "name": "CS-CS-MSTAT-01:MODE",
+        "DRVH": "0.0",
+        "ENUM_1": "Injection",
+        "HIGH": "0.0",
+        "HIHI": "0.0",
+        "ENUM_0": "Shutdown",
+        "DRVL": "0.0",
+        "ENUM_3": "Mach. Dev.",
+        "PREC": "0.0",
+        "LOLO": "0.0",
+        "ENUM_2": "No Beam",
+        "LOPR": "0.0",
+        "ENUM_5": "Special",
+        "ENUM_4": "User",
+        "HOPR": "0.0",
+        "ENUM_7": "Unknown",
+        "ENUM_6": "BL Startup",
+        "LOW": "0.0",
+        "NELM": "1",
+        "ENUM_8": "Eight",
+        "ENUM_9": "Nine",
+        "ENUM_10": "Ten",
+        "ENUM_11": "Eleven",
+    }
+    expect = OrderedDict(
+        [
+            (0, "Shutdown"),
+            (1, "Injection"),
+            (2, "No Beam"),
+            (3, "Mach. Dev."),
+            (4, "User"),
+            (5, "Special"),
+            (6, "BL Startup"),
+            (7, "Unknown"),
+            (8, "Eight"),
+            (9, "Nine"),
+            (10, "Ten"),
+            (11, "Eleven"),
+        ]
+    )
+    result = data.parse_enum_options(test_input)
+    assert result == expect

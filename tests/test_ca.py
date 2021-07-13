@@ -43,7 +43,6 @@ def test_CaClient_create_archive_event_handles_2d_event(ca_client, dummy_pv, eve
 
 
 def test_CaClient_get_returns_event(ca_client, dummy_pv, event_1d):
-    print(ca_client)
     with mock.patch("aa.utils.datetime_to_epoch"):
         events = ca_client.get(dummy_pv, datetime.now(), datetime.now(), 2)
     assert events == [event_1d]

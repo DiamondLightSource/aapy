@@ -1,5 +1,10 @@
 """Objects representing data returned from the Archiver Appliance."""
+from __future__ import annotations
+
 import logging
+import re
+from collections import OrderedDict
+from typing import Dict, List, Optional
 
 import numpy
 import pytz
@@ -10,25 +15,31 @@ __all__ = [
     "ArchiveEvent",
     "ArchiveData",
     "data_from_events",
+    "parse_enum_options",
 ]
 
 
 DIFFERENT_PV_ERROR = "All concatenated ArchiveData objects must have the same PV name"
 TIMESTAMP_WARNING = "Timestamps not monotonically increasing: {} -> {}"
+REGEX_ENUM = r"^ENUM_([0-9]+)$"
+DTYPE_ENUM_STR = "U100"
 
 
 class ArchiveEvent(object):
 
     DESC = (
         "Archive event for PV {}: "
-        "timestamp {:%Y-%m-%d %H:%M:%S.%f %Z} value {} severity {:.0f}"
+        "timestamp {:%Y-%m-%d %H:%M:%S.%f %Z} value {} severity {}"
     )
 
-    def __init__(self, pv, value, timestamp, severity):
+    def __init__(
+        self, pv, value, timestamp, severity, enum_options: OrderedDict = OrderedDict()
+    ):
         self._pv = pv
         self._value = value
         self._timestamp = timestamp
         self._severity = severity
+        self._enum_options = enum_options
 
     @property
     def pv(self):
@@ -41,6 +52,27 @@ class ArchiveEvent(object):
     @property
     def timestamp(self):
         return self._timestamp
+
+    @property
+    def enum_options(self) -> OrderedDict[int, str]:
+        """OrderedDict containing string label for each option if this PV is an enum.
+
+        Key is int value of PV, value is the corresponding string label.
+        """
+        return self._enum_options
+
+    @property
+    def has_enum_options(self) -> bool:
+        return len(self._enum_options) > 0
+
+    @property
+    def enum_string(self) -> Optional[numpy.ndarray]:
+        """If PV is an enum, contains the string label of the value, if avilable"""
+        return (
+            lookup_enum_string(self.value, self.enum_options)
+            if self.has_enum_options
+            else None
+        )
 
     def datetime(self, tz):
         """Returns a timezone-aware datetime for the events.
@@ -69,8 +101,13 @@ class ArchiveEvent(object):
         return self._severity
 
     def __str__(self):
+        display_val = (
+            f"{self.enum_string} ({repr(self.value)})"
+            if self.enum_string
+            else f"{repr(self.value)}"
+        )
         return ArchiveEvent.DESC.format(
-            self.pv, self.utc_datetime, self.value, self.severity
+            self.pv, self.utc_datetime, display_val, repr(self.severity)
         )
 
     __repr__ = __str__
@@ -81,6 +118,8 @@ class ArchiveEvent(object):
         equal = equal and numpy.allclose(self.value, other.value)
         equal = equal and self.timestamp == other.timestamp
         equal = equal and self.severity == other.severity
+        equal = equal and numpy.array_equal(self.enum_options, other.enum_options)
+
         return equal
 
 
@@ -92,7 +131,14 @@ class ArchiveData(object):
         " last timestamp {:%Y-%m-%d %H:%M:%S.%f %Z}"
     )
 
-    def __init__(self, pv, values, timestamps, severities):
+    def __init__(
+        self,
+        pv,
+        values,
+        timestamps,
+        severities,
+        enum_options: OrderedDict[int, str] = OrderedDict(),
+    ):
         values = numpy.array(values)
         timestamps = numpy.array(timestamps)
         severities = numpy.array(severities)
@@ -104,6 +150,7 @@ class ArchiveData(object):
         self._values = values
         self._timestamps = timestamps
         self._severities = severities
+        self._enum_options = enum_options
 
     @staticmethod
     def _check_timestamps(ts_array):
@@ -133,6 +180,22 @@ class ArchiveData(object):
     @property
     def timestamps(self):
         return self._timestamps
+
+    @property
+    def enum_options(self) -> OrderedDict[int, str]:
+        return self._enum_options
+
+    @property
+    def has_enum_options(self) -> bool:
+        return len(self._enum_options) > 0
+
+    @property
+    def enum_strings(self) -> Optional[numpy.ndarray]:
+        return (
+            lookup_enum_string(self.values, self.enum_options)
+            if self.has_enum_options
+            else None
+        )
 
     def datetimes(self, tz):
         """Returns a numpy array of timezone-aware datetimes for the events.
@@ -164,7 +227,11 @@ class ArchiveData(object):
 
     def get_event(self, index):
         return ArchiveEvent(
-            self.pv, self.values[index], self.timestamps[index], self.severities[index]
+            self.pv,
+            self.values[index],
+            self.timestamps[index],
+            self.severities[index],
+            self.enum_options,
         )
 
     def concatenate(self, other, zero_pad=False):
@@ -196,7 +263,11 @@ class ArchiveData(object):
         else:
             new_values = numpy.concatenate([self.values, other.values])
         severities = numpy.concatenate([self.severities, other.severities])
-        return ArchiveData(self.pv, new_values, timestamps, severities)
+        if self.enum_options != other.enum_options:
+            logging.warning("Enum options are not the same. Using mine.")
+        return ArchiveData(
+            self.pv, new_values, timestamps, severities, self.enum_options
+        )
 
     def __str__(self):
         if not self.values.size:
@@ -217,24 +288,34 @@ class ArchiveData(object):
         equal = equal and numpy.allclose(self.values, other.values)
         equal = equal and numpy.allclose(self.timestamps, other.timestamps)
         equal = equal and numpy.array_equal(self.severities, other.severities)
+        equal = equal and self.enum_options == other.enum_options
         return equal
 
     def __iter__(self):
         for value, timestamp, severity in zip(
             self.values, self.timestamps, self.severities
         ):
-            yield ArchiveEvent(self.pv, value, timestamp, severity)
+            yield ArchiveEvent(self.pv, value, timestamp, severity, self.enum_options)
 
     def __len__(self):
         return len(self.values)
 
     def __getitem__(self, i):
         return ArchiveEvent(
-            self.pv, self.values[i], self.timestamps[i], self.severities[i]
+            self.pv,
+            self.values[i],
+            self.timestamps[i],
+            self.severities[i],
+            self.enum_options,
         )
 
 
-def data_from_events(pv, events, count=None):
+def data_from_events(
+    pv,
+    events: List[ArchiveEvent],
+    count: int = None,
+    enum_options: OrderedDict = OrderedDict(),
+):
     """Convert multiple ArchiveEvents into an ArchiveData object
 
     Args:
@@ -248,6 +329,7 @@ def data_from_events(pv, events, count=None):
     event_count = min(count, len(events)) if count is not None else len(events)
 
     # Use the first event to determine the type of array to use.
+    dt: numpy.dtype
     try:
         first_event = events[0]
         if isinstance(first_event.value, str):
@@ -261,7 +343,7 @@ def data_from_events(pv, events, count=None):
         dt = numpy.dtype(type(first_event.value))
     except IndexError:  # No events
         wf_length = 1
-        dt = numpy.float64
+        dt = numpy.dtype(numpy.float64)
 
     values = numpy.zeros((event_count, wf_length), dtype=dt)
     timestamps = numpy.zeros((event_count,))
@@ -271,4 +353,29 @@ def data_from_events(pv, events, count=None):
         timestamps[i] = event.timestamp
         severities[i] = event.severity
 
-    return ArchiveData(pv, values, timestamps, severities)
+    return ArchiveData(pv, values, timestamps, severities, enum_options)
+
+
+def parse_enum_options(meta_dict: Dict[str, str]) -> OrderedDict[int, str]:
+    """Parse enum options, if available, from a metadata dict.
+
+    Returns
+        a dict with keys of enum value (str) and values of enum string
+    """
+    output_dict = OrderedDict()
+
+    for key, value in meta_dict.items():
+        result = re.search(REGEX_ENUM, key)
+        if result is not None:
+            enum_key = int(result.group(1))
+            output_dict[enum_key] = value
+
+    return OrderedDict([(key, output_dict[key]) for key in sorted(output_dict.keys())])
+
+
+def _lookup_enum_string(int_value: int, enum_options: OrderedDict[int, str]) -> str:
+    """Look up the enum string for an int value; defaults to empty string."""
+    return enum_options.get(int_value, "")
+
+
+lookup_enum_string = numpy.vectorize(_lookup_enum_string, otypes=[DTYPE_ENUM_STR])

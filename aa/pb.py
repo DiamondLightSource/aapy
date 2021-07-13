@@ -20,11 +20,14 @@ Note: due to the way the protobuf objects are constructed, pylint can't
 correctly deduce some properties, so I have manually disabled some warnings.
 
 """
+from __future__ import annotations
+
 import collections
 import datetime
 import logging as log
 import os
 import re
+from typing import Any
 
 import pytz
 import requests
@@ -217,8 +220,16 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
     """
     year_chunks = break_up_chunks(raw_data)
     events = []
+    enum_options = {}
     # Iterate over years
     for year, (chunk_info, lines) in year_chunks.items():
+        # Look for enum options in the chunk info.
+        # Assume these are unchanging therefore stop looking after first success.
+        if not enum_options:
+            enum_options = parse_enum_options_from_PayloadInfo(chunk_info)
+            if enum_options:
+                log.debug(f"Found enum options: {enum_options}")
+
         # Find the index of the start event
         if start.year == year:  # search for the start
             s = search_events(start, chunk_info, lines)
@@ -240,7 +251,22 @@ def parse_pb_data(raw_data, pv, start, end, count=None):
         log.info("Year {} start {} end {}".format(year, s, e))
         for line in lines[s:e]:
             events.append(event_from_line(line, pv, year, chunk_info.type))
-    return data.data_from_events(pv, events, count)
+
+    return data.data_from_events(pv, events, count, enum_options)
+
+
+def parse_enum_options_from_PayloadInfo(
+    payload_info: Any,
+) -> collections.OrderedDict[int, str]:
+    """Get enum options from a PayloadInfo object if available
+
+    Convert the header fields to a dict and then call the parsing
+    function from aa.data.
+
+    Could not find a suitable type annotation for PayloadInfo arg.
+    """
+    headers_dict = {h.name: h.val for h in payload_info.headers}
+    return data.parse_enum_options(headers_dict)
 
 
 class PbFetcher(fetcher.AaFetcher):

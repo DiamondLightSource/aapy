@@ -25,7 +25,7 @@ RAW_EVENT = (
 # The contents of a PB file with a header and one event.
 PB_CHUNK = RAW_PAYLOAD_INFO + b"\n" + RAW_EVENT
 # The actual contents of the above raw strings (PV name is not stored)
-EVENT = data.ArchiveEvent(PV, 264.65571148, 1422752399.004147078, 0)
+EVENT = data.ArchiveEvent(PV, [264.65571148], 1422752399.004147078, 0)
 
 
 def test_parse_PayloadInfo():
@@ -38,7 +38,7 @@ def test_parse_PayloadInfo():
 def test_parse_ScalarDouble():
     e = ee.ScalarDouble()
     e.ParseFromString(RAW_EVENT)
-    assert abs(e.val - EVENT.value) < 1e-7
+    assert abs(e.val - EVENT.value[0]) < 1e-7
     year_timestamp = utils.year_timestamp(2015)
     assert year_timestamp + e.secondsintoyear + 1e-9 * e.nano == EVENT.timestamp
     assert e.severity == EVENT.severity
@@ -112,6 +112,7 @@ def test_PbFetcher_get_calls_get_with_correct_url(dummy_pv, jan_2018):
         expected_url = (
             "http://dummy.com:8000/retrieval/data/getData.raw"
             "?pv=dummy&from=2018-01-01T00:00:00Z&to=2018-01-01T00:00:00Z"
+            "&fetchLatestMetadata=true"
         )
         mock_get.assert_called_with(expected_url, stream=True)
 
