@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/dls-controls/aapy.svg?branch=travis)](https://travis-ci.org/dls-controls/aapy) [![Coverage Status](https://coveralls.io/repos/github/dls-controls/aapy/badge.svg?branch=master)](https://coveralls.io/github/dls-controls/aapy?branch=master)
 
-Python code to retrieve data from the Archiver Appliance.
+Python code to retrieve data from the
+[EPICS Archiver Appliance](https://slacmshankar.github.io/epicsarchiver_docs/).
 
 ## Usage
 
@@ -12,6 +13,7 @@ timezone, but will print a warning. If you pass it a timezone-aware
 datetime no warning will be printed. You can use `utc_datetime()` as
 a shortcut:
 
+    >>> from aa.utils import utc_datetime
     >>> utc_datetime(2019, 10, 7, 17) # 5pm UTC on 7th October 2019
 
 ### Fetching data
@@ -59,18 +61,13 @@ You can also request a range of events, returning an ArchiveData object:
 
 ## Development
 
+aapy uses Pipenv to manage its dependencies.
+
 To install development requirements:
 
-    pip install -r requirements.txt
+    pipenv install --dev
 
-To run the tests:
+To run the tests and static checks:
 
-    py.test test
+    pipenv run tests
 
-To run the tests with coverage:
-
-    py.test --cov=aa test
-
-To run the tests with pylint checks:
-
-    py.test --pylint dls_aa test
