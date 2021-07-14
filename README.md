@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/dls-controls/aapy.svg?branch=travis)](https://travis-ci.org/dls-controls/aapy) [![Coverage Status](https://coveralls.io/repos/github/dls-controls/aapy/badge.svg?branch=master)](https://coveralls.io/github/dls-controls/aapy?branch=master)
 
-Python code to retrieve data from the Archiver Appliance.
+Python code to retrieve data from the
+[EPICS Archiver Appliance](https://slacmshankar.github.io/epicsarchiver_docs/).
 
 ## Usage
 
