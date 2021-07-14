@@ -12,6 +12,7 @@ timezone, but will print a warning. If you pass it a timezone-aware
 datetime no warning will be printed. You can use `utc_datetime()` as
 a shortcut:
 
+    >>> from aa.utils import utc_datetime
     >>> utc_datetime(2019, 10, 7, 17) # 5pm UTC on 7th October 2019
 
 ### Fetching data
@@ -59,18 +60,13 @@ You can also request a range of events, returning an ArchiveData object:
 
 ## Development
 
+aapy uses Pipenv to manage its dependencies.
+
 To install development requirements:
 
-    pip install -r requirements.txt
+    pipenv install --dev
 
-To run the tests:
+To run the tests and static checks:
 
-    py.test test
+    pipenv run tests
 
-To run the tests with coverage:
-
-    py.test --cov=aa test
-
-To run the tests with pylint checks:
-
-    py.test --pylint dls_aa test
