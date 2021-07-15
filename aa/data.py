@@ -1,6 +1,7 @@
 """Objects representing data returned from the Archiver Appliance."""
 from __future__ import annotations
 
+import datetime as datetime_module
 import logging
 import re
 from collections import OrderedDict
@@ -27,30 +28,37 @@ DTYPE_ENUM_STR = "U100"
 
 class ArchiveEvent(object):
 
+    """One Event, retrieved from the AA, representing a change in value of a PV"""
+
     DESC = (
         "Archive event for PV {}: "
         "timestamp {:%Y-%m-%d %H:%M:%S.%f %Z} value {} severity {}"
     )
 
     def __init__(
-        self, pv, value, timestamp, severity, enum_options: OrderedDict = OrderedDict()
+        self,
+        pv: str,
+        value: numpy.ndarray,
+        timestamp: float,
+        severity: float,
+        enum_options: OrderedDict = OrderedDict(),
     ):
-        self._pv = pv
-        self._value = value
-        self._timestamp = timestamp
-        self._severity = severity
-        self._enum_options = enum_options
+        self._pv: str = pv
+        self._value: numpy.ndarray = value
+        self._timestamp: float = timestamp
+        self._severity: float = severity
+        self._enum_options: OrderedDict = enum_options
 
     @property
-    def pv(self):
+    def pv(self) -> str:
         return self._pv
 
     @property
-    def value(self):
+    def value(self) -> numpy.ndarray:
         return self._value
 
     @property
-    def timestamp(self):
+    def timestamp(self) -> float:
         return self._timestamp
 
     @property
@@ -63,6 +71,7 @@ class ArchiveEvent(object):
 
     @property
     def has_enum_options(self) -> bool:
+        """True if this PV has enum string labels available."""
         return len(self._enum_options) > 0
 
     @property
@@ -74,7 +83,7 @@ class ArchiveEvent(object):
             else None
         )
 
-    def datetime(self, tz):
+    def datetime(self, tz: datetime_module.tzinfo) -> datetime_module.datetime:
         """Returns a timezone-aware datetime for the events.
 
         Args:
@@ -87,7 +96,7 @@ class ArchiveEvent(object):
         return utils.epoch_to_datetime(self._timestamp).astimezone(tz)
 
     @property
-    def utc_datetime(self):
+    def utc_datetime(self) -> datetime_module.datetime:
         """Returns a UTC datetime for the events.
 
         Returns:
@@ -97,7 +106,8 @@ class ArchiveEvent(object):
         return self.datetime(pytz.utc)
 
     @property
-    def severity(self):
+    def severity(self) -> float:
+        """EPICS alarm sevirity"""
         return self._severity
 
     def __str__(self):
@@ -125,6 +135,16 @@ class ArchiveEvent(object):
 
 class ArchiveData(object):
 
+    """A collection of ArchiveEvents retireved from the AA.
+
+    Stores the data for the result of a retrieval request. Events can be accessed:
+
+    - By `indexing: data[0]`
+    - By `get_event(index)`
+    - By iterating: `for event in data:`
+    - By directly accessing the arrays of values and timestamps
+    """
+
     DESC = (
         "Archive data for PV {}: {} events"
         " first timestamp {:%Y-%m-%d %H:%M:%S.%f %Z}"
@@ -133,27 +153,24 @@ class ArchiveData(object):
 
     def __init__(
         self,
-        pv,
-        values,
-        timestamps,
-        severities,
+        pv: str,
+        values: numpy.ndarray,
+        timestamps: numpy.ndarray,
+        severities: numpy.ndarray,
         enum_options: OrderedDict[int, str] = OrderedDict(),
     ):
-        values = numpy.array(values)
-        timestamps = numpy.array(timestamps)
-        severities = numpy.array(severities)
         assert len(values) == len(timestamps) == len(severities)
         if values.ndim == 1:
             values = values.reshape((-1, 1))
         self._check_timestamps(timestamps)
-        self._pv = pv
-        self._values = values
-        self._timestamps = timestamps
-        self._severities = severities
-        self._enum_options = enum_options
+        self._pv: str = pv
+        self._values: numpy.ndarray = values
+        self._timestamps: numpy.ndarray = timestamps
+        self._severities: numpy.ndarray = severities
+        self._enum_options: OrderedDict = enum_options
 
     @staticmethod
-    def _check_timestamps(ts_array):
+    def _check_timestamps(ts_array: numpy.ndarray) -> None:
         back_steps = numpy.diff(ts_array) < 0
         if numpy.any(back_steps):
             for nonzero_index in numpy.nditer(numpy.nonzero(back_steps)):
@@ -165,20 +182,21 @@ class ArchiveData(object):
                 )
 
     @staticmethod
-    def empty(pv):
+    def empty(pv: str) -> ArchiveData:
+        """Returns an empty ArchiveData"""
         empty_array = numpy.zeros((0,))
         return ArchiveData(pv, empty_array, empty_array, empty_array)
 
     @property
-    def pv(self):
+    def pv(self) -> str:
         return self._pv
 
     @property
-    def values(self):
+    def values(self) -> numpy.ndarray:
         return self._values
 
     @property
-    def timestamps(self):
+    def timestamps(self) -> numpy.ndarray:
         return self._timestamps
 
     @property
@@ -197,7 +215,7 @@ class ArchiveData(object):
             else None
         )
 
-    def datetimes(self, tz):
+    def datetimes(self, tz: datetime_module.tzinfo) -> numpy.ndarray:
         """Returns a numpy array of timezone-aware datetimes for the events.
 
         Args:
@@ -212,7 +230,7 @@ class ArchiveData(object):
         )
 
     @property
-    def utc_datetimes(self):
+    def utc_datetimes(self) -> numpy.ndarray:
         """Returns a numpy array of UTC datetimes for the events.
 
         Returns:
@@ -222,10 +240,11 @@ class ArchiveData(object):
         return self.datetimes(pytz.utc)
 
     @property
-    def severities(self):
+    def severities(self) -> numpy.ndarray:
         return self._severities
 
-    def get_event(self, index):
+    def get_event(self, index: int) -> ArchiveEvent:
+        """Returns an ArchiveEvent for the event at the given index"""
         return ArchiveEvent(
             self.pv,
             self.values[index],
@@ -234,7 +253,7 @@ class ArchiveData(object):
             self.enum_options,
         )
 
-    def concatenate(self, other, zero_pad=False):
+    def concatenate(self, other: ArchiveData, zero_pad: bool = False) -> ArchiveData:
         """Combine two ArchiveData objects.
 
         Create a new object so that ArchiveData objects can be treated as
@@ -311,11 +330,11 @@ class ArchiveData(object):
 
 
 def data_from_events(
-    pv,
+    pv: str,
     events: List[ArchiveEvent],
     count: int = None,
     enum_options: OrderedDict = OrderedDict(),
-):
+) -> ArchiveData:
     """Convert multiple ArchiveEvents into an ArchiveData object
 
     Args:

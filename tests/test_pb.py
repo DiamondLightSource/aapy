@@ -1,6 +1,7 @@
 import os
 
 import mock
+import numpy
 import pytest
 import requests
 import utils as testutils
@@ -25,7 +26,7 @@ RAW_EVENT = (
 # The contents of a PB file with a header and one event.
 PB_CHUNK = RAW_PAYLOAD_INFO + b"\n" + RAW_EVENT
 # The actual contents of the above raw strings (PV name is not stored)
-EVENT = data.ArchiveEvent(PV, [264.65571148], 1422752399.004147078, 0)
+EVENT = data.ArchiveEvent(PV, numpy.array([264.65571148]), 1422752399.004147078, 0)
 
 
 def test_parse_PayloadInfo():
