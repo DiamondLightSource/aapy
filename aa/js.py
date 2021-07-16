@@ -32,6 +32,12 @@ class JsonFetcher(fetcher.AaFetcher):
                     )
                 )
 
-            archive_data = data.data_from_events(pv, events)
+            enum_options = (
+                data.parse_enum_options(json_data[0]["meta"])
+                if "meta" in json_data[0]
+                else {}
+            )
+
+            archive_data = data.data_from_events(pv, events, enum_options=enum_options)
 
         return archive_data

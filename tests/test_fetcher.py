@@ -56,6 +56,7 @@ def test_AaFetcher_constructs_url_correctly(dummy_pv, aa_fetcher):
         aa_fetcher.get_values(dummy_pv, early, late, None)
         expected = (
             "dummy-url?pv=dummy&from=2001-01-01T01:01:00Z&to=2010-02-03T04:05:00Z"
+            "&fetchLatestMetadata=true"
         )
         assert mock_get.call_args[0][0] == expected
         mock_get.reset_mock()
@@ -64,7 +65,11 @@ def test_AaFetcher_constructs_url_correctly(dummy_pv, aa_fetcher):
         request_params["param1Name"] = "param1Value"
         request_params["param2Name"] = "param2Value"
         aa_fetcher.get_values(dummy_pv, early, late, None, request_params)
-        expected += "&param1Name=param1Value&param2Name=param2Value"
+        expected = (
+            "dummy-url?pv=dummy&from=2001-01-01T01:01:00Z&to=2010-02-03T04:05:00Z"
+            "&param1Name=param1Value&param2Name=param2Value"
+            "&fetchLatestMetadata=true"
+        )
         assert mock_get.call_args[0][0] == expected
 
 

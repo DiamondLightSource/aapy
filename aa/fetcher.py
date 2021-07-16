@@ -101,6 +101,9 @@ class AaFetcher(Fetcher):
         if request_params is None:
             request_params = {}
 
+        # Gets values for all fields. Enables us to give string labels for enums.
+        request_params["fetchLatestMetadata"] = "true"
+
         suffix = "?pv={}&from={}&to={}".format(
             pv, self._format_datetime(start), self._format_datetime(end)
         )

@@ -1,0 +1,30 @@
+[ 
+  { "meta":
+    {
+      "name": "CS-CS-MSTAT-01:MODE",
+      "DRVH": "0.0",
+      "ENUM_1": "Injection",
+      "HIGH": "0.0",
+      "HIHI": "0.0",
+      "ENUM_0": "Shutdown",
+      "DRVL": "0.0",
+      "ENUM_3": "Mach. Dev.",
+      "PREC": "0.0",
+      "LOLO": "0.0",
+      "ENUM_2": "No Beam",
+      "LOPR": "0.0",
+      "ENUM_5": "Special",
+      "ENUM_4": "User",
+      "HOPR": "0.0",
+      "ENUM_7": "Unknown", 
+      "ENUM_6": "BL Startup",
+      "LOW": "0.0",
+      "NELM": "1" 
+    },
+  "data": 
+    [ 
+      { "secs": 1625883918, "val": 4, "nanos": 89023701, "severity":0, "status":0 }
+    ]
+  }
+]
+  

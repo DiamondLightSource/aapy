@@ -55,7 +55,6 @@ def test_JsonFetcher_decodes_string_event_correctly(dummy_pv, json_fetcher):
     mock_response = utils.mock_response(json_str=event_json)
     json_fetcher._fetch_data = mock.MagicMock(return_value=mock_response)
     aa_data = json_fetcher.get_values(dummy_pv, EARLY_DATE, LATE_DATE)
-    print(aa_data)
     assert aa_data.pv == dummy_pv
     assert aa_data.values[0] == "2015-01-08 19:47:01 UTC"
     assert aa_data.timestamps[0] == 1507712433.235971000
@@ -70,3 +69,16 @@ def test_JsonFetcher_decodes_waveform_events_correctly(
     json_fetcher._fetch_data = mock.MagicMock(return_value=mock_response)
     aa_data = json_fetcher.get_values(dummy_pv, EARLY_DATE, LATE_DATE)
     assert aa_data == data_2d_2_events
+
+
+def test_JsonFetcher_decodes_enum_events_correctly(
+    dummy_pv, json_fetcher,
+):
+    enum_json = utils.load_from_file("enum_event.json")
+    mock_response = utils.mock_response(json_str=enum_json)
+    json_fetcher._fetch_data = mock.MagicMock(return_value=mock_response)
+    aa_data = json_fetcher.get_values(dummy_pv, EARLY_DATE, LATE_DATE)
+    assert aa_data.enum_options[5] == "Special"
+    assert aa_data.enum_strings[0] == "User"
+    assert aa_data[0].enum_string[0] == "User"
+    assert aa_data.values[0] == 4
