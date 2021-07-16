@@ -256,11 +256,12 @@
 <p>Objects representing data returned from the Archiver Appliance.</p>
 <dl class="py class">
 <dt id="aa.data.ArchiveEvent">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.data.</span></code><code class="sig-name descname"><span class="pre">ArchiveEvent</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/data.html#ArchiveEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveEvent" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.data.</span></code><code class="sig-name descname"><span class="pre">ArchiveEvent</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">enum_options</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.9)"><span class="pre">collections.OrderedDict</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/data.html#ArchiveEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveEvent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>One Event, retrieved from the AA, representing a change in value of a PV</p>
 <dl class="py attribute">
 <dt id="aa.data.ArchiveEvent.DESC">
-<code class="sig-name descname"><span class="pre">DESC</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Archive</span> <span class="pre">event</span> <span class="pre">for</span> <span class="pre">PV</span> <span class="pre">{}:</span> <span class="pre">timestamp</span> <span class="pre">{:%Y-%m-%d</span> <span class="pre">%H:%M:%S.%f</span> <span class="pre">%Z}</span> <span class="pre">value</span> <span class="pre">{}</span> <span class="pre">severity</span> <span class="pre">{:.0f}'</span></em><a class="headerlink" href="#aa.data.ArchiveEvent.DESC" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">DESC</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Archive</span> <span class="pre">event</span> <span class="pre">for</span> <span class="pre">PV</span> <span class="pre">{}:</span> <span class="pre">timestamp</span> <span class="pre">{:%Y-%m-%d</span> <span class="pre">%H:%M:%S.%f</span> <span class="pre">%Z}</span> <span class="pre">value</span> <span class="pre">{}</span> <span class="pre">severity</span> <span class="pre">{}'</span></em><a class="headerlink" href="#aa.data.ArchiveEvent.DESC" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -279,8 +280,27 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="aa.data.ArchiveEvent.enum_options">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">enum_options</span></code><a class="headerlink" href="#aa.data.ArchiveEvent.enum_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>OrderedDict containing string label for each option if this PV is an enum.</p>
+<p>Key is int value of PV, value is the corresponding string label.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveEvent.has_enum_options">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">has_enum_options</span></code><a class="headerlink" href="#aa.data.ArchiveEvent.has_enum_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if this PV has enum string labels available.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveEvent.enum_string">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">enum_string</span></code><a class="headerlink" href="#aa.data.ArchiveEvent.enum_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>If PV is an enum, contains the string label of the value, if avilable</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="aa.data.ArchiveEvent.datetime">
-<code class="sig-name descname"><span class="pre">datetime</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/data.html#ArchiveEvent.datetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveEvent.datetime" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">datetime</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tz</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.9)"><span class="pre">datetime.tzinfo</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.9)"><span class="pre">datetime.datetime</span></a><a class="reference internal" href="_modules/aa/data.html#ArchiveEvent.datetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveEvent.datetime" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a timezone-aware datetime for the events.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -306,14 +326,23 @@
 <dl class="py method">
 <dt id="aa.data.ArchiveEvent.severity">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">severity</span></code><a class="headerlink" href="#aa.data.ArchiveEvent.severity" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>EPICS alarm sevirity</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt id="aa.data.ArchiveData">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.data.</span></code><code class="sig-name descname"><span class="pre">ArchiveData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">severities</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/data.html#ArchiveData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.data.</span></code><code class="sig-name descname"><span class="pre">ArchiveData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamps</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">severities</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enum_options</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">OrderedDict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/data.html#ArchiveData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A collection of ArchiveEvents retireved from the AA.</p>
+<p>Stores the data for the result of a retrieval request. Events can be accessed:</p>
+<ul class="simple">
+<li><p>By <code class="xref any docutils literal notranslate"><span class="pre">indexing:</span> <span class="pre">data[0]</span></code></p></li>
+<li><p>By <code class="xref any docutils literal notranslate"><span class="pre">get_event(index)</span></code></p></li>
+<li><p>By iterating: <code class="xref any docutils literal notranslate"><span class="pre">for</span> <span class="pre">event</span> <span class="pre">in</span> <span class="pre">data:</span></code></p></li>
+<li><p>By directly accessing the arrays of values and timestamps</p></li>
+</ul>
 <dl class="py attribute">
 <dt id="aa.data.ArchiveData.DESC">
 <code class="sig-name descname"><span class="pre">DESC</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Archive</span> <span class="pre">data</span> <span class="pre">for</span> <span class="pre">PV</span> <span class="pre">{}:</span> <span class="pre">{}</span> <span class="pre">events</span> <span class="pre">first</span> <span class="pre">timestamp</span> <span class="pre">{:%Y-%m-%d</span> <span class="pre">%H:%M:%S.%f</span> <span class="pre">%Z}</span> <span class="pre">last</span> <span class="pre">timestamp</span> <span class="pre">{:%Y-%m-%d</span> <span class="pre">%H:%M:%S.%f</span> <span class="pre">%Z}'</span></em><a class="headerlink" href="#aa.data.ArchiveData.DESC" title="Permalink to this definition">¶</a></dt>
@@ -321,8 +350,9 @@
 
 <dl class="py method">
 <dt id="aa.data.ArchiveData.empty">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">empty</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/data.html#ArchiveData.empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData.empty" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">empty</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#aa.data.ArchiveData" title="aa.data.ArchiveData"><span class="pre">aa.data.ArchiveData</span></a><a class="reference internal" href="_modules/aa/data.html#ArchiveData.empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData.empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an empty ArchiveData</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="aa.data.ArchiveData.pv">
@@ -340,8 +370,23 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="aa.data.ArchiveData.enum_options">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">enum_options</span></code><a class="headerlink" href="#aa.data.ArchiveData.enum_options" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.has_enum_options">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">has_enum_options</span></code><a class="headerlink" href="#aa.data.ArchiveData.has_enum_options" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.enum_strings">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">enum_strings</span></code><a class="headerlink" href="#aa.data.ArchiveData.enum_strings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="aa.data.ArchiveData.datetimes">
-<code class="sig-name descname"><span class="pre">datetimes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/data.html#ArchiveData.datetimes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData.datetimes" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">datetimes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tz</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.9)"><span class="pre">datetime.tzinfo</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">numpy.ndarray</span><a class="reference internal" href="_modules/aa/data.html#ArchiveData.datetimes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData.datetimes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a numpy array of timezone-aware datetimes for the events.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -371,12 +416,13 @@
 
 <dl class="py method">
 <dt id="aa.data.ArchiveData.get_event">
-<code class="sig-name descname"><span class="pre">get_event</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/data.html#ArchiveData.get_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData.get_event" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname"><span class="pre">get_event</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#aa.data.ArchiveEvent" title="aa.data.ArchiveEvent"><span class="pre">aa.data.ArchiveEvent</span></a><a class="reference internal" href="_modules/aa/data.html#ArchiveData.get_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData.get_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an ArchiveEvent for the event at the given index</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="aa.data.ArchiveData.concatenate">
-<code class="sig-name descname"><span class="pre">concatenate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/data.html#ArchiveData.concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData.concatenate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">concatenate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#aa.data.ArchiveData" title="aa.data.ArchiveData"><span class="pre">aa.data.ArchiveData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_pad</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#aa.data.ArchiveData" title="aa.data.ArchiveData"><span class="pre">aa.data.ArchiveData</span></a><a class="reference internal" href="_modules/aa/data.html#ArchiveData.concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData.concatenate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Combine two ArchiveData objects.</p>
 <p>Create a new object so that ArchiveData objects can be treated as
 immutable.</p>
@@ -399,7 +445,7 @@ with zeros.</p></li>
 
 <dl class="py function">
 <dt id="aa.data.data_from_events">
-<code class="sig-prename descclassname"><span class="pre">aa.data.</span></code><code class="sig-name descname"><span class="pre">data_from_events</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/data.html#data_from_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.data_from_events" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">aa.data.</span></code><code class="sig-name descname"><span class="pre">data_from_events</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#aa.data.ArchiveEvent" title="aa.data.ArchiveEvent"><span class="pre">aa.data.ArchiveEvent</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enum_options</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.9)"><span class="pre">collections.OrderedDict</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#aa.data.ArchiveData" title="aa.data.ArchiveData"><span class="pre">aa.data.ArchiveData</span></a><a class="reference internal" href="_modules/aa/data.html#data_from_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.data_from_events" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert multiple ArchiveEvents into an ArchiveData object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -411,6 +457,16 @@ with zeros.</p></li>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>ArchiveData object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aa.data.parse_enum_options">
+<code class="sig-prename descclassname"><span class="pre">aa.data.</span></code><code class="sig-name descname"><span class="pre">parse_enum_options</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meta_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">OrderedDict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/aa/data.html#parse_enum_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.parse_enum_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse enum options, if available, from a metadata dict.</p>
+<dl class="simple">
+<dt>Returns</dt><dd><p>a dict with keys of enum value (str) and values of enum string</p>
 </dd>
 </dl>
 </dd></dl>
