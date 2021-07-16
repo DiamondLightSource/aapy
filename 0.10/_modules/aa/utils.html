@@ -1,0 +1,362 @@
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>aa.utils &mdash; aa 0.0+unknown documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/dls-favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: rgb(7, 43, 93)" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> aa
+          
+
+          
+            
+            <img src="../../_static/dls-logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+  <style>
+    /* style mobile top nav to look like main nav */
+    .wy-nav-top {
+        background: rgb(7, 43, 93)
+    }
+  </style>
+  
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../aa.html">aa package</a></li>
+</ul>
+
+            
+          
+  <!-- Include Index in the sidebar -->
+  <!-- https://stackoverflow.com/a/37843854 -->
+  <a href="../../genindex.html">Index</a>
+  <!-- Include all versions of the docs -->
+  <!-- https://holzhaus.github.io/sphinx-multiversion/master/templates.html -->
+  
+  <p class="caption"><span class="caption-text">Versions</span></p>
+  <ul>
+    <li><a href="../../../master/index.html">master</a></li>
+    <li><a href="../../../0.9a1/index.html">0.9a1</a></li>
+    <li><a href="../../../0.9/index.html">0.9</a></li>
+    <li><a href="utils.html">0.10</a></li>
+  </ul>
+  
+
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">aa</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>aa.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for aa.utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Miscellaneous utility functions.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">pytz</span>
+<span class="kn">import</span> <span class="nn">tzlocal</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;utc_datetime&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;utc_now&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EPOCH&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;datetime_to_epoch&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;epoch_to_datetime&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;add_local_timezone&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;year_timestamp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;print_raw_bytes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;binary_search&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dict_to_tuples&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="utc_datetime"><a class="viewcode-back" href="../../aa.html#aa.utils.utc_datetime">[docs]</a><span class="k">def</span> <span class="nf">utc_datetime</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=no-value-for-parameter</span>
+    <span class="k">return</span> <span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="utc_now"><a class="viewcode-back" href="../../aa.html#aa.utils.utc_now">[docs]</a><span class="k">def</span> <span class="nf">utc_now</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span></div>
+
+
+<span class="n">EPOCH</span> <span class="o">=</span> <span class="n">utc_datetime</span><span class="p">(</span><span class="mi">1970</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="datetime_to_epoch"><a class="viewcode-back" href="../../aa.html#aa.utils.datetime_to_epoch">[docs]</a><span class="k">def</span> <span class="nf">datetime_to_epoch</span><span class="p">(</span><span class="n">dt</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">((</span><span class="n">dt</span> <span class="o">-</span> <span class="n">EPOCH</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="epoch_to_datetime"><a class="viewcode-back" href="../../aa.html#aa.utils.epoch_to_datetime">[docs]</a><span class="k">def</span> <span class="nf">epoch_to_datetime</span><span class="p">(</span><span class="n">secs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">secs</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="add_local_timezone"><a class="viewcode-back" href="../../aa.html#aa.utils.add_local_timezone">[docs]</a><span class="k">def</span> <span class="nf">add_local_timezone</span><span class="p">(</span><span class="n">dt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add the local timezone to a naive datetime.</span>
+
+<span class="sd">    The tzlocal module is used to deduce the local timezone.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dt: naive datetime</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        AssertionError: if dt already has a timezone</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">dt</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="n">localtz</span> <span class="o">=</span> <span class="n">tzlocal</span><span class="o">.</span><span class="n">get_localzone</span><span class="p">()</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Assuming timezone for </span><span class="si">{}</span><span class="s2"> is </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">localtz</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">localtz</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="year_timestamp"><a class="viewcode-back" href="../../aa.html#aa.utils.year_timestamp">[docs]</a><span class="k">def</span> <span class="nf">year_timestamp</span><span class="p">(</span><span class="n">year</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">1970</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="print_raw_bytes"><a class="viewcode-back" href="../../aa.html#aa.utils.print_raw_bytes">[docs]</a><span class="k">def</span> <span class="nf">print_raw_bytes</span><span class="p">(</span><span class="n">byte_seq</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">byte_seq</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">x</span><span class="si">{:02x}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">b</span><span class="p">)),</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="binary_search"><a class="viewcode-back" href="../../aa.html#aa.utils.binary_search">[docs]</a><span class="k">def</span> <span class="nf">binary_search</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find no such that f(seq[no-1]) &lt;= target and f(seq[no]) &gt; target.</span>
+
+<span class="sd">    If target &lt; f(seq[0]), return 0</span>
+<span class="sd">    If target &gt; f(seq[-1]), return len(seq)</span>
+
+<span class="sd">    Assume f(seq[no]) &lt; f(seq[no+1]).</span>
+
+<span class="sd">    The integer result is useful for indexing the array.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        seq: sequence of inputs on which to act</span>
+<span class="sd">        f: function that returns a comparable when called on any input</span>
+<span class="sd">        target: value</span>
+
+<span class="sd">    Returns: index of item in seq meeting search requirements</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">seq</span> <span class="ow">or</span> <span class="n">f</span><span class="p">(</span><span class="n">seq</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">target</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">elif</span> <span class="n">f</span><span class="p">(</span><span class="n">seq</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">target</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">upper</span> <span class="o">-</span> <span class="n">lower</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="p">(</span><span class="n">upper</span> <span class="o">+</span> <span class="n">lower</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">next_val</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">seq</span><span class="p">[</span><span class="n">current</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">next_val</span> <span class="o">&gt;</span> <span class="n">target</span><span class="p">:</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="n">current</span>
+        <span class="k">elif</span> <span class="n">next_val</span> <span class="o">&lt;=</span> <span class="n">target</span><span class="p">:</span>
+            <span class="n">lower</span> <span class="o">=</span> <span class="n">current</span>
+    <span class="k">return</span> <span class="n">upper</span></div>
+
+
+<span class="n">SCAN</span> <span class="o">=</span> <span class="s2">&quot;SCAN&quot;</span>
+<span class="n">MONITOR</span> <span class="o">=</span> <span class="s2">&quot;MONITOR&quot;</span>
+
+<span class="c1"># Make UTC and local timezone easy to get hold of.</span>
+<span class="n">LOCALTZ</span> <span class="o">=</span> <span class="n">tzlocal</span><span class="o">.</span><span class="n">get_localzone</span><span class="p">()</span>
+<span class="n">UTC</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">utc</span>
+
+<span class="c1"># Logging utilities</span>
+<span class="n">LOG_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> </span><span class="si">%(levelname)-8s</span><span class="s2"> </span><span class="si">%(message)s</span><span class="s2">&quot;</span>
+<span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+
+
+<div class="viewcode-block" id="set_up_logging"><a class="viewcode-back" href="../../aa.html#aa.utils.set_up_logging">[docs]</a><span class="k">def</span> <span class="nf">set_up_logging</span><span class="p">(</span><span class="n">fmt</span><span class="o">=</span><span class="n">LOG_FORMAT</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">LOG_LEVEL</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Simple logging setup.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fmt: logging format to use</span>
+<span class="sd">        level: logging level to use</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="n">datefmt</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %I:%M:%S&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="dict_to_tuples"><a class="viewcode-back" href="../../aa.html#aa.utils.dict_to_tuples">[docs]</a><span class="k">def</span> <span class="nf">dict_to_tuples</span><span class="p">(</span><span class="n">input_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;Convert a dict to a list of tuples, sorted alphabetically by key.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_dict (dict): Dictionary to convert</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of tuples (key, value) sorted alphabetically by key</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[(</span><span class="n">key</span><span class="p">,</span> <span class="n">input_dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Diamond Light Source.
+
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
