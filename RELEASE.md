@@ -1,12 +1,20 @@
 aapy release notes
 ==================
 
+0.10 (16th Jul 2021)
+--------------------
+
+- #53 Add pv argument to get_all_pvs that allows a glob pattern.
+- #68 Tweaks to README
+- #67 Add support for Enum string lables.
+- Added some type hints
+
 0.9 (29th Jun 2021)
 -------------------
 
 - Python 2 is no longer supported.
-- #54 Apply DLS standard package template
-- #53 Check that JSON response contains data
+- #64 Apply DLS standard package template
+- #63 Check that JSON response contains data
 
 
 0.8 (21st Feb 2020)
