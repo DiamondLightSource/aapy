@@ -136,3 +136,11 @@ class AaRestClient(object):
             samplingperiod=period,
             samplingmethod=method.upper(),
         )
+
+    def get_appliance_metrics(self):
+        """Gives summary metrics for all appliances in cluster"""
+        return self._rest_get("getApplianceMetrics")
+
+    def get_appliance_metrics_for_appliance(self, appliance):
+        """Gives detailed metrics for the appliance on the specified host"""
+        return self._rest_get("getApplianceMetricsForAppliance", appliance=appliance)
