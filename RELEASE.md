@@ -1,6 +1,11 @@
 aapy release notes
 ==================
 
+0.11 (21st Jul 2021)
+--------------------
+
+- #69 Add REST calls to get appliance and cluster metrics
+
 0.10 (16th Jul 2021)
 --------------------
 
