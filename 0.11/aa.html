@@ -1,0 +1,963 @@
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>aa package &mdash; aa 0.0+unknown documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/dls-favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="aapy API documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: rgb(7, 43, 93)" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> aa
+          
+
+          
+            
+            <img src="_static/dls-logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+  <style>
+    /* style mobile top nav to look like main nav */
+    .wy-nav-top {
+        background: rgb(7, 43, 93)
+    }
+  </style>
+  
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">aa package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-aa.ca">aa.ca module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-aa.data">aa.data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-aa.epics_event_pb2">aa.epics_event_pb2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-aa.fetcher">aa.fetcher module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-aa.js">aa.js module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-aa.pb">aa.pb module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-aa.rest">aa.rest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-aa.storage">aa.storage module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-aa.utils">aa.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-aa">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+  <!-- Include Index in the sidebar -->
+  <!-- https://stackoverflow.com/a/37843854 -->
+  <a href="genindex.html">Index</a>
+  <!-- Include all versions of the docs -->
+  <!-- https://holzhaus.github.io/sphinx-multiversion/master/templates.html -->
+  
+  <p class="caption"><span class="caption-text">Versions</span></p>
+  <ul>
+    <li><a href="../master/aa.html">master</a></li>
+    <li><a href="../0.9a1/aa.html">0.9a1</a></li>
+    <li><a href="../0.9/aa.html">0.9</a></li>
+    <li><a href="aa.html">0.11</a></li>
+    <li><a href="../0.10/aa.html">0.10</a></li>
+  </ul>
+  
+
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">aa</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>aa package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/aa.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="aa-package">
+<h1>aa package<a class="headerlink" href="#aa-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-aa.ca">
+<span id="aa-ca-module"></span><h2>aa.ca module<a class="headerlink" href="#module-aa.ca" title="Permalink to this headline">¶</a></h2>
+<p>Simple client to the Channel Archiver using xmlrpc.</p>
+<dl class="py class">
+<dt id="aa.ca.CaClient">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.ca.</span></code><code class="sig-name descname"><span class="pre">CaClient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/ca.html#CaClient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.ca.CaClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class to handle XMLRPC interaction with a channel archiver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>url</strong> – url for the channel archiver</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="aa.ca.CaClient.get">
+<code class="sig-name descname"><span class="pre">get</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/ca.html#CaClient.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.ca.CaClient.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request events over XMLRPC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pv</strong> – PV name to request events for</p></li>
+<li><p><strong>start</strong> – datetime of start of requested period</p></li>
+<li><p><strong>end</strong> – datetime of end of requested period</p></li>
+<li><p><strong>count</strong> – maximum number of events to retrieve</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of ArchiveEvent objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="aa.ca.CaFetcher">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.ca.</span></code><code class="sig-name descname"><span class="pre">CaFetcher</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/ca.html#CaFetcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.ca.CaFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aa.fetcher.Fetcher" title="aa.fetcher.Fetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">aa.fetcher.Fetcher</span></code></a></p>
+<p>Class to retrieve data from a channel archiver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>url</strong> – url for the channel archiver</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-aa.data">
+<span id="aa-data-module"></span><h2>aa.data module<a class="headerlink" href="#module-aa.data" title="Permalink to this headline">¶</a></h2>
+<p>Objects representing data returned from the Archiver Appliance.</p>
+<dl class="py class">
+<dt id="aa.data.ArchiveEvent">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.data.</span></code><code class="sig-name descname"><span class="pre">ArchiveEvent</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">enum_options</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.9)"><span class="pre">collections.OrderedDict</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/data.html#ArchiveEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>One Event, retrieved from the AA, representing a change in value of a PV</p>
+<dl class="py attribute">
+<dt id="aa.data.ArchiveEvent.DESC">
+<code class="sig-name descname"><span class="pre">DESC</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Archive</span> <span class="pre">event</span> <span class="pre">for</span> <span class="pre">PV</span> <span class="pre">{}:</span> <span class="pre">timestamp</span> <span class="pre">{:%Y-%m-%d</span> <span class="pre">%H:%M:%S.%f</span> <span class="pre">%Z}</span> <span class="pre">value</span> <span class="pre">{}</span> <span class="pre">severity</span> <span class="pre">{}'</span></em><a class="headerlink" href="#aa.data.ArchiveEvent.DESC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveEvent.pv">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">pv</span></code><a class="headerlink" href="#aa.data.ArchiveEvent.pv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveEvent.value">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">value</span></code><a class="headerlink" href="#aa.data.ArchiveEvent.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveEvent.timestamp">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">timestamp</span></code><a class="headerlink" href="#aa.data.ArchiveEvent.timestamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveEvent.enum_options">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">enum_options</span></code><a class="headerlink" href="#aa.data.ArchiveEvent.enum_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>OrderedDict containing string label for each option if this PV is an enum.</p>
+<p>Key is int value of PV, value is the corresponding string label.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveEvent.has_enum_options">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">has_enum_options</span></code><a class="headerlink" href="#aa.data.ArchiveEvent.has_enum_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if this PV has enum string labels available.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveEvent.enum_string">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">enum_string</span></code><a class="headerlink" href="#aa.data.ArchiveEvent.enum_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>If PV is an enum, contains the string label of the value, if avilable</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveEvent.datetime">
+<code class="sig-name descname"><span class="pre">datetime</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tz</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.9)"><span class="pre">datetime.tzinfo</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.9)"><span class="pre">datetime.datetime</span></a><a class="reference internal" href="_modules/aa/data.html#ArchiveEvent.datetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveEvent.datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a timezone-aware datetime for the events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tz</strong> – the timezone for the datetime object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>datetime object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveEvent.utc_datetime">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">utc_datetime</span></code><a class="headerlink" href="#aa.data.ArchiveEvent.utc_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a UTC datetime for the events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>datetime object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveEvent.severity">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">severity</span></code><a class="headerlink" href="#aa.data.ArchiveEvent.severity" title="Permalink to this definition">¶</a></dt>
+<dd><p>EPICS alarm sevirity</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="aa.data.ArchiveData">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.data.</span></code><code class="sig-name descname"><span class="pre">ArchiveData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamps</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">severities</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enum_options</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">OrderedDict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/data.html#ArchiveData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A collection of ArchiveEvents retireved from the AA.</p>
+<p>Stores the data for the result of a retrieval request. Events can be accessed:</p>
+<ul class="simple">
+<li><p>By <code class="xref any docutils literal notranslate"><span class="pre">indexing:</span> <span class="pre">data[0]</span></code></p></li>
+<li><p>By <code class="xref any docutils literal notranslate"><span class="pre">get_event(index)</span></code></p></li>
+<li><p>By iterating: <code class="xref any docutils literal notranslate"><span class="pre">for</span> <span class="pre">event</span> <span class="pre">in</span> <span class="pre">data:</span></code></p></li>
+<li><p>By directly accessing the arrays of values and timestamps</p></li>
+</ul>
+<dl class="py attribute">
+<dt id="aa.data.ArchiveData.DESC">
+<code class="sig-name descname"><span class="pre">DESC</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Archive</span> <span class="pre">data</span> <span class="pre">for</span> <span class="pre">PV</span> <span class="pre">{}:</span> <span class="pre">{}</span> <span class="pre">events</span> <span class="pre">first</span> <span class="pre">timestamp</span> <span class="pre">{:%Y-%m-%d</span> <span class="pre">%H:%M:%S.%f</span> <span class="pre">%Z}</span> <span class="pre">last</span> <span class="pre">timestamp</span> <span class="pre">{:%Y-%m-%d</span> <span class="pre">%H:%M:%S.%f</span> <span class="pre">%Z}'</span></em><a class="headerlink" href="#aa.data.ArchiveData.DESC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.empty">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">empty</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#aa.data.ArchiveData" title="aa.data.ArchiveData"><span class="pre">aa.data.ArchiveData</span></a><a class="reference internal" href="_modules/aa/data.html#ArchiveData.empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData.empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an empty ArchiveData</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.pv">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">pv</span></code><a class="headerlink" href="#aa.data.ArchiveData.pv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.values">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">values</span></code><a class="headerlink" href="#aa.data.ArchiveData.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.timestamps">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">timestamps</span></code><a class="headerlink" href="#aa.data.ArchiveData.timestamps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.enum_options">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">enum_options</span></code><a class="headerlink" href="#aa.data.ArchiveData.enum_options" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.has_enum_options">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">has_enum_options</span></code><a class="headerlink" href="#aa.data.ArchiveData.has_enum_options" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.enum_strings">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">enum_strings</span></code><a class="headerlink" href="#aa.data.ArchiveData.enum_strings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.datetimes">
+<code class="sig-name descname"><span class="pre">datetimes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tz</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.9)"><span class="pre">datetime.tzinfo</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">numpy.ndarray</span><a class="reference internal" href="_modules/aa/data.html#ArchiveData.datetimes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData.datetimes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a numpy array of timezone-aware datetimes for the events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tz</strong> – the timezone for the datetime objects</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>numpy array of datetime objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.utc_datetimes">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">utc_datetimes</span></code><a class="headerlink" href="#aa.data.ArchiveData.utc_datetimes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a numpy array of UTC datetimes for the events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>numpy array of datetime objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.severities">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">severities</span></code><a class="headerlink" href="#aa.data.ArchiveData.severities" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.get_event">
+<code class="sig-name descname"><span class="pre">get_event</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#aa.data.ArchiveEvent" title="aa.data.ArchiveEvent"><span class="pre">aa.data.ArchiveEvent</span></a><a class="reference internal" href="_modules/aa/data.html#ArchiveData.get_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData.get_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an ArchiveEvent for the event at the given index</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.data.ArchiveData.concatenate">
+<code class="sig-name descname"><span class="pre">concatenate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#aa.data.ArchiveData" title="aa.data.ArchiveData"><span class="pre">aa.data.ArchiveData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_pad</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#aa.data.ArchiveData" title="aa.data.ArchiveData"><span class="pre">aa.data.ArchiveData</span></a><a class="reference internal" href="_modules/aa/data.html#ArchiveData.concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.ArchiveData.concatenate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine two ArchiveData objects.</p>
+<p>Create a new object so that ArchiveData objects can be treated as
+immutable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> – ArchiveData object with later timestamps</p></li>
+<li><p><strong>zero_pad</strong> – if the values arrays differ in their second dimension,
+expand the smaller to the size of the larger, padding
+with zeros.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>new ArchiveData object combining self and other</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="aa.data.data_from_events">
+<code class="sig-prename descclassname"><span class="pre">aa.data.</span></code><code class="sig-name descname"><span class="pre">data_from_events</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#aa.data.ArchiveEvent" title="aa.data.ArchiveEvent"><span class="pre">aa.data.ArchiveEvent</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enum_options</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.9)"><span class="pre">collections.OrderedDict</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#aa.data.ArchiveData" title="aa.data.ArchiveData"><span class="pre">aa.data.ArchiveData</span></a><a class="reference internal" href="_modules/aa/data.html#data_from_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.data_from_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert multiple ArchiveEvents into an ArchiveData object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pv</strong> – pv name for all archive events</p></li>
+<li><p><strong>events</strong> – sequence of ArchiveEvent objects</p></li>
+<li><p><strong>count</strong> – maximum number of events to include.  If None, return all events</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ArchiveData object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aa.data.parse_enum_options">
+<code class="sig-prename descclassname"><span class="pre">aa.data.</span></code><code class="sig-name descname"><span class="pre">parse_enum_options</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meta_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">OrderedDict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/aa/data.html#parse_enum_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.data.parse_enum_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse enum options, if available, from a metadata dict.</p>
+<dl class="simple">
+<dt>Returns</dt><dd><p>a dict with keys of enum value (str) and values of enum string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-aa.epics_event_pb2">
+<span id="aa-epics-event-pb2-module"></span><h2>aa.epics_event_pb2 module<a class="headerlink" href="#module-aa.epics_event_pb2" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-aa.fetcher">
+<span id="aa-fetcher-module"></span><h2>aa.fetcher module<a class="headerlink" href="#module-aa.fetcher" title="Permalink to this headline">¶</a></h2>
+<p>Base classes for use in fetching data from archivers.</p>
+<dl class="py class">
+<dt id="aa.fetcher.Fetcher">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.fetcher.</span></code><code class="sig-name descname"><span class="pre">Fetcher</span></code><a class="reference internal" href="_modules/aa/fetcher.html#Fetcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.fetcher.Fetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Abstract base class for fetching data from an archiver.</p>
+<dl class="py method">
+<dt id="aa.fetcher.Fetcher.get_values">
+<code class="sig-name descname"><span class="pre">get_values</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/fetcher.html#Fetcher.get_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.fetcher.Fetcher.get_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve archive data.</p>
+<p>start and end are datetime objects. If they are not timezone aware,
+assume that they are in the local timezone.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pv</strong> – PV to request data for</p></li>
+<li><p><strong>start</strong> – datetime at start of requested period</p></li>
+<li><p><strong>end</strong> – datetime at end of requested period. If None, request all
+events to the current time</p></li>
+<li><p><strong>count</strong> – maximum number of events to return. If None, return all
+events</p></li>
+<li><p><strong>request_params</strong> – Settings dictionary used for archiver request</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ArchiveData object representing all events</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.fetcher.Fetcher.get_event_at">
+<code class="sig-name descname"><span class="pre">get_event_at</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/fetcher.html#Fetcher.get_event_at"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.fetcher.Fetcher.get_event_at" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the event preceding the specified datetime.</p>
+<p>If instant is not timezone aware, assume that it is in the local
+timezone.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pv</strong> – PV to request event for</p></li>
+<li><p><strong>instant</strong> – datetime of the requested event</p></li>
+<li><p><strong>request_params</strong> – Settings dictionary used for archiver request</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ArchiveEvent representing the event preceding the requested
+datetime</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="aa.fetcher.AaFetcher">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.fetcher.</span></code><code class="sig-name descname"><span class="pre">AaFetcher</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/fetcher.html#AaFetcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.fetcher.AaFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aa.fetcher.Fetcher" title="aa.fetcher.Fetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">aa.fetcher.Fetcher</span></code></a></p>
+<p>Abstract base class for fetching data from the Archiver Appliance.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-aa.js">
+<span id="aa-js-module"></span><h2>aa.js module<a class="headerlink" href="#module-aa.js" title="Permalink to this headline">¶</a></h2>
+<p>Class for fetching data from the Archiver Appliance using JSON.</p>
+<dl class="py class">
+<dt id="aa.js.JsonFetcher">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.js.</span></code><code class="sig-name descname"><span class="pre">JsonFetcher</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/js.html#JsonFetcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.js.JsonFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aa.fetcher.AaFetcher" title="aa.fetcher.AaFetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">aa.fetcher.AaFetcher</span></code></a></p>
+<p>Class to fetch data from the Archiver Appliance using JSON.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hostname</strong> – hostname of Archiver Appliance</p></li>
+<li><p><strong>port</strong> – port to connect to</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-aa.pb">
+<span id="aa-pb-module"></span><h2>aa.pb module<a class="headerlink" href="#module-aa.pb" title="Permalink to this headline">¶</a></h2>
+<p>Handle retrieval of data in the Archiver Appliance PB file format.</p>
+<p>The file format is described on this page:
+<a class="reference external" href="https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html">https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html</a></p>
+<p>The data can be parsed in the same way whether retrieved using the
+Rest API or whether reading files directly from disk. In either
+case, it is important to treat the data as binary data - a stream of
+bytes. The Google Protobuf library handles converting the stream of
+bytes into the objects defined by the EPICSEvent.proto file.</p>
+<p>The Archiver Appliance escapes certain characters as described on the
+page above, which allows one to deduce the number of events in the
+binary file using tools such as wc.</p>
+<p>The unescape_bytes() method handles unescaping these characters before
+handing the interpretation over to the Google Protobuf library.</p>
+<p>Note: due to the way the protobuf objects are constructed, pylint can’t
+correctly deduce some properties, so I have manually disabled some warnings.</p>
+<dl class="py function">
+<dt id="aa.pb.unescape_bytes">
+<code class="sig-prename descclassname"><span class="pre">aa.pb.</span></code><code class="sig-name descname"><span class="pre">unescape_bytes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte_seq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/pb.html#unescape_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.pb.unescape_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace specific sub-sequences in a bytes sequence.</p>
+<p>This escaping is defined as part of the Archiver Appliance raw file
+format: <a class="reference external" href="https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html">https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>byte_seq</strong> – any byte sequence</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the byte sequence unescaped according to the AA file format rules</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aa.pb.escape_bytes">
+<code class="sig-prename descclassname"><span class="pre">aa.pb.</span></code><code class="sig-name descname"><span class="pre">escape_bytes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte_seq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/pb.html#escape_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.pb.escape_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace specific sub-sequences in a bytes sequence.</p>
+<p>This escaping is defined as part of the Archiver Appliance raw file
+format: <a class="reference external" href="https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html">https://slacmshankar.github.io/epicsarchiver_docs/pb_pbraw.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>byte_seq</strong> – any byte sequence</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the byte sequence escaped according to the AA file format rules</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aa.pb.event_timestamp">
+<code class="sig-prename descclassname"><span class="pre">aa.pb.</span></code><code class="sig-name descname"><span class="pre">event_timestamp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/pb.html#event_timestamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.pb.event_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aa.pb.search_events">
+<code class="sig-prename descclassname"><span class="pre">aa.pb.</span></code><code class="sig-name descname"><span class="pre">search_events</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lines</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/pb.html#search_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.pb.search_events" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aa.pb.break_up_chunks">
+<code class="sig-prename descclassname"><span class="pre">aa.pb.</span></code><code class="sig-name descname"><span class="pre">break_up_chunks</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/pb.html#break_up_chunks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.pb.break_up_chunks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Break up raw data into chunks by year</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>raw_data</strong> – Raw data from file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>keys are years; values are lists of chunks</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.9)">collections.OrderedDict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aa.pb.event_from_line">
+<code class="sig-prename descclassname"><span class="pre">aa.pb.</span></code><code class="sig-name descname"><span class="pre">event_from_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/pb.html#event_from_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.pb.event_from_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an ArchiveEvent from this line</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>line</strong> – A line of chunks of data</p></li>
+<li><p><strong>pv</strong> – Name of the PV</p></li>
+<li><p><strong>year</strong> – Year of interest</p></li>
+<li><p><strong>event_type</strong> – Need to know the type of the event as key of TYPE_MAPPINGS</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ArchiveEvent</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aa.pb.parse_pb_data">
+<code class="sig-prename descclassname"><span class="pre">aa.pb.</span></code><code class="sig-name descname"><span class="pre">parse_pb_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/pb.html#parse_pb_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.pb.parse_pb_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn raw PB data into an ArchiveData object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>raw_data</strong> – The raw data</p></li>
+<li><p><strong>pv</strong> – name of PV</p></li>
+<li><p><strong>start</strong> – datetime.datetime for start of window</p></li>
+<li><p><strong>end</strong> – datetime.datetime for end of window</p></li>
+<li><p><strong>count</strong> – return up to this many events</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An ArchiveData object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="aa.pb.PbFetcher">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.pb.</span></code><code class="sig-name descname"><span class="pre">PbFetcher</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/pb.html#PbFetcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.pb.PbFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aa.fetcher.AaFetcher" title="aa.fetcher.AaFetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">aa.fetcher.AaFetcher</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="aa.pb.PbFileFetcher">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.pb.</span></code><code class="sig-name descname"><span class="pre">PbFileFetcher</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/pb.html#PbFileFetcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.pb.PbFileFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aa.fetcher.Fetcher" title="aa.fetcher.Fetcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">aa.fetcher.Fetcher</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aa.pb.get_iso_timestamp_for_event">
+<code class="sig-prename descclassname"><span class="pre">aa.pb.</span></code><code class="sig-name descname"><span class="pre">get_iso_timestamp_for_event</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/pb.html#get_iso_timestamp_for_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.pb.get_iso_timestamp_for_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an ISO-formatted timestamp string for the given event
+and year.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-aa.rest">
+<span id="aa-rest-module"></span><h2>aa.rest module<a class="headerlink" href="#module-aa.rest" title="Permalink to this headline">¶</a></h2>
+<p>Class for making calls to the Archiver Appliance Rest API.</p>
+<dl class="py class">
+<dt id="aa.rest.AaRestClient">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aa.rest.</span></code><code class="sig-name descname"><span class="pre">AaRestClient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class used for making calls to the AA Rest API.</p>
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.get_all_pvs">
+<code class="sig-name descname"><span class="pre">get_all_pvs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.get_all_pvs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.get_all_pvs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of PVs that are being archived.</p>
+<p>This includes PVs that have connected in the past but are now
+disconnected (those from get_currently_disconnnected_pvs()),
+but not those that have never connected (those from
+get_never_connected_pvs()).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pv</strong> – only return PV names that match pv, which may be a glob</p></li>
+<li><p><strong>limit</strong> – return a maximum of limit PV names. The default (-1)
+returns all PV names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of PV names</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.get_pv_type_info">
+<code class="sig-name descname"><span class="pre">get_pv_type_info</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.get_pv_type_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.get_pv_type_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.get_pv_status">
+<code class="sig-name descname"><span class="pre">get_pv_status</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.get_pv_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.get_pv_status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.get_pv_statuses">
+<code class="sig-name descname"><span class="pre">get_pv_statuses</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv_names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.get_pv_statuses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.get_pv_statuses" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.get_never_connected_pvs">
+<code class="sig-name descname"><span class="pre">get_never_connected_pvs</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.get_never_connected_pvs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.get_never_connected_pvs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.get_currently_disconnected_pvs">
+<code class="sig-name descname"><span class="pre">get_currently_disconnected_pvs</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.get_currently_disconnected_pvs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.get_currently_disconnected_pvs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.archive_pv">
+<code class="sig-name descname"><span class="pre">archive_pv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samplingperiod</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samplingmethod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SCAN'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.archive_pv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.archive_pv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.pause_archiving_pv">
+<code class="sig-name descname"><span class="pre">pause_archiving_pv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.pause_archiving_pv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.pause_archiving_pv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.resume_archiving_pv">
+<code class="sig-name descname"><span class="pre">resume_archiving_pv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.resume_archiving_pv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.resume_archiving_pv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.delete_pv">
+<code class="sig-name descname"><span class="pre">delete_pv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.delete_pv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.delete_pv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.abort_archiving_pv">
+<code class="sig-name descname"><span class="pre">abort_archiving_pv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.abort_archiving_pv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.abort_archiving_pv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.change_archival_parameters">
+<code class="sig-name descname"><span class="pre">change_archival_parameters</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MONITOR'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.change_archival_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.change_archival_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.get_appliance_metrics">
+<code class="sig-name descname"><span class="pre">get_appliance_metrics</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.get_appliance_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.get_appliance_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gives summary metrics for all appliances in cluster</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aa.rest.AaRestClient.get_appliance_metrics_for_appliance">
+<code class="sig-name descname"><span class="pre">get_appliance_metrics_for_appliance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appliance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/rest.html#AaRestClient.get_appliance_metrics_for_appliance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.rest.AaRestClient.get_appliance_metrics_for_appliance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gives detailed metrics for the appliance on the specified host</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-aa.storage">
+<span id="aa-storage-module"></span><h2>aa.storage module<a class="headerlink" href="#module-aa.storage" title="Permalink to this headline">¶</a></h2>
+<dl class="py exception">
+<dt id="aa.storage.ParsingError">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">aa.storage.</span></code><code class="sig-name descname"><span class="pre">ParsingError</span></code><a class="reference internal" href="_modules/aa/storage.html#ParsingError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.storage.ParsingError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aa.storage.pv_name_from_path">
+<code class="sig-prename descclassname"><span class="pre">aa.storage.</span></code><code class="sig-name descname"><span class="pre">pv_name_from_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/storage.html#pv_name_from_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.storage.pv_name_from_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a path to a PB file relative to storage root, infer what the
+PV name is.</p>
+<p>In the AA storage, a PV name is broken up into parts
+and there are subdirectories with each part of the name.
+This method is to reverse that process so you can work out
+what a PV name is from the path to a PB file.</p>
+<p>The first three slashes in the path become dashes in the
+PV name. Subsequent slashes become colons.</p>
+<p>E.g. “BL14I/MO/STAGE/01/XF.RBV:2019.pb” goes to
+“BL14I-MO-STAGE-01:XF.RBV”</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-aa.utils">
+<span id="aa-utils-module"></span><h2>aa.utils module<a class="headerlink" href="#module-aa.utils" title="Permalink to this headline">¶</a></h2>
+<p>Miscellaneous utility functions.</p>
+<dl class="py function">
+<dt id="aa.utils.utc_datetime">
+<code class="sig-prename descclassname"><span class="pre">aa.utils.</span></code><code class="sig-name descname"><span class="pre">utc_datetime</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/utils.html#utc_datetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.utils.utc_datetime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aa.utils.utc_now">
+<code class="sig-prename descclassname"><span class="pre">aa.utils.</span></code><code class="sig-name descname"><span class="pre">utc_now</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/utils.html#utc_now"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.utils.utc_now" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aa.utils.datetime_to_epoch">
+<code class="sig-prename descclassname"><span class="pre">aa.utils.</span></code><code class="sig-name descname"><span class="pre">datetime_to_epoch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/utils.html#datetime_to_epoch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.utils.datetime_to_epoch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aa.utils.epoch_to_datetime">
+<code class="sig-prename descclassname"><span class="pre">aa.utils.</span></code><code class="sig-name descname"><span class="pre">epoch_to_datetime</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/utils.html#epoch_to_datetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.utils.epoch_to_datetime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aa.utils.add_local_timezone">
+<code class="sig-prename descclassname"><span class="pre">aa.utils.</span></code><code class="sig-name descname"><span class="pre">add_local_timezone</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/utils.html#add_local_timezone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.utils.add_local_timezone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the local timezone to a naive datetime.</p>
+<p>The tzlocal module is used to deduce the local timezone.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dt</strong> – naive datetime</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.9)"><strong>AssertionError</strong></a> – if dt already has a timezone</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aa.utils.year_timestamp">
+<code class="sig-prename descclassname"><span class="pre">aa.utils.</span></code><code class="sig-name descname"><span class="pre">year_timestamp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/utils.html#year_timestamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.utils.year_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aa.utils.print_raw_bytes">
+<code class="sig-prename descclassname"><span class="pre">aa.utils.</span></code><code class="sig-name descname"><span class="pre">print_raw_bytes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte_seq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/utils.html#print_raw_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.utils.print_raw_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aa.utils.binary_search">
+<code class="sig-prename descclassname"><span class="pre">aa.utils.</span></code><code class="sig-name descname"><span class="pre">binary_search</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/utils.html#binary_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.utils.binary_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find no such that f(seq[no-1]) &lt;= target and f(seq[no]) &gt; target.</p>
+<p>If target &lt; f(seq[0]), return 0
+If target &gt; f(seq[-1]), return len(seq)</p>
+<p>Assume f(seq[no]) &lt; f(seq[no+1]).</p>
+<p>The integer result is useful for indexing the array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seq</strong> – sequence of inputs on which to act</p></li>
+<li><p><strong>f</strong> – function that returns a comparable when called on any input</p></li>
+<li><p><strong>target</strong> – value</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: index of item in seq meeting search requirements</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aa.utils.dict_to_tuples">
+<code class="sig-prename descclassname"><span class="pre">aa.utils.</span></code><code class="sig-name descname"><span class="pre">dict_to_tuples</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/aa/utils.html#dict_to_tuples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.utils.dict_to_tuples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a dict to a list of tuples, sorted alphabetically by key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Dictionary to convert</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of tuples (key, value) sorted alphabetically by key</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-aa">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aa" title="Permalink to this headline">¶</a></h2>
+<p>Python client to the EPICS Archiver Appliance.</p>
+<dl class="py function">
+<dt id="aa.set_up_logging">
+<code class="sig-prename descclassname"><span class="pre">aa.</span></code><code class="sig-name descname"><span class="pre">set_up_logging</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%(asctime)s</span> <span class="pre">%(levelname)-8s</span> <span class="pre">%(message)s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aa/utils.html#set_up_logging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aa.set_up_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple logging setup.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fmt</strong> – logging format to use</p></li>
+<li><p><strong>level</strong> – logging level to use</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="index.html" class="btn btn-neutral float-left" title="aapy API documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Diamond Light Source.
+
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
