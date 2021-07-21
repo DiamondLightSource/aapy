@@ -42,6 +42,12 @@ def test_AaRestClient_construct_url(kwargs, aa_client):
         ("resumeArchivingPV", "resume_archiving_pv", {"pv": "dummy"}),
         ("deletePV", "delete_pv", {"pv": "dummy"}),
         ("abortArchivingPV", "abort_archiving_pv", {"pv": "dummy"}),
+        ("getApplianceMetrics", "get_appliance_metrics", {}),
+        (
+            "getApplianceMetricsForAppliance",
+            "get_appliance_metrics_for_appliance",
+            {"appliance": "dummy_host"},
+        ),
     ],
 )
 @mock.patch("requests.get")
