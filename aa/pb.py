@@ -296,14 +296,6 @@ class PbFileFetcher(fetcher.Fetcher):
     def __init__(self, root):
         self._root = root
 
-    def _get_pb_file(self, pv, year):
-        # Split PV on either dash or colon
-        parts = re.split("[-:]", pv)
-        suffix = parts.pop()
-        directory = os.path.join(self._root, os.path.sep.join(parts))
-        filename = "{}:{}.pb".format(suffix, year)
-        return os.path.join(directory, filename)
-
     def _create_datetime_for_pb_file(self, filepath):
         filename = os.path.basename(filepath)
         # the filename can contain only the year or stepwise more info up to year, month, day, hour and minutes
