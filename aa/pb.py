@@ -318,14 +318,14 @@ class PbFileFetcher(fetcher.Fetcher):
         # Dynamically find the correct path to the pb files.
         # Therefore, strip any STS/MTS/LTS first.
         if os.path.basename(os.path.normpath(self._root)) in ["STS", "MTS", "LTS"]:
-            root = os.path.dirname(os.path.normpath(self._root))
+            self._root = os.path.dirname(os.path.normpath(self._root))
         # get all files for this pv
         pv_files = []
         # Split PV on either dash or colon
         parts = re.split("[-:]", pv)
         suffix = parts.pop()
         for s in ["LTS", "MTS", "STS"]:
-            directory = os.path.join(root, s, os.path.sep.join(parts))
+            directory = os.path.join(self._root, s, os.path.sep.join(parts))
             for f in sorted(glob.glob(os.path.join(directory, f"{suffix}*pb"))):
                 pv_files.append(f)
         pv_files_datetime = [self._create_datetime_for_pb_file(f) for f in pv_files]
