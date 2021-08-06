@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import collections
 import datetime
+import glob
 import logging as log
 import os
 import re
@@ -303,6 +304,52 @@ class PbFileFetcher(fetcher.Fetcher):
         filename = "{}:{}.pb".format(suffix, year)
         return os.path.join(directory, filename)
 
+    def _create_datetime_for_pb_file(self, filepath):
+        filename = os.path.basename(filepath)
+        # the filename can contain only the year or stepwise more info up to year, month, day, hour and minutes
+        dates = re.search(r"\d{4}(_\d{2})?(_\d{2})?(_\d{2})?(_\d{2})?", filename).group(0).split('_')
+        dates = [int(date) for date in dates]
+        # make sure to give a least 3 arguments to datetime.datetime
+        while len(dates) < 3:
+            dates.append(1)
+        return datetime.datetime(*dates, tzinfo=pytz.timezone('UTC'))
+
+    def _get_pb_files(self, pv, start, end):
+        # Dynamically find the correct path to the pb files.
+        # Therefore, strip any STS/MTS/LTS first.
+        if os.path.basename(os.path.normpath(self._root)) in ["STS", "MTS", "LTS"]:
+            root = os.path.dirname(os.path.normpath(self._root))
+        # get all files for this pv
+        pv_files = []
+        # Split PV on either dash or colon
+        parts = re.split("[-:]", pv)
+        suffix = parts.pop()
+        for s in ["LTS", "MTS", "STS"]:
+            directory = os.path.join(root, s, os.path.sep.join(parts))
+            for f in sorted(glob.glob(os.path.join(directory, f"{suffix}*pb"))):
+                pv_files.append(f)
+        pv_files_datetime = [self._create_datetime_for_pb_file(f) for f in pv_files]
+        # find the files we need between start and end
+        start_index, end_index = None, None
+        for i, file_date in enumerate(pv_files_datetime):
+            if file_date > start and start_index is None:
+                start_index = i - 1
+            if file_date > end and end_index is None:
+                end_index = i - 1
+        # Ensure sound indices
+        if start_index is None:
+            start_index = 0
+        if end_index is None:
+            end_index = len(pv_files)
+        if start_index < 0:
+            start_index = 0
+        if end_index < 0:
+            end_index = 1
+        if start_index == end_index:
+            end_index += 1
+        
+        return pv_files[start_index : end_index]
+
     @staticmethod
     def _read_pb_files(files, pv, start, end, count):
         raw_data = bytearray()
@@ -314,13 +361,13 @@ class PbFileFetcher(fetcher.Fetcher):
                     raw_data.append(10)
                     raw_data.extend(f.read())
             except IOError:  # File not found. No data.
-                log.warning("No pb file {} found")
+                log.warning("No pb file {} found".format(filepath))
         return parse_pb_data(bytes(raw_data), pv, start, end, count)
 
     def _get_values(self, pv, start, end=None, count=None, request_params=None):
-        pb_files = []
-        for year in range(start.year, end.year + 1):
-            pb_files.append(self._get_pb_file(pv, year))
+        if end is None:
+            end = datetime.datetime.now()
+        pb_files = self._get_pb_files(pv, start, end)
         log.info("Parsing pb files {}".format(pb_files))
         return self._read_pb_files(pb_files, pv, start, end, count)
 
