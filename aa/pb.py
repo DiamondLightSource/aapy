@@ -297,23 +297,28 @@ class PbFileFetcher(fetcher.Fetcher):
         self._root = root
 
     def _create_datetime_for_pb_file(self, filepath):
+        """Each .pb files of the archiver appliance ends with a date information corresponding to the stored data.
+        This function returns a datetime.datetime object matching the date information of the given .pb file."""
         filename = os.path.basename(filepath)
-        # the filename can contain only the year or stepwise more info up to year, month, day, hour and minutes
+        # The filename can contain only the year or stepwise more info up to year, month, day, hour and minutes.
         dates = re.search(r"\d{4}(_\d{2})?(_\d{2})?(_\d{2})?(_\d{2})?", filename).group(0).split('_')
         dates = [int(date) for date in dates]
-        # make sure to give a least 3 arguments to datetime.datetime
+        # Make sure to give a least 3 arguments to datetime.datetime.
         while len(dates) < 3:
             dates.append(1)
-        return datetime.datetime(*dates, tzinfo=pytz.timezone('UTC'))
+        return datetime.datetime(*dates, tzinfo=pytz.utc)
 
     def _get_pb_files(self, pv, start, end):
+        """Instead of looking only in the LTS for yearly generated .pb files, this function goes through all
+        LTS/MTS/STS directories and returns all .pb files containing data of the specified time window. The 
+        granularity setup of the archiver for LTS/MTS/STS can also deviate from the standard one."""
         # Dynamically find the correct path to the pb files.
-        # Therefore, strip any STS/MTS/LTS first.
+        # Strip any STS/MTS/LTS from the root first to ensure backwards compatibility.
         if os.path.basename(os.path.normpath(self._root)) in ["STS", "MTS", "LTS"]:
             self._root = os.path.dirname(os.path.normpath(self._root))
-        # get all files for this pv
+        # Get all files for this pv.
         pv_files = []
-        # Split PV on either dash or colon
+        # Split PV on either dash or colon.
         parts = re.split("[-:]", pv)
         suffix = parts.pop()
         for s in ["LTS", "MTS", "STS"]:
@@ -321,14 +326,14 @@ class PbFileFetcher(fetcher.Fetcher):
             for f in sorted(glob.glob(os.path.join(directory, f"{suffix}*pb"))):
                 pv_files.append(f)
         pv_files_datetime = [self._create_datetime_for_pb_file(f) for f in pv_files]
-        # find the files we need between start and end
+        # Find the files we need between start and end.
         start_index, end_index = None, None
         for i, file_date in enumerate(pv_files_datetime):
             if file_date > start and start_index is None:
                 start_index = i - 1
             if file_date > end and end_index is None:
                 end_index = i - 1
-        # Ensure sound indices
+        # Ensure sound indices.
         if start_index is None:
             start_index = 0
         if end_index is None:
@@ -339,7 +344,6 @@ class PbFileFetcher(fetcher.Fetcher):
             end_index = 1
         if start_index == end_index:
             end_index += 1
-        
         return pv_files[start_index : end_index]
 
     @staticmethod
