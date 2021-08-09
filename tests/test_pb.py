@@ -150,46 +150,62 @@ def test_PbFileFetcher_create_datetime_for_pb_file():
     assert fetcher._create_datetime_for_pb_file(filepath) == expected
 
 
-@mock.patch("glob.glob")
-def test_PbFileFetcher_get_pb_files(mock_glob):
-    def side_effect(path_to_pv_dir):
-        if "LTS" in path_to_pv_dir:
-            return ["/root/LTS/a/b/c/d_2001.pb"]
-        elif "MTS" in path_to_pv_dir:
-            return ["/root/MTS/a/b/c/d_2001_02_03.pb"]
-        elif "STS" in path_to_pv_dir:
-            return ["/root/STS/a/b/c/d_2001_02_03_04.pb"]
+def test_PbFileFetcher_create_datetime_for_pb_file_only_year():
+    root = "root"
+    filepath = os.path.join("root", "a", "b", "c", "d:2001.pb")
+    fetcher = pb.PbFileFetcher(root)
+    expected = utils.utc_datetime(2001, 1, 1)
+    assert fetcher._create_datetime_for_pb_file(filepath) == expected
 
-    mock_glob.side_effect = side_effect
-    start = utils.utc_datetime(2001, 1, 1)
-    end = utils.utc_datetime(2001, 2, 4)
-    expected = [
-        "/root/LTS/a/b/c/d_2001.pb",
-        "/root/MTS/a/b/c/d_2001_02_03.pb",
-        "/root/STS/a/b/c/d_2001_02_03_04.pb",
-    ]
+
+@mock.patch("glob.glob")
+def test_PbFileFetcher_get_pb_files_no_file_found(mock_glob):
+    mock_glob.return_value = []
     root = "root"
     pv = "a-b-c:d"
     fetcher = pb.PbFileFetcher(root)
+    start = utils.utc_datetime(2001, 1, 1)
+    end = utils.utc_datetime(2001, 1, 2)
+    expected = []
     assert fetcher._get_pb_files(pv, start, end) == expected
 
 
-# def test_PbFileFetcher_get_pb_file_handles_pv_with_one_colon():
-#    root = "root"
-#    year = 2001
-#    pv = "a-b-c:d"
-#    fetcher = pb.PbFileFetcher(root)
-#    expected = os.path.join("root", "a", "b", "c", "d:2001.pb")
-#    assert fetcher._get_pb_file(pv, year) == expected
-#
-#
-# def test_PbFileFetcher_get_pb_file_handles_pv_with_two_colons():
-#    root = "root"
-#    year = 2001
-#    pv = "a-b-c:d:e"
-#    fetcher = pb.PbFileFetcher(root)
-#    expected = os.path.join("root", "a", "b", "c", "d", "e:2001.pb")
-#    assert fetcher._get_pb_file(pv, year) == expected
+@mock.patch("glob.glob")
+def test_PbFileFetcher_get_pb_files(mock_glob):
+    dummy_filenames = [
+        "/root/LTS/a/b/c/d_2001.pb",
+        "/root/MTS/a/b/c/d_2001_02_02.pb",
+        "/root/MTS/a/b/c/d_2001_02_03.pb",
+        "/root/STS/a/b/c/d_2001_02_03_04.pb",
+        "/root/STS/a/b/c/d_2001_02_03_05.pb",
+    ]
+
+    def side_effect(path_to_pv_dir, f=dummy_filenames):
+        if "LTS" in path_to_pv_dir:
+            return [f[0]]
+        elif "MTS" in path_to_pv_dir:
+            return f[1:3]
+        elif "STS" in path_to_pv_dir:
+            return f[3:]
+
+    mock_glob.side_effect = side_effect
+    for i, (start, end) in enumerate(
+        (
+            (utils.utc_datetime(2000, 1, 1), utils.utc_datetime(2000, 1, 2)),
+            (utils.utc_datetime(2001, 2, 2, 10), utils.utc_datetime(2001, 2, 3, 2)),
+            (utils.utc_datetime(2001, 3, 1), utils.utc_datetime(2001, 3, 2)),
+        )
+    ):
+        if i == 0:
+            expected = [dummy_filenames[0]]
+        if i == 1:
+            expected = dummy_filenames[1:3]
+        if i == 2:
+            expected = [dummy_filenames[-1]]
+        root = "root/LTS/"
+        pv = "a-b-c:d"
+        fetcher = pb.PbFileFetcher(root)
+        assert fetcher._get_pb_files(pv, start, end) == expected
 
 
 def test_PbFileFetcher_read_pb_files(dummy_pv, jan_2001, jan_2018):

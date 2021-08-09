@@ -339,19 +339,21 @@ class PbFileFetcher(fetcher.Fetcher):
             if file_date > start and start_index is None:
                 start_index = i - 1
             if file_date > end and end_index is None:
-                end_index = i - 1
+                end_index = i
         # Ensure sound indices.
         if start_index is None:
-            start_index = 0
+            start_index = len(pv_files) - 1
         if end_index is None:
             end_index = len(pv_files)
         if start_index < 0:
             start_index = 0
-        if end_index < 0:
-            end_index = 1
         if start_index == end_index:
             end_index += 1
-        return pv_files[start_index:end_index]
+        # Only return files matching the time window.
+        pb_files = pv_files[start_index:end_index]
+        if len(pb_files) == 0:
+            log.warning("No pb file found for PV {}".format(pv))
+        return pb_files
 
     @staticmethod
     def _read_pb_files(files, pv, start, end, count):
