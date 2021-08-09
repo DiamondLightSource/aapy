@@ -142,22 +142,54 @@ def test_PbFetcher_get_raises_if_get_throws_HTTPError_not_404(
             pb_fetcher.get_values(dummy_pv, jan_2018, jan_2018)
 
 
-def test_PbFileFetcher_get_pb_file_handles_pv_with_one_colon():
+def test_PbFileFetcher_create_datetime_for_pb_file():
     root = "root"
-    year = 2001
+    filepath = os.path.join("root", "a", "b", "c", "d:2001_02_03_04_05.pb")
+    fetcher = pb.PbFileFetcher(root)
+    expected = utils.utc_datetime(2001, 2, 3, 4, 5)
+    assert fetcher._create_datetime_for_pb_file(filepath) == expected
+
+
+@mock.patch("glob.glob")
+def test_PbFileFetcher_get_pb_files(mock_glob):
+    def side_effect(path_to_pv_dir):
+        if "LTS" in path_to_pv_dir:
+            return ["/root/LTS/a/b/c/d_2001.pb"]
+        elif "MTS" in path_to_pv_dir:
+            return ["/root/MTS/a/b/c/d_2001_02_03.pb"]
+        elif "STS" in path_to_pv_dir:
+            return ["/root/STS/a/b/c/d_2001_02_03_04.pb"]
+
+    mock_glob.side_effect = side_effect
+    start = utils.utc_datetime(2001, 1, 1)
+    end = utils.utc_datetime(2001, 2, 4)
+    expected = [
+        "/root/LTS/a/b/c/d_2001.pb",
+        "/root/MTS/a/b/c/d_2001_02_03.pb",
+        "/root/STS/a/b/c/d_2001_02_03_04.pb",
+    ]
+    root = "root"
     pv = "a-b-c:d"
     fetcher = pb.PbFileFetcher(root)
-    expected = os.path.join("root", "a", "b", "c", "d:2001.pb")
-    assert fetcher._get_pb_file(pv, year) == expected
+    assert fetcher._get_pb_files(pv, start, end) == expected
 
 
-def test_PbFileFetcher_get_pb_file_handles_pv_with_two_colons():
-    root = "root"
-    year = 2001
-    pv = "a-b-c:d:e"
-    fetcher = pb.PbFileFetcher(root)
-    expected = os.path.join("root", "a", "b", "c", "d", "e:2001.pb")
-    assert fetcher._get_pb_file(pv, year) == expected
+# def test_PbFileFetcher_get_pb_file_handles_pv_with_one_colon():
+#    root = "root"
+#    year = 2001
+#    pv = "a-b-c:d"
+#    fetcher = pb.PbFileFetcher(root)
+#    expected = os.path.join("root", "a", "b", "c", "d:2001.pb")
+#    assert fetcher._get_pb_file(pv, year) == expected
+#
+#
+# def test_PbFileFetcher_get_pb_file_handles_pv_with_two_colons():
+#    root = "root"
+#    year = 2001
+#    pv = "a-b-c:d:e"
+#    fetcher = pb.PbFileFetcher(root)
+#    expected = os.path.join("root", "a", "b", "c", "d", "e:2001.pb")
+#    assert fetcher._get_pb_file(pv, year) == expected
 
 
 def test_PbFileFetcher_read_pb_files(dummy_pv, jan_2001, jan_2018):
