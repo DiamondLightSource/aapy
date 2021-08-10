@@ -131,4 +131,3 @@ html_css_files = ["theme_overrides.css"]
 # Logo
 html_logo = "images/dls-logo.svg"
 html_favicon = "images/dls-favicon.ico"
-

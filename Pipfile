@@ -28,7 +28,12 @@ sphinx-rtd-theme = "*"
 mock = "*"
 jsonschema = "*"
 
-
+# mypy type stubs
+types-mock = "*"
+types-pytz = "*"
+types-tzlocal = "*"
+types-requests = "*"
+types-protobuf = "*"
 
 [packages]
 aapy = {editable = true,path = "."}
