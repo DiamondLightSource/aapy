@@ -314,7 +314,7 @@ class PbFileFetcher(fetcher.Fetcher):
                     raw_data.append(10)
                     raw_data.extend(f.read())
             except IOError:  # File not found. No data.
-                log.warning("No pb file {} found")
+                log.warning("No pb file {} found".format(filepath))
         return parse_pb_data(bytes(raw_data), pv, start, end, count)
 
     def _get_values(self, pv, start, end=None, count=None, request_params=None):
