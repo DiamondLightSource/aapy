@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
@@ -8,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>aa.pb &mdash; aa 0.0+unknown documentation</title>
+  <title>aa.pb &mdash; aa 0.11+5.gffd9489 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
 
@@ -34,6 +35,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -111,15 +113,39 @@
   <!-- Include Index in the sidebar -->
   <!-- https://stackoverflow.com/a/37843854 -->
   <a href="../../genindex.html">Index</a>
-  <!-- Include all versions of the docs -->
-  <!-- https://holzhaus.github.io/sphinx-multiversion/master/templates.html -->
-  
   <p class="caption"><span class="caption-text">Versions</span></p>
-  <ul>
-    <li><a href="pb.html">master</a></li>
-    <li><a href="../../../0.9a1/index.html">0.9a1</a></li>
-  </ul>
-  
+  <ul id="versions"/>
+  <script>
+    // Add any branches to appear in the side pane here, tags will be added below
+    // Will only appear if docs are built and pushed in gh-pages
+    var versions = ['master', 'main'];
+    var dirs = new Set();
+    function addVersion(name) {
+      if (dirs.has(name)) {
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.href = 'https://dls-controls.github.io/aa/' + name;
+        a.innerText = name;
+        li.appendChild(a)
+        document.getElementById('versions').appendChild(li);
+      }
+    }
+    Promise.all([
+      // Find gh-pages directories and populate `dirs`
+      fetch("https://api.github.com/repos/dls-controls/aa/contents?ref=gh-pages")
+      .then(response => response.json())
+      .then(data => data.forEach(function(e) {
+        if (e.type == "dir") dirs.add(e.name);
+      })),
+      // Add tags to `versions`
+      fetch('https://api.github.com/repos/dls-controls/aa/tags')
+        .then(response => response.json())
+        .then(data => data.forEach(function(e) {
+          versions.push(e.name);
+        }))
+      ]).then(_ => versions.forEach(addVersion))
+  </script>
+
 
         </div>
         
@@ -205,11 +231,14 @@
 <span class="sd">correctly deduce some properties, so I have manually disabled some warnings.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">log</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span> <span class="nn">pytz</span>
 <span class="kn">import</span> <span class="nn">requests</span>
@@ -217,6 +246,20 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">data</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">epics_event_pb2</span> <span class="k">as</span> <span class="n">ee</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">fetcher</span><span class="p">,</span> <span class="n">utils</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;unescape_bytes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;escape_bytes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;event_timestamp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;search_events&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;break_up_chunks&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;event_from_line&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;parse_pb_data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PbFetcher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PbFileFetcher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_iso_timestamp_for_event&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
 
 <span class="c1"># It is not clear to me why I can&#39;t extract this information</span>
 <span class="c1"># from the compiled protobuf file.</span>
@@ -306,7 +349,7 @@
     <span class="k">return</span> <span class="n">year_start</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">secondsintoyear</span> <span class="o">+</span> <span class="mf">1e-9</span> <span class="o">*</span> <span class="n">event</span><span class="o">.</span><span class="n">nano</span></div>
 
 
-<div class="viewcode-block" id="get_timestamp_from_line_function"><a class="viewcode-back" href="../../aa.html#aa.pb.get_timestamp_from_line_function">[docs]</a><span class="k">def</span> <span class="nf">get_timestamp_from_line_function</span><span class="p">(</span><span class="n">chunk_info</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_timestamp_from_line_function</span><span class="p">(</span><span class="n">chunk_info</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">timestamp_from_line</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
         <span class="n">event</span> <span class="o">=</span> <span class="n">TYPE_MAPPINGS</span><span class="p">[</span><span class="n">chunk_info</span><span class="o">.</span><span class="n">type</span><span class="p">]()</span>
         <span class="n">event</span><span class="o">.</span><span class="n">ParseFromString</span><span class="p">(</span><span class="n">unescape_bytes</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
@@ -315,7 +358,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">event_time</span>
 
-    <span class="k">return</span> <span class="n">timestamp_from_line</span></div>
+    <span class="k">return</span> <span class="n">timestamp_from_line</span>
 
 
 <div class="viewcode-block" id="search_events"><a class="viewcode-back" href="../../aa.html#aa.pb.search_events">[docs]</a><span class="k">def</span> <span class="nf">search_events</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">chunk_info</span><span class="p">,</span> <span class="n">lines</span><span class="p">):</span>
@@ -388,8 +431,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">year_chunks</span> <span class="o">=</span> <span class="n">break_up_chunks</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span>
     <span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">enum_options</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="c1"># Iterate over years</span>
     <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="p">(</span><span class="n">chunk_info</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span> <span class="ow">in</span> <span class="n">year_chunks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Look for enum options in the chunk info.</span>
+        <span class="c1"># Assume these are unchanging therefore stop looking after first success.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">enum_options</span><span class="p">:</span>
+            <span class="n">enum_options</span> <span class="o">=</span> <span class="n">parse_enum_options_from_PayloadInfo</span><span class="p">(</span><span class="n">chunk_info</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">enum_options</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found enum options: </span><span class="si">{</span><span class="n">enum_options</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="c1"># Find the index of the start event</span>
         <span class="k">if</span> <span class="n">start</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">:</span>  <span class="c1"># search for the start</span>
             <span class="n">s</span> <span class="o">=</span> <span class="n">search_events</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">chunk_info</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
@@ -411,7 +462,22 @@
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Year </span><span class="si">{}</span><span class="s2"> start </span><span class="si">{}</span><span class="s2"> end </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="n">s</span><span class="p">:</span><span class="n">e</span><span class="p">]:</span>
             <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event_from_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">chunk_info</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">data_from_events</span><span class="p">(</span><span class="n">pv</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div>
+
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">data_from_events</span><span class="p">(</span><span class="n">pv</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">enum_options</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">parse_enum_options_from_PayloadInfo</span><span class="p">(</span>
+    <span class="n">payload_info</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Get enum options from a PayloadInfo object if available</span>
+
+<span class="sd">    Convert the header fields to a dict and then call the parsing</span>
+<span class="sd">    function from aa.data.</span>
+
+<span class="sd">    Could not find a suitable type annotation for PayloadInfo arg.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">headers_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">h</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">h</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">payload_info</span><span class="o">.</span><span class="n">headers</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">parse_enum_options</span><span class="p">(</span><span class="n">headers_dict</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="PbFetcher"><a class="viewcode-back" href="../../aa.html#aa.pb.PbFetcher">[docs]</a><span class="k">class</span> <span class="nc">PbFetcher</span><span class="p">(</span><span class="n">fetcher</span><span class="o">.</span><span class="n">AaFetcher</span><span class="p">):</span>

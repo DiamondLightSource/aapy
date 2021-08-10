@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
@@ -8,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>aa.rest &mdash; aa 0.0+unknown documentation</title>
+  <title>aa.rest &mdash; aa 0.11+5.gffd9489 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
 
@@ -34,6 +35,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -111,15 +113,39 @@
   <!-- Include Index in the sidebar -->
   <!-- https://stackoverflow.com/a/37843854 -->
   <a href="../../genindex.html">Index</a>
-  <!-- Include all versions of the docs -->
-  <!-- https://holzhaus.github.io/sphinx-multiversion/master/templates.html -->
-  
   <p class="caption"><span class="caption-text">Versions</span></p>
-  <ul>
-    <li><a href="rest.html">master</a></li>
-    <li><a href="../../../0.9a1/index.html">0.9a1</a></li>
-  </ul>
-  
+  <ul id="versions"/>
+  <script>
+    // Add any branches to appear in the side pane here, tags will be added below
+    // Will only appear if docs are built and pushed in gh-pages
+    var versions = ['master', 'main'];
+    var dirs = new Set();
+    function addVersion(name) {
+      if (dirs.has(name)) {
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.href = 'https://dls-controls.github.io/aa/' + name;
+        a.innerText = name;
+        li.appendChild(a)
+        document.getElementById('versions').appendChild(li);
+      }
+    }
+    Promise.all([
+      // Find gh-pages directories and populate `dirs`
+      fetch("https://api.github.com/repos/dls-controls/aa/contents?ref=gh-pages")
+      .then(response => response.json())
+      .then(data => data.forEach(function(e) {
+        if (e.type == "dir") dirs.add(e.name);
+      })),
+      // Add tags to `versions`
+      fetch('https://api.github.com/repos/dls-controls/aa/tags')
+        .then(response => response.json())
+        .then(data => data.forEach(function(e) {
+          versions.push(e.name);
+        }))
+      ]).then(_ => versions.forEach(addVersion))
+  </script>
+
 
         </div>
         
@@ -186,7 +212,9 @@
 <span></span><span class="sd">&quot;&quot;&quot;Class for making calls to the Archiver Appliance Rest API.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 
-<span class="kn">import</span> <span class="nn">aa</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">MONITOR</span><span class="p">,</span> <span class="n">SCAN</span><span class="p">,</span> <span class="n">dict_to_tuples</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AaRestClient&quot;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="AaRestClient"><a class="viewcode-back" href="../../aa.html#aa.rest.AaRestClient">[docs]</a><span class="k">class</span> <span class="nc">AaRestClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -205,9 +233,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://</span><span class="si">{}</span><span class="s2">/mgmt/bpl/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hostname</span><span class="p">,</span> <span class="n">command</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">popitem</span><span class="p">()</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="n">dict_to_tuples</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
             <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;?</span><span class="si">{}</span><span class="s2">=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;&amp;</span><span class="si">{}</span><span class="s2">=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">url</span>
 
@@ -244,12 +273,28 @@
         <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
-<div class="viewcode-block" id="AaRestClient.get_all_pvs"><a class="viewcode-back" href="../../aa.html#aa.rest.AaRestClient.get_all_pvs">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_pvs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
-        <span class="c1"># This includes PVs that have connected in the past but are now</span>
-        <span class="c1"># disconnected (those from get_currently_disconnnected_pvs()),</span>
-        <span class="c1"># but not those that have never connected (those from</span>
-        <span class="c1"># get_never_connected_pvs()).</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rest_get</span><span class="p">(</span><span class="s2">&quot;getAllPVs&quot;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span></div>
+<div class="viewcode-block" id="AaRestClient.get_all_pvs"><a class="viewcode-back" href="../../aa.html#aa.rest.AaRestClient.get_all_pvs">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_pvs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of PVs that are being archived.</span>
+
+<span class="sd">        This includes PVs that have connected in the past but are now</span>
+<span class="sd">        disconnected (those from get_currently_disconnnected_pvs()),</span>
+<span class="sd">        but not those that have never connected (those from</span>
+<span class="sd">        get_never_connected_pvs()).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pv: only return PV names that match pv, which may be a glob</span>
+<span class="sd">            limit: return a maximum of limit PV names. The default (-1)</span>
+<span class="sd">                   returns all PV names</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of PV names</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Only supply the pv argument if it is not None.</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="n">limit</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">pv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;pv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pv</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rest_get</span><span class="p">(</span><span class="s2">&quot;getAllPVs&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AaRestClient.get_pv_type_info"><a class="viewcode-back" href="../../aa.html#aa.rest.AaRestClient.get_pv_type_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_pv_type_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rest_get</span><span class="p">(</span><span class="s2">&quot;getPVTypeInfo&quot;</span><span class="p">,</span> <span class="n">pv</span><span class="o">=</span><span class="n">pv</span><span class="p">)</span></div>
@@ -273,8 +318,8 @@
         <span class="n">pv_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rest_get</span><span class="p">(</span><span class="s2">&quot;getCurrentlyDisconnectedPVs&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">([</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;pvName&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">pv_info</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="AaRestClient.archive_pv"><a class="viewcode-back" href="../../aa.html#aa.rest.AaRestClient.archive_pv">[docs]</a>    <span class="k">def</span> <span class="nf">archive_pv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">samplingperiod</span><span class="p">,</span> <span class="n">samplingmethod</span><span class="o">=</span><span class="n">aa</span><span class="o">.</span><span class="n">SCAN</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">samplingmethod</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">aa</span><span class="o">.</span><span class="n">SCAN</span><span class="p">,</span> <span class="n">aa</span><span class="o">.</span><span class="n">MONITOR</span><span class="p">]:</span>
+<div class="viewcode-block" id="AaRestClient.archive_pv"><a class="viewcode-back" href="../../aa.html#aa.rest.AaRestClient.archive_pv">[docs]</a>    <span class="k">def</span> <span class="nf">archive_pv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">samplingperiod</span><span class="p">,</span> <span class="n">samplingmethod</span><span class="o">=</span><span class="n">SCAN</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">samplingmethod</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">SCAN</span><span class="p">,</span> <span class="n">MONITOR</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Sampling method </span><span class="si">{}</span><span class="s2"> not valid&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">samplingmethod</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rest_get</span><span class="p">(</span>
             <span class="s2">&quot;archivePV&quot;</span><span class="p">,</span>
@@ -295,13 +340,21 @@
 <div class="viewcode-block" id="AaRestClient.abort_archiving_pv"><a class="viewcode-back" href="../../aa.html#aa.rest.AaRestClient.abort_archiving_pv">[docs]</a>    <span class="k">def</span> <span class="nf">abort_archiving_pv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rest_get</span><span class="p">(</span><span class="s2">&quot;abortArchivingPV&quot;</span><span class="p">,</span> <span class="n">pv</span><span class="o">=</span><span class="n">pv</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AaRestClient.change_archival_parameters"><a class="viewcode-back" href="../../aa.html#aa.rest.AaRestClient.change_archival_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">change_archival_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">aa</span><span class="o">.</span><span class="n">MONITOR</span><span class="p">):</span>
+<div class="viewcode-block" id="AaRestClient.change_archival_parameters"><a class="viewcode-back" href="../../aa.html#aa.rest.AaRestClient.change_archival_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">change_archival_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">MONITOR</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rest_get</span><span class="p">(</span>
             <span class="s2">&quot;changeArchivalParameters&quot;</span><span class="p">,</span>
             <span class="n">pv</span><span class="o">=</span><span class="n">pv</span><span class="p">,</span>
             <span class="n">samplingperiod</span><span class="o">=</span><span class="n">period</span><span class="p">,</span>
             <span class="n">samplingmethod</span><span class="o">=</span><span class="n">method</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
-        <span class="p">)</span></div></div>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="AaRestClient.get_appliance_metrics"><a class="viewcode-back" href="../../aa.html#aa.rest.AaRestClient.get_appliance_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">get_appliance_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gives summary metrics for all appliances in cluster&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rest_get</span><span class="p">(</span><span class="s2">&quot;getApplianceMetrics&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AaRestClient.get_appliance_metrics_for_appliance"><a class="viewcode-back" href="../../aa.html#aa.rest.AaRestClient.get_appliance_metrics_for_appliance">[docs]</a>    <span class="k">def</span> <span class="nf">get_appliance_metrics_for_appliance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appliance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gives detailed metrics for the appliance on the specified host&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rest_get</span><span class="p">(</span><span class="s2">&quot;getApplianceMetricsForAppliance&quot;</span><span class="p">,</span> <span class="n">appliance</span><span class="o">=</span><span class="n">appliance</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

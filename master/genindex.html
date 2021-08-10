@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
@@ -8,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Index &mdash; aa 0.0+unknown documentation</title>
+  <title>Index &mdash; aa 0.11+5.gffd9489 documentation</title>
   
 
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
 
@@ -34,6 +35,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -111,18 +113,39 @@
   <!-- Include Index in the sidebar -->
   <!-- https://stackoverflow.com/a/37843854 -->
   <a href="#">Index</a>
-  <!-- Include all versions of the docs -->
-  <!-- https://holzhaus.github.io/sphinx-multiversion/master/templates.html -->
-  
   <p class="caption"><span class="caption-text">Versions</span></p>
-  <ul>
-    <li><a href="genindex.html">master</a></li>
-    <li><a href="../0.9a1/index.html">0.9a1</a></li>
-    <li><a href="../0.9/index.html">0.9</a></li>
-    <li><a href="../0.11/index.html">0.11</a></li>
-    <li><a href="../0.10/index.html">0.10</a></li>
-  </ul>
-  
+  <ul id="versions"/>
+  <script>
+    // Add any branches to appear in the side pane here, tags will be added below
+    // Will only appear if docs are built and pushed in gh-pages
+    var versions = ['master', 'main'];
+    var dirs = new Set();
+    function addVersion(name) {
+      if (dirs.has(name)) {
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.href = 'https://dls-controls.github.io/aa/' + name;
+        a.innerText = name;
+        li.appendChild(a)
+        document.getElementById('versions').appendChild(li);
+      }
+    }
+    Promise.all([
+      // Find gh-pages directories and populate `dirs`
+      fetch("https://api.github.com/repos/dls-controls/aa/contents?ref=gh-pages")
+      .then(response => response.json())
+      .then(data => data.forEach(function(e) {
+        if (e.type == "dir") dirs.add(e.name);
+      })),
+      // Add tags to `versions`
+      fetch('https://api.github.com/repos/dls-controls/aa/tags')
+        .then(response => response.json())
+        .then(data => data.forEach(function(e) {
+          versions.push(e.name);
+        }))
+      ]).then(_ => versions.forEach(addVersion))
+  </script>
+
 
         </div>
         
@@ -359,17 +382,17 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="aa.html#aa.data.ArchiveData.empty">empty() (aa.data.ArchiveData static method)</a>
 </li>
-      <li><a href="aa.html#aa.data.ArchiveData.enum_options">enum_options() (aa.data.ArchiveData property)</a>
+      <li><a href="aa.html#aa.data.ArchiveData.enum_options">enum_options (aa.data.ArchiveData property)</a>
 
       <ul>
         <li><a href="aa.html#aa.data.ArchiveEvent.enum_options">(aa.data.ArchiveEvent property)</a>
 </li>
       </ul></li>
-      <li><a href="aa.html#aa.data.ArchiveEvent.enum_string">enum_string() (aa.data.ArchiveEvent property)</a>
+      <li><a href="aa.html#aa.data.ArchiveEvent.enum_string">enum_string (aa.data.ArchiveEvent property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aa.html#aa.data.ArchiveData.enum_strings">enum_strings() (aa.data.ArchiveData property)</a>
+      <li><a href="aa.html#aa.data.ArchiveData.enum_strings">enum_strings (aa.data.ArchiveData property)</a>
 </li>
       <li><a href="aa.html#aa.utils.epoch_to_datetime">epoch_to_datetime() (in module aa.utils)</a>
 </li>
@@ -427,7 +450,7 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aa.html#aa.data.ArchiveData.has_enum_options">has_enum_options() (aa.data.ArchiveData property)</a>
+      <li><a href="aa.html#aa.data.ArchiveData.has_enum_options">has_enum_options (aa.data.ArchiveData property)</a>
 
       <ul>
         <li><a href="aa.html#aa.data.ArchiveEvent.has_enum_options">(aa.data.ArchiveEvent property)</a>
@@ -494,7 +517,7 @@
 </li>
       <li><a href="aa.html#aa.utils.print_raw_bytes">print_raw_bytes() (in module aa.utils)</a>
 </li>
-      <li><a href="aa.html#aa.data.ArchiveData.pv">pv() (aa.data.ArchiveData property)</a>
+      <li><a href="aa.html#aa.data.ArchiveData.pv">pv (aa.data.ArchiveData property)</a>
 
       <ul>
         <li><a href="aa.html#aa.data.ArchiveEvent.pv">(aa.data.ArchiveEvent property)</a>
@@ -522,9 +545,9 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aa.html#aa.data.ArchiveData.severities">severities() (aa.data.ArchiveData property)</a>
+      <li><a href="aa.html#aa.data.ArchiveData.severities">severities (aa.data.ArchiveData property)</a>
 </li>
-      <li><a href="aa.html#aa.data.ArchiveEvent.severity">severity() (aa.data.ArchiveEvent property)</a>
+      <li><a href="aa.html#aa.data.ArchiveEvent.severity">severity (aa.data.ArchiveEvent property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -532,11 +555,11 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aa.html#aa.data.ArchiveEvent.timestamp">timestamp() (aa.data.ArchiveEvent property)</a>
+      <li><a href="aa.html#aa.data.ArchiveEvent.timestamp">timestamp (aa.data.ArchiveEvent property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aa.html#aa.data.ArchiveData.timestamps">timestamps() (aa.data.ArchiveData property)</a>
+      <li><a href="aa.html#aa.data.ArchiveData.timestamps">timestamps (aa.data.ArchiveData property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -546,15 +569,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="aa.html#aa.pb.unescape_bytes">unescape_bytes() (in module aa.pb)</a>
 </li>
-      <li><a href="aa.html#aa.data.ArchiveEvent.utc_datetime">utc_datetime() (aa.data.ArchiveEvent property)</a>
-
-      <ul>
-        <li><a href="aa.html#aa.utils.utc_datetime">(in module aa.utils)</a>
+      <li><a href="aa.html#aa.data.ArchiveEvent.utc_datetime">utc_datetime (aa.data.ArchiveEvent property)</a>
 </li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aa.html#aa.data.ArchiveData.utc_datetimes">utc_datetimes() (aa.data.ArchiveData property)</a>
+      <li><a href="aa.html#aa.utils.utc_datetime">utc_datetime() (in module aa.utils)</a>
+</li>
+      <li><a href="aa.html#aa.data.ArchiveData.utc_datetimes">utc_datetimes (aa.data.ArchiveData property)</a>
 </li>
       <li><a href="aa.html#aa.utils.utc_now">utc_now() (in module aa.utils)</a>
 </li>
@@ -564,11 +585,11 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aa.html#aa.data.ArchiveEvent.value">value() (aa.data.ArchiveEvent property)</a>
+      <li><a href="aa.html#aa.data.ArchiveEvent.value">value (aa.data.ArchiveEvent property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aa.html#aa.data.ArchiveData.values">values() (aa.data.ArchiveData property)</a>
+      <li><a href="aa.html#aa.data.ArchiveData.values">values (aa.data.ArchiveData property)</a>
 </li>
   </ul></td>
 </tr></table>

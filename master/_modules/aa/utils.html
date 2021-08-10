@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
@@ -8,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>aa.utils &mdash; aa 0.0+unknown documentation</title>
+  <title>aa.utils &mdash; aa 0.11+5.gffd9489 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
 
@@ -34,6 +35,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -111,15 +113,39 @@
   <!-- Include Index in the sidebar -->
   <!-- https://stackoverflow.com/a/37843854 -->
   <a href="../../genindex.html">Index</a>
-  <!-- Include all versions of the docs -->
-  <!-- https://holzhaus.github.io/sphinx-multiversion/master/templates.html -->
-  
   <p class="caption"><span class="caption-text">Versions</span></p>
-  <ul>
-    <li><a href="utils.html">master</a></li>
-    <li><a href="../../../0.9a1/index.html">0.9a1</a></li>
-  </ul>
-  
+  <ul id="versions"/>
+  <script>
+    // Add any branches to appear in the side pane here, tags will be added below
+    // Will only appear if docs are built and pushed in gh-pages
+    var versions = ['master', 'main'];
+    var dirs = new Set();
+    function addVersion(name) {
+      if (dirs.has(name)) {
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.href = 'https://dls-controls.github.io/aa/' + name;
+        a.innerText = name;
+        li.appendChild(a)
+        document.getElementById('versions').appendChild(li);
+      }
+    }
+    Promise.all([
+      // Find gh-pages directories and populate `dirs`
+      fetch("https://api.github.com/repos/dls-controls/aa/contents?ref=gh-pages")
+      .then(response => response.json())
+      .then(data => data.forEach(function(e) {
+        if (e.type == "dir") dirs.add(e.name);
+      })),
+      // Add tags to `versions`
+      fetch('https://api.github.com/repos/dls-controls/aa/tags')
+        .then(response => response.json())
+        .then(data => data.forEach(function(e) {
+          versions.push(e.name);
+        }))
+      ]).then(_ => versions.forEach(addVersion))
+  </script>
+
 
         </div>
         
@@ -188,9 +214,23 @@
 
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">pytz</span>
 <span class="kn">import</span> <span class="nn">tzlocal</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;utc_datetime&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;utc_now&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EPOCH&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;datetime_to_epoch&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;epoch_to_datetime&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;add_local_timezone&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;year_timestamp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;print_raw_bytes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;binary_search&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dict_to_tuples&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 
 
 <div class="viewcode-block" id="utc_datetime"><a class="viewcode-back" href="../../aa.html#aa.utils.utc_datetime">[docs]</a><span class="k">def</span> <span class="nf">utc_datetime</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -271,6 +311,41 @@
         <span class="k">elif</span> <span class="n">next_val</span> <span class="o">&lt;=</span> <span class="n">target</span><span class="p">:</span>
             <span class="n">lower</span> <span class="o">=</span> <span class="n">current</span>
     <span class="k">return</span> <span class="n">upper</span></div>
+
+
+<span class="n">SCAN</span> <span class="o">=</span> <span class="s2">&quot;SCAN&quot;</span>
+<span class="n">MONITOR</span> <span class="o">=</span> <span class="s2">&quot;MONITOR&quot;</span>
+
+<span class="c1"># Make UTC and local timezone easy to get hold of.</span>
+<span class="n">LOCALTZ</span> <span class="o">=</span> <span class="n">tzlocal</span><span class="o">.</span><span class="n">get_localzone</span><span class="p">()</span>
+<span class="n">UTC</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">utc</span>
+
+<span class="c1"># Logging utilities</span>
+<span class="n">LOG_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> </span><span class="si">%(levelname)-8s</span><span class="s2"> </span><span class="si">%(message)s</span><span class="s2">&quot;</span>
+<span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+
+
+<div class="viewcode-block" id="set_up_logging"><a class="viewcode-back" href="../../aa.html#aa.utils.set_up_logging">[docs]</a><span class="k">def</span> <span class="nf">set_up_logging</span><span class="p">(</span><span class="n">fmt</span><span class="o">=</span><span class="n">LOG_FORMAT</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">LOG_LEVEL</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Simple logging setup.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fmt: logging format to use</span>
+<span class="sd">        level: logging level to use</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="n">datefmt</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %I:%M:%S&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="dict_to_tuples"><a class="viewcode-back" href="../../aa.html#aa.utils.dict_to_tuples">[docs]</a><span class="k">def</span> <span class="nf">dict_to_tuples</span><span class="p">(</span><span class="n">input_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;Convert a dict to a list of tuples, sorted alphabetically by key.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_dict (dict): Dictionary to convert</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of tuples (key, value) sorted alphabetically by key</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[(</span><span class="n">key</span><span class="p">,</span> <span class="n">input_dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span></div>
 </pre></div>
 
            </div>
