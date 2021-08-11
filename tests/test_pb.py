@@ -142,6 +142,26 @@ def test_PbFetcher_get_raises_if_get_throws_HTTPError_not_404(
             pb_fetcher.get_values(dummy_pv, jan_2018, jan_2018)
 
 
+def test_PbFileFetcher_get_all_pb_files_of_pv():
+    dummy_files = [
+        "root/LTS/a/b/c/d_2001.pb",
+        "root/MTS/a/b/c/d_2001_02_03.pb",
+        "root/STS/a/b/c/d_2001_02_03_04.pb",
+    ]
+
+    def side_effect(path_pv_dir):
+        for i, s in enumerate(["LTS", "MTS", "STS"]):
+            if s in path_pv_dir:
+                return [dummy_files[i]]
+
+    with mock.patch("glob.glob") as mock_glob:
+        mock_glob.side_effect = side_effect
+        root = "root"
+        pv = "a-b-c:d"
+        fetcher = pb.PbFileFetcher(root)
+        assert fetcher._get_all_pb_files_of_pv(pv) == dummy_files
+
+
 def test_PbFileFetcher_create_datetime_for_pb_file():
     root = "root"
     filepath = os.path.join("root", "a", "b", "c", "d:2001_02_03_04_05.pb")
@@ -158,53 +178,129 @@ def test_PbFileFetcher_create_datetime_for_pb_file_only_year():
     assert fetcher._create_datetime_for_pb_file(filepath) == expected
 
 
-@mock.patch("glob.glob")
-def test_PbFileFetcher_get_pb_files_no_file_found(mock_glob):
-    mock_glob.return_value = []
-    root = "root"
-    pv = "a-b-c:d"
-    fetcher = pb.PbFileFetcher(root)
-    start = utils.utc_datetime(2001, 1, 1)
-    end = utils.utc_datetime(2001, 1, 2)
-    expected = []
-    assert fetcher._get_pb_files(pv, start, end) == expected
+def test_PbFileFetcher_get_pb_files_no_file_found():
+    with mock.patch("glob.glob") as mock_glob:
+        mock_glob.return_value = []
+        root = "root"
+        pv = "a-b-c:d"
+        fetcher = pb.PbFileFetcher(root)
+        start = utils.utc_datetime(2001, 1, 1)
+        end = utils.utc_datetime(2001, 1, 2)
+        expected = []
+        assert fetcher._get_pb_files(pv, start, end) == expected
 
 
-@mock.patch("glob.glob")
-def test_PbFileFetcher_get_pb_files(mock_glob):
-    dummy_filenames = [
+def test_PbFileFetcher_get_pb_files_too_early():
+    dummy_files = [
         "/root/LTS/a/b/c/d_2001.pb",
         "/root/MTS/a/b/c/d_2001_02_02.pb",
         "/root/MTS/a/b/c/d_2001_02_03.pb",
         "/root/STS/a/b/c/d_2001_02_03_04.pb",
         "/root/STS/a/b/c/d_2001_02_03_05.pb",
     ]
-
-    def side_effect(path_to_pv_dir, f=dummy_filenames):
-        if "LTS" in path_to_pv_dir:
-            return [f[0]]
-        elif "MTS" in path_to_pv_dir:
-            return f[1:3]
-        elif "STS" in path_to_pv_dir:
-            return f[3:]
-
-    mock_glob.side_effect = side_effect
-    for i, (start, end) in enumerate(
-        (
-            (utils.utc_datetime(2000, 1, 1), utils.utc_datetime(2000, 1, 2)),
-            (utils.utc_datetime(2001, 2, 2, 10), utils.utc_datetime(2001, 2, 3, 2)),
-            (utils.utc_datetime(2001, 3, 1), utils.utc_datetime(2001, 3, 2)),
-        )
-    ):
-        if i == 0:
-            expected = [dummy_filenames[0]]
-        if i == 1:
-            expected = dummy_filenames[1:3]
-        if i == 2:
-            expected = [dummy_filenames[-1]]
-        root = "root/LTS/"
+    with mock.patch("aa.pb.PbFileFetcher._get_all_pb_files_of_pv") as mock_get_files:
+        mock_get_files.return_value = dummy_files
+        root = "root"
         pv = "a-b-c:d"
         fetcher = pb.PbFileFetcher(root)
+        start = utils.utc_datetime(2000, 1, 1)
+        end = utils.utc_datetime(2000, 1, 2)
+        expected = [dummy_files[0]]
+        assert fetcher._get_pb_files(pv, start, end) == expected
+
+
+def test_PbFileFetcher_get_pb_files_first_recordings():
+    dummy_files = [
+        "/root/LTS/a/b/c/d_2001.pb",
+        "/root/MTS/a/b/c/d_2001_02_02.pb",
+        "/root/MTS/a/b/c/d_2001_02_03.pb",
+        "/root/STS/a/b/c/d_2001_02_03_04.pb",
+        "/root/STS/a/b/c/d_2001_02_03_05.pb",
+    ]
+    with mock.patch("aa.pb.PbFileFetcher._get_all_pb_files_of_pv") as mock_get_files:
+        mock_get_files.return_value = dummy_files
+        root = "root"
+        pv = "a-b-c:d"
+        fetcher = pb.PbFileFetcher(root)
+        start = utils.utc_datetime(2000, 12, 1)
+        end = utils.utc_datetime(2001, 1, 2)
+        expected = [dummy_files[0]]
+        assert fetcher._get_pb_files(pv, start, end) == expected
+
+
+def test_PbFileFetcher_get_pb_files_from_middle():
+    dummy_files = [
+        "/root/LTS/a/b/c/d_2001.pb",
+        "/root/MTS/a/b/c/d_2001_02_02.pb",
+        "/root/MTS/a/b/c/d_2001_02_03.pb",
+        "/root/STS/a/b/c/d_2001_02_03_04.pb",
+        "/root/STS/a/b/c/d_2001_02_03_05.pb",
+    ]
+    with mock.patch("aa.pb.PbFileFetcher._get_all_pb_files_of_pv") as mock_get_files:
+        mock_get_files.return_value = dummy_files
+        root = "root"
+        pv = "a-b-c:d"
+        fetcher = pb.PbFileFetcher(root)
+        start = utils.utc_datetime(2001, 2, 2)
+        end = utils.utc_datetime(2001, 2, 3, 4, 5)
+        expected = dummy_files[1:4]
+        assert fetcher._get_pb_files(pv, start, end) == expected
+
+
+def test_PbFileFetcher_get_pb_files_newest_recordings():
+    dummy_files = [
+        "/root/LTS/a/b/c/d_2001.pb",
+        "/root/MTS/a/b/c/d_2001_02_02.pb",
+        "/root/MTS/a/b/c/d_2001_02_03.pb",
+        "/root/STS/a/b/c/d_2001_02_03_04.pb",
+        "/root/STS/a/b/c/d_2001_02_03_05.pb",
+    ]
+    with mock.patch("aa.pb.PbFileFetcher._get_all_pb_files_of_pv") as mock_get_files:
+        mock_get_files.return_value = dummy_files
+        root = "root"
+        pv = "a-b-c:d"
+        fetcher = pb.PbFileFetcher(root)
+        start = utils.utc_datetime(2001, 2, 3, 5, 6)
+        end = utils.utc_datetime(2001, 2, 3, 5, 30)
+        expected = [dummy_files[4]]
+        assert fetcher._get_pb_files(pv, start, end) == expected
+
+
+def test_PbFileFetcher_get_pb_files_too_late():
+    dummy_files = [
+        "/root/LTS/a/b/c/d_2001.pb",
+        "/root/MTS/a/b/c/d_2001_02_02.pb",
+        "/root/MTS/a/b/c/d_2001_02_03.pb",
+        "/root/STS/a/b/c/d_2001_02_03_04.pb",
+        "/root/STS/a/b/c/d_2001_02_03_05.pb",
+    ]
+    with mock.patch("aa.pb.PbFileFetcher._get_all_pb_files_of_pv") as mock_get_files:
+        mock_get_files.return_value = dummy_files
+        root = "root"
+        pv = "a-b-c:d"
+        fetcher = pb.PbFileFetcher(root)
+        start = utils.utc_datetime(2001, 2, 4)
+        expected = [dummy_files[4]]
+        # using default for end
+        assert fetcher._get_pb_files(pv, start) == expected
+
+
+def test_PbFileFetcher_get_pb_files_wrong_time_order():
+    dummy_files = [
+        "/root/LTS/a/b/c/d_2001.pb",
+        "/root/MTS/a/b/c/d_2001_02_02.pb",
+        "/root/MTS/a/b/c/d_2001_02_03.pb",
+        "/root/STS/a/b/c/d_2001_02_03_04.pb",
+        "/root/STS/a/b/c/d_2001_02_03_05.pb",
+    ]
+    with mock.patch("aa.pb.PbFileFetcher._get_all_pb_files_of_pv") as mock_get_files:
+        mock_get_files.return_value = dummy_files
+        root = "root"
+        pv = "a-b-c:d"
+        fetcher = pb.PbFileFetcher(root)
+        end = utils.utc_datetime(2001, 2, 2)
+        start = utils.utc_datetime(2001, 2, 3, 4, 5)
+        expected = dummy_files[1:4]
         assert fetcher._get_pb_files(pv, start, end) == expected
 
 
