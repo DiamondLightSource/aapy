@@ -156,7 +156,7 @@ def test_PbFileFetcher_get_all_pb_files_of_pv():
 
     with mock.patch("glob.glob") as mock_glob:
         mock_glob.side_effect = side_effect
-        root = "root"
+        root = "root/LTS/"
         pv = "a-b-c:d"
         fetcher = pb.PbFileFetcher(root)
         assert fetcher._get_all_pb_files_of_pv(pv) == dummy_files
