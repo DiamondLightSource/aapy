@@ -162,6 +162,26 @@ def test_PbFileFetcher_get_all_pb_files_of_pv():
         assert fetcher._get_all_pb_files_of_pv(pv) == dummy_files
 
 
+def test_PbFileFetcher_get_all_pb_files_of_pv_handels_pv_with_two_colons():
+    dummy_files = [
+        "root/LTS/a/b/c/d_2001.pb",
+        "root/MTS/a/b/c/d_2001_02_03.pb",
+        "root/STS/a/b/c/d_2001_02_03_04.pb",
+    ]
+
+    def side_effect(path_pv_dir):
+        for i, s in enumerate(["LTS", "MTS", "STS"]):
+            if s in path_pv_dir:
+                return [dummy_files[i]]
+
+    with mock.patch("glob.glob") as mock_glob:
+        mock_glob.side_effect = side_effect
+        root = "root"
+        pv = "a-b:c:d"
+        fetcher = pb.PbFileFetcher(root)
+        assert fetcher._get_all_pb_files_of_pv(pv) == dummy_files
+
+
 def test_PbFileFetcher_create_datetime_for_pb_file():
     root = "root"
     filepath = os.path.join("root", "a", "b", "c", "d:2001_02_03_04_05.pb")
