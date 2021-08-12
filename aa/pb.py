@@ -318,8 +318,8 @@ class PbFileFetcher(fetcher.Fetcher):
         corresponding to the stored data. This function returns a datetime.datetime
         object matching the date information of the given .pb file."""
         filename = os.path.basename(filepath)
-        # The filename can contain only the year or stepwise more info up to year,
-        # month, day, hour and minutes.
+        # The filename can contain just the year or stepwise more information up to
+        # year, month, day, hour and minutes.
         dates = (
             re.search(r"\d{4}(_\d{2})?(_\d{2})?(_\d{2})?(_\d{2})?", filename)
             .group(0)
@@ -332,15 +332,15 @@ class PbFileFetcher(fetcher.Fetcher):
         return datetime.datetime(*dates, tzinfo=pytz.utc)
 
     def _get_pb_files(self, pv, start, end=None):
-        """Instead of looking only in the LTS for yearly generated .pb files, this
-        function goes through all LTS/MTS/STS directories and returns all .pb files
+        """Goes through LTS/MTS/STS directories of given PV and returns all .pb files
         containing data of the specified time window. The granularity setup of the
-        archiver for LTS/MTS/STS can also deviate from the standard one."""
+        archiver for LTS/MTS/STS can deviate from the standard one."""
         if end is None:
             end = datetime.datetime.now().astimezone(pytz.utc)
+            log.info("No end time given, assuming now() in UTC.")
         if start > end:
             start, end = end, start
-            log.warning("Start date was after end date. Swapped them.")
+            log.warning("End date was before start date. Swapped them.")
         pv_files = self._get_all_pb_files_of_pv(pv)
         pv_files_datetime = [self._create_datetime_for_pb_file(f) for f in pv_files]
         # Find the files we need between start and end.
