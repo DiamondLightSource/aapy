@@ -294,7 +294,9 @@ class PbFetcher(fetcher.AaFetcher):
 
 class PbFileFetcher(fetcher.Fetcher):
     def __init__(self, roots):
-        self._roots = list(roots)
+        if isinstance(roots, str):
+            roots = [roots]
+        self._roots = roots
 
     def _get_all_pb_files_of_pv(self, pv):
         """Returns a list of all .pb files of the given PV which are found under the
@@ -320,11 +322,7 @@ class PbFileFetcher(fetcher.Fetcher):
         filename = os.path.basename(filepath)
         # The filename can contain just the year or stepwise more information up to
         # year, month, day, hour and minutes.
-        dates = (
-            re.search(r"\d{4}(_\d{2}){0,4}", filename)
-            .group(0)
-            .split("_")
-        )
+        dates = re.search(r"\d{4}(_\d{2}){0,4}", filename).group(0).split("_")
         if dates is None:
             log.warning(
                 "File path does not contain date information in expected format."
