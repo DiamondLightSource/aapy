@@ -29,11 +29,11 @@ PB_CHUNK = RAW_PAYLOAD_INFO + b"\n" + RAW_EVENT
 EVENT = data.ArchiveEvent(PV, numpy.array([264.65571148]), 1422752399.004147078, 0)
 # Return values for mocked glob.glob function.
 DUMMY_FILES = [
-    "/root/LTS/a/b/c/d_2001.pb",
-    "/root/MTS/a/b/c/d_2001_02_02.pb",
-    "/root/MTS/a/b/c/d_2001_02_03.pb",
-    "/root/STS/a/b/c/d_2001_02_03_04.pb",
-    "/root/STS/a/b/c/d_2001_02_03_05.pb",
+    "/root/LTS/a/b/c/d:2001.pb",
+    "/root/MTS/a/b/c/d:2001_02_02.pb",
+    "/root/MTS/a/b/c/d:2001_02_03.pb",
+    "/root/STS/a/b/c/d:2001_02_03_04.pb",
+    "/root/STS/a/b/c/d:2001_02_03_05.pb",
 ]
 
 
@@ -187,6 +187,18 @@ def test_PbFileFetcher_create_datetime_for_pb_file_only_year():
     assert pb.PbFileFetcher._create_datetime_for_pb_file(filepath) == expected
 
 
+def test_PbFileFetcher_create_datetime_for_pb_file_wrong_format():
+    filepath = os.path.join("root", "a", "b", "c", "d:20010203_0405.pb")
+    expected = None
+    assert pb.PbFileFetcher._create_datetime_for_pb_file(filepath) == expected
+
+
+def test_PbFileFetcher_create_datetime_for_pb_file_wrong_numbers():
+    filepath = os.path.join("root", "a", "b", "c", "d:2001_22_03_04_05.pb")
+    expected = None
+    assert pb.PbFileFetcher._create_datetime_for_pb_file(filepath) == expected
+
+
 def test_PbFileFetcher_get_pb_files_no_file_found():
     with mock.patch("glob.glob") as mock_glob:
         mock_glob.return_value = []
@@ -268,6 +280,20 @@ def test_PbFileFetcher_get_pb_files_wrong_time_order():
         end = utils.utc_datetime(2001, 2, 2)
         start = utils.utc_datetime(2001, 2, 3, 4, 5)
         expected = DUMMY_FILES[1:4]
+        assert fetcher._get_pb_files(pv, start, end) == expected
+
+
+def test_PbFileFetcher_get_pb_files_wrong_date_information_in_filename():
+    with mock.patch("aa.pb.PbFileFetcher._get_all_pb_files_of_pv") as mock_get_files:
+        mock_get_files.return_value = [
+            path.replace("2001", "20011") for path in DUMMY_FILES
+        ]
+        roots = ["root/LTS/", "root/MTS/", "root/STS/"]
+        pv = "a-b-c:d"
+        fetcher = pb.PbFileFetcher(roots)
+        end = utils.utc_datetime(2001, 2, 2)
+        start = utils.utc_datetime(2001, 2, 3, 4, 5)
+        expected = []
         assert fetcher._get_pb_files(pv, start, end) == expected
 
 

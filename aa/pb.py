@@ -321,20 +321,23 @@ class PbFileFetcher(fetcher.Fetcher):
         object matching the date information of the given .pb file."""
         filename = os.path.basename(filepath)
         # The filename can contain just the year or stepwise more information up to
-        # year, month, day, hour and minutes.
-        dates = re.search(r"\d{4}(_\d{2}){0,4}", filename).group(0).split("_")
-        if dates is None:
+        # year, month, day, hour and minutes. Expected format:
+        # "suffix:yyyy_mm_dd_HH_MM.pb"
+        date_info = re.search(r":\d{4}(\D\d{2}){0,4}\.pb", filename)
+        if date_info is None:
             log.warning(
                 "File path does not contain date information in expected format."
             )
             return None
+        # Strip leading ':' and extension '.pb' and split at non integer.
+        dates = re.split(r"\D", date_info.group(0)[1:-3])
         dates = [int(date) for date in dates]
         # Make sure to give a least 3 arguments to datetime.datetime.
         while len(dates) < 3:
             dates.append(1)
         try:
             file_date = datetime.datetime(*dates, tzinfo=pytz.utc)
-        except ValueError:
+        except (ValueError, TypeError):
             log.warning(
                 "Numbers from file path are no valid input for datetime object."
             )
