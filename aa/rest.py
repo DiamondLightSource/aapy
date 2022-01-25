@@ -144,3 +144,7 @@ class AaRestClient(object):
     def get_appliance_metrics_for_appliance(self, appliance):
         """Gives detailed metrics for the appliance on the specified host"""
         return self._rest_get("getApplianceMetricsForAppliance", appliance=appliance)
+
+    def rename_pv(self, pv: str, newname: str):
+        """Rename pv to newname. The PV needs to be paused first."""
+        return self._rest_get("renamePV", pv=pv, newname=newname)
