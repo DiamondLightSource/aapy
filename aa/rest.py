@@ -148,3 +148,10 @@ class AaRestClient(object):
     def rename_pv(self, pv: str, newname: str):
         """Rename pv to newname. The PV needs to be paused first."""
         return self._rest_get("renamePV", pv=pv, newname=newname)
+
+    def get_policy_list(self):
+        """Get the list of available archiving policies
+
+        Note this is not part of the documented BPL API.
+        """
+        return self._rest_get("getPolicyList")
