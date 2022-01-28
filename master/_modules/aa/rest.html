@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>aa.rest &mdash; aa 0.11+9.g4bb3f46 documentation</title>
+  <title>aa.rest &mdash; aa 0.11+11.gbb2d29f documentation</title>
   
 
   
@@ -358,7 +358,14 @@
 
 <div class="viewcode-block" id="AaRestClient.rename_pv"><a class="viewcode-back" href="../../aa.html#aa.rest.AaRestClient.rename_pv">[docs]</a>    <span class="k">def</span> <span class="nf">rename_pv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">newname</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Rename pv to newname. The PV needs to be paused first.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rest_get</span><span class="p">(</span><span class="s2">&quot;renamePV&quot;</span><span class="p">,</span> <span class="n">pv</span><span class="o">=</span><span class="n">pv</span><span class="p">,</span> <span class="n">newname</span><span class="o">=</span><span class="n">newname</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rest_get</span><span class="p">(</span><span class="s2">&quot;renamePV&quot;</span><span class="p">,</span> <span class="n">pv</span><span class="o">=</span><span class="n">pv</span><span class="p">,</span> <span class="n">newname</span><span class="o">=</span><span class="n">newname</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AaRestClient.get_policy_list"><a class="viewcode-back" href="../../aa.html#aa.rest.AaRestClient.get_policy_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_policy_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the list of available archiving policies</span>
+
+<span class="sd">        Note this is not part of the documented BPL API.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rest_get</span><span class="p">(</span><span class="s2">&quot;getPolicyList&quot;</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
