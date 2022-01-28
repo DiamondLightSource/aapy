@@ -49,6 +49,7 @@ def test_AaRestClient_construct_url(kwargs, aa_client):
             {"appliance": "dummy_host"},
         ),
         ("renamePV", "rename_pv", {"pv": "dummy1", "newname": "dummy2"}),
+        ("getPolicyList", "get_policy_list", {}),
     ],
 )
 @mock.patch("requests.get")
