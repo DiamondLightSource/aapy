@@ -1,6 +1,14 @@
 aapy release notes
 ==================
 
+0.12 (31st Jan 2022)
+--------------------
+
+- Switch to Github Actions for CI
+- #72 Add missing filename in warning message
+- #74 and #75 Add REST calls to rename PV and get
+  policy list
+
 0.11 (21st Jul 2021)
 --------------------
 
