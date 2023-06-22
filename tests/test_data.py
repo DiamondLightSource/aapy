@@ -134,7 +134,15 @@ def test_warning_logged_by_ArchiveData_constructor_if_timestamps_descending(
 
 
 # Test both ascending array and constant array.
-@pytest.mark.parametrize("timestamps", (numpy.arange(1, 2, 0.1), numpy.ones(10,)))
+@pytest.mark.parametrize(
+    "timestamps",
+    (
+        numpy.arange(1, 2, 0.1),
+        numpy.ones(
+            10,
+        ),
+    ),
+)
 def test_ArchiveData_constructor_raises_no_exception_if_timestamps_valid(
     dummy_pv, timestamps
 ):

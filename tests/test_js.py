@@ -71,9 +71,7 @@ def test_JsonFetcher_decodes_waveform_events_correctly(
     assert aa_data == data_2d_2_events
 
 
-def test_JsonFetcher_decodes_enum_events_correctly(
-    dummy_pv, json_fetcher,
-):
+def test_JsonFetcher_decodes_enum_events_correctly(dummy_pv, json_fetcher):
     enum_json = utils.load_from_file("enum_event.json")
     mock_response = utils.mock_response(json_str=enum_json)
     json_fetcher._fetch_data = mock.MagicMock(return_value=mock_response)

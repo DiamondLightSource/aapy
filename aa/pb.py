@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import collections
 import datetime
+import glob
 import logging as log
 import os
 import re
@@ -292,16 +293,86 @@ class PbFetcher(fetcher.AaFetcher):
 
 
 class PbFileFetcher(fetcher.Fetcher):
-    def __init__(self, root):
-        self._root = root
+    def __init__(self, roots):
+        if isinstance(roots, str):
+            roots = [roots]
+        self._roots = roots
 
-    def _get_pb_file(self, pv, year):
-        # Split PV on either dash or colon
+    def _get_all_pb_files_of_pv(self, pv):
+        """Returns a list of all .pb files of the given PV which are found under the
+        root directory / directories."""
+        pv_files = []
+        # Split PV on either dash or colon.
         parts = re.split("[-:]", pv)
         suffix = parts.pop()
-        directory = os.path.join(self._root, os.path.sep.join(parts))
-        filename = "{}:{}.pb".format(suffix, year)
-        return os.path.join(directory, filename)
+        # Go through each root path and collect all files for this PV.
+        for root in self._roots:
+            directory = os.path.join(root, os.path.sep.join(parts))
+            for f in sorted(glob.glob(os.path.join(directory, f"{suffix}*pb"))):
+                pv_files.append(f)
+        if len(pv_files) == 0:
+            log.warning("No pb file found for PV {}".format(pv))
+        return pv_files
+
+    @staticmethod
+    def _create_datetime_for_pb_file(filepath):
+        """Each .pb files of the archiver appliance ends with a date information
+        corresponding to the stored data. This function returns a datetime.datetime
+        object matching the date information of the given .pb file."""
+        filename = os.path.basename(filepath)
+        # The filename can contain just the year or stepwise more information up to
+        # year, month, day, hour and minutes. Expected format:
+        # "suffix:yyyy_mm_dd_HH_MM.pb"
+        date_info = re.search(r":\d{4}(\D\d{2}){0,4}\.pb", filename)
+        if date_info is None:
+            log.warning(
+                "File path does not contain date information in expected format."
+            )
+            return None
+        # Strip leading ':' and extension '.pb' and split at non integer.
+        dates = re.split(r"\D", date_info.group(0)[1:-3])
+        dates = [int(date) for date in dates]
+        # Make sure to give a least 3 arguments to datetime.datetime.
+        while len(dates) < 3:
+            dates.append(1)
+        try:
+            file_date = datetime.datetime(*dates, tzinfo=pytz.utc)
+        except (ValueError, TypeError):
+            log.warning(
+                "Numbers from file path are no valid input for datetime object."
+            )
+            return None
+        return file_date
+
+    def _get_pb_files(self, pv, start, end=None):
+        """Searches through all directories of given PV under all root directories and
+        returns all .pb files containing data of the specified time window. The
+        granularity setup of the archiver for LTS/MTS/STS can deviate from the standard
+        one."""
+        if end is None:
+            end = utils.utc_now()
+            log.info("No end time given, assuming now() in UTC.")
+        if start > end:
+            start, end = end, start
+            log.warning("End date was before start date. Swapped them.")
+        pv_files = self._get_all_pb_files_of_pv(pv)
+        # Compare each file date against given time window.
+        matching_paths = []
+        for file_path in pv_files:
+            file_date = self._create_datetime_for_pb_file(file_path)
+            if file_date is None:
+                continue
+            if file_date >= start and file_date <= end:
+                matching_paths.append(file_path)
+            # Return newest file when only latest results are requested.
+            elif file_path == pv_files[-1] and len(matching_paths) == 0:
+                if start > file_date:
+                    matching_paths.append(file_path)
+        if len(matching_paths) == 0:
+            log.warning(
+                "No pb file found matching given time window for PV {}".format(pv)
+            )
+        return matching_paths
 
     @staticmethod
     def _read_pb_files(files, pv, start, end, count):
@@ -318,9 +389,7 @@ class PbFileFetcher(fetcher.Fetcher):
         return parse_pb_data(bytes(raw_data), pv, start, end, count)
 
     def _get_values(self, pv, start, end=None, count=None, request_params=None):
-        pb_files = []
-        for year in range(start.year, end.year + 1):
-            pb_files.append(self._get_pb_file(pv, year))
+        pb_files = self._get_pb_files(pv, start, end)
         log.info("Parsing pb files {}".format(pb_files))
         return self._read_pb_files(pb_files, pv, start, end, count)
 
