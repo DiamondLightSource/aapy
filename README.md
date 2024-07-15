@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/dls-controls/aapy.svg?branch=travis)](https://travis-ci.org/dls-controls/aapy) [![Coverage Status](https://coveralls.io/repos/github/dls-controls/aapy/badge.svg?branch=master)](https://coveralls.io/github/dls-controls/aapy?branch=master)
+[![Build Status](https://travis-ci.org/DiamondLightSource/aapy.svg?branch=travis)](https://travis-ci.org/DiamondLightSource/aapy) [![Coverage Status](https://coveralls.io/repos/github/DiamondLightSource/aapy/badge.svg?branch=master)](https://coveralls.io/github/DiamondLightSource/aapy?branch=master)
 
 Python code to retrieve data from the
 [EPICS Archiver Appliance](https://slacmshankar.github.io/epicsarchiver_docs/).
